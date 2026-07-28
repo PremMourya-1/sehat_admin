@@ -1,0 +1,338 @@
+@import url("https://fonts.googleapis.com/css2?family=Playfair+Display:wght@500;600;700&family=Yeseva+One&family=Poppins:wght@300;400;500;600;700&display=swap");
+
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root {
+  /* ---------------------------------------------------------------- */
+  /* Sehat Potli brand tokens (domain spec — do not rename/hardcode)   */
+  /* ---------------------------------------------------------------- */
+  --color-primary: #2e4a3b; /* Deep Forest Green */
+  --color-secondary: #6b1f2a; /* Deep Maroon / Wine */
+  --color-background: #f5ede0; /* Warm Cream / Ivory */
+  --color-accent: #c89b3c; /* Mustard Gold */
+  --color-earthy: #5c4033; /* Earthy Brown */
+  --color-text: #2a2a28; /* Charcoal */
+
+  /* ---------------------------------------------------------------- */
+  /* Semantic aliases consumed by utility classes / tailwind.config.js */
+  /* (mirrors reference admin's variable naming architecture)          */
+  /* ---------------------------------------------------------------- */
+  --primary-tp: #2e4a3b2d;
+  --primary: var(--color-primary);
+  --primary-light: #3f6350;
+  --primary-dark: #1c3125;
+  --secondary: var(--color-secondary);
+  --accent: var(--color-accent);
+  --earthy: var(--color-earthy);
+  --box-Shadow: #c9b28f;
+  --background: var(--color-background);
+  --background-light: #faf5ea;
+  --table-heading: #efe4d0;
+  --text: var(--color-text);
+  --text-light: #8a8175;
+  --border: #e2d5bd;
+  --success: #2f8f4e;
+  --warning: #c89b3c;
+  --danger: #b3261e;
+  --info: #3b6fa0;
+  --muted: #9c9184;
+  --highlight: #fbf3e0;
+
+  /* Fonts */
+  --font-heading: "Playfair Display", "Cormorant Garamond", serif;
+  --font-accent: "Yeseva One", "Dancing Script", cursive;
+  --font-sans: "Poppins", "Inter", sans-serif;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+html,
+body {
+  padding: 0;
+  margin: 0;
+  background-color: var(--background);
+  color: var(--text);
+  font-family: var(--font-sans);
+}
+
+#root {
+  min-height: 100vh;
+}
+
+a {
+  color: inherit;
+  text-decoration: none;
+}
+
+::-webkit-scrollbar {
+  width: 8px;
+  height: 8px;
+}
+::-webkit-scrollbar-track {
+  background: var(--background-light);
+}
+::-webkit-scrollbar-thumb {
+  background: var(--primary-light);
+  border-radius: 8px;
+}
+
+/* ------------------------------------------------------------------ */
+/* Brand wordmark                                                      */
+/* ------------------------------------------------------------------ */
+.brand-logo {
+  font-family: var(--font-heading);
+  font-weight: 700;
+  color: var(--primary);
+  letter-spacing: 0.3px;
+}
+
+.brand-tagline {
+  font-family: var(--font-accent);
+  color: var(--accent);
+}
+
+/* ------------------------------------------------------------------ */
+/* Buttons                                                             */
+/* ------------------------------------------------------------------ */
+.btn {
+  @apply inline-flex items-center justify-center gap-2 rounded-lg px-4 py-2 text-sm font-medium transition-all duration-200 disabled:cursor-not-allowed disabled:opacity-60;
+}
+.btn-primary {
+  @apply btn text-white;
+  background-color: var(--primary);
+}
+.btn-primary:hover:not(:disabled) {
+  background-color: var(--primary-dark);
+}
+.btn-secondary {
+  @apply btn text-white;
+  background-color: var(--secondary);
+}
+.btn-secondary:hover:not(:disabled) {
+  filter: brightness(1.1);
+}
+.btn-accent {
+  @apply btn;
+  background-color: var(--accent);
+  color: var(--text);
+}
+.btn-accent:hover:not(:disabled) {
+  filter: brightness(0.95);
+}
+.btn-outline {
+  @apply btn bg-transparent;
+  border: 1px solid var(--primary);
+  color: var(--primary);
+}
+.btn-outline:hover:not(:disabled) {
+  background-color: var(--primary-tp);
+}
+.btn-danger {
+  @apply btn text-white;
+  background-color: var(--danger);
+}
+.btn-danger:hover:not(:disabled) {
+  filter: brightness(1.1);
+}
+.btn-icon {
+  @apply inline-flex h-9 w-9 items-center justify-center rounded-lg transition-colors duration-150;
+}
+.action-icon-view {
+  @apply btn-icon;
+  background-color: rgba(59, 111, 160, 0.12);
+  color: var(--info);
+}
+.action-icon-view:hover {
+  background-color: rgba(59, 111, 160, 0.22);
+}
+.action-icon-edit {
+  @apply btn-icon;
+  background-color: var(--primary-tp);
+  color: var(--primary);
+}
+.action-icon-edit:hover {
+  background-color: rgba(46, 74, 59, 0.22);
+}
+.action-icon-delete {
+  @apply btn-icon;
+  background-color: rgba(179, 38, 30, 0.12);
+  color: var(--danger);
+}
+.action-icon-delete:hover {
+  background-color: rgba(179, 38, 30, 0.22);
+}
+
+/* ------------------------------------------------------------------ */
+/* Card                                                                 */
+/* ------------------------------------------------------------------ */
+.card {
+  @apply rounded-xl p-5;
+  background-color: #fff;
+  border: 1px solid var(--border);
+  box-shadow: 0 1px 3px rgba(46, 74, 59, 0.08);
+}
+
+/* ------------------------------------------------------------------ */
+/* Badges                                                               */
+/* ------------------------------------------------------------------ */
+.badge {
+  @apply inline-flex items-center gap-1 rounded-full px-3 py-1 text-xs font-medium;
+}
+.badge-success {
+  @apply badge;
+  background-color: rgba(47, 143, 78, 0.12);
+  color: var(--success);
+}
+.badge-warning {
+  @apply badge;
+  background-color: rgba(200, 155, 60, 0.15);
+  color: #8a6a20;
+}
+.badge-danger {
+  @apply badge;
+  background-color: rgba(179, 38, 30, 0.12);
+  color: var(--danger);
+}
+.badge-info {
+  @apply badge;
+  background-color: rgba(59, 111, 160, 0.12);
+  color: var(--info);
+}
+.badge-muted {
+  @apply badge;
+  background-color: rgba(156, 145, 132, 0.15);
+  color: var(--muted);
+}
+.badge-primary {
+  @apply badge;
+  background-color: var(--primary-tp);
+  color: var(--primary);
+}
+.badge-secondary {
+  @apply badge;
+  background-color: rgba(107, 31, 42, 0.1);
+  color: var(--secondary);
+}
+.badge-accent {
+  @apply badge;
+  background-color: rgba(200, 155, 60, 0.18);
+  color: #8a6a20;
+}
+
+/* ------------------------------------------------------------------ */
+/* Form controls                                                        */
+/* ------------------------------------------------------------------ */
+.form-label {
+  @apply mb-1.5 block text-sm font-medium;
+  color: var(--text);
+}
+.inputBox {
+  @apply w-full rounded-lg px-3.5 py-2.5 text-sm outline-none transition-colors duration-150;
+  background-color: #fff;
+  border: 1px solid var(--border);
+  color: var(--text);
+}
+.inputBox:focus {
+  border-color: var(--primary);
+  box-shadow: 0 0 0 3px var(--primary-tp);
+}
+.inputBox::placeholder {
+  color: var(--text-light);
+}
+.inputBox.has-error {
+  border-color: var(--danger);
+}
+.form-error {
+  @apply mt-1 text-xs;
+  color: var(--danger);
+}
+.formGroup {
+  @apply mb-4;
+}
+
+/* ------------------------------------------------------------------ */
+/* Table                                                                 */
+/* ------------------------------------------------------------------ */
+.customTable {
+  @apply w-full border-collapse text-left text-sm;
+}
+.customTable thead th {
+  @apply sticky top-0 whitespace-nowrap px-4 py-3 text-xs font-semibold uppercase tracking-wide;
+  background-color: var(--table-heading);
+  color: var(--text);
+  border-bottom: 1px solid var(--border);
+}
+.customTable tbody td {
+  @apply whitespace-nowrap px-4 py-3 align-middle;
+  border-bottom: 1px solid var(--border);
+  color: var(--text);
+}
+.customTable tbody tr {
+  transition: background-color 0.15s ease;
+}
+.customTable tbody tr:hover {
+  background-color: var(--background-light);
+}
+
+/* ------------------------------------------------------------------ */
+/* Shimmer skeleton                                                      */
+/* ------------------------------------------------------------------ */
+.shimmer {
+  background: linear-gradient(
+    90deg,
+    var(--background-light) 25%,
+    var(--table-heading) 37%,
+    var(--background-light) 63%
+  );
+  background-size: 1000px 100%;
+  animation: shimmer 1.6s infinite linear;
+  border-radius: 6px;
+}
+
+@keyframes shimmer {
+  0% {
+    background-position: -1000px 0;
+  }
+  100% {
+    background-position: 1000px 0;
+  }
+}
+
+/* ------------------------------------------------------------------ */
+/* Spinner                                                               */
+/* ------------------------------------------------------------------ */
+.spinner {
+  width: 2.5rem;
+  height: 2.5rem;
+  border-radius: 50%;
+  border: 3px solid var(--primary-tp);
+  border-top-color: var(--primary);
+  animation: spin 0.8s linear infinite;
+}
+
+@keyframes spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+/* ------------------------------------------------------------------ */
+/* Misc utility helpers                                                  */
+/* ------------------------------------------------------------------ */
+.section-title {
+  @apply text-lg font-semibold;
+  font-family: var(--font-heading);
+  color: var(--text);
+}
+
+.text-muted {
+  color: var(--text-light);
+}
+
+.divider {
+  border-top: 1px solid var(--border);
+}

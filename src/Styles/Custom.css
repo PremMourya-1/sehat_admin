@@ -1,0 +1,79 @@
+/* ------------------------------------------------------------------ */
+/* rsuite component overrides + layout width calc tied to sidebar width */
+/* ------------------------------------------------------------------ */
+
+:root {
+  --sidebar-width: 260px;
+  --sidebar-width-collapsed: 80px;
+}
+
+.admin-header {
+  position: fixed;
+  top: 0;
+  right: 0;
+  left: var(--sidebar-width);
+  z-index: 30;
+  background-color: #fff;
+  border-bottom: 1px solid var(--border);
+  transition: left 0.25s ease;
+}
+
+.admin-header.collapsed {
+  left: var(--sidebar-width-collapsed);
+}
+
+.admin-content {
+  margin-left: var(--sidebar-width);
+  padding-top: 68px;
+  min-height: 100vh;
+  transition: margin-left 0.25s ease;
+}
+
+.admin-content.collapsed {
+  margin-left: var(--sidebar-width-collapsed);
+}
+
+@media (max-width: 992px) {
+  .admin-header,
+  .admin-content,
+  .admin-header.collapsed,
+  .admin-content.collapsed {
+    left: 0;
+    margin-left: 0;
+  }
+}
+
+/* rsuite Modal */
+.rs-modal-content {
+  border-radius: 0.9rem;
+  font-family: var(--font-sans);
+}
+.rs-modal-header .rs-modal-title {
+  font-family: var(--font-heading);
+  color: var(--text);
+}
+.rs-btn-primary {
+  background-color: var(--primary) !important;
+}
+.rs-btn-primary:hover {
+  background-color: var(--primary-dark) !important;
+}
+
+/* rsuite Drawer */
+.rs-drawer-content {
+  font-family: var(--font-sans);
+}
+.rs-drawer-header .rs-drawer-title {
+  font-family: var(--font-heading);
+  font-size: 1.1rem;
+  color: var(--text);
+}
+.rs-drawer-body {
+  padding: 1.5rem;
+}
+
+/* rsuite checkbox / toggle accent */
+.rs-checkbox-checked .rs-checkbox-wrapper .rs-checkbox-inner::before {
+  background-color: var(--primary) !important;
+  border-color: var(--primary) !important;
+}

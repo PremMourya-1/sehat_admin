@@ -1,0 +1,85 @@
+import { apiJson, apiMultipart } from "./service";
+import adminUrl from "./url";
+
+// Single object grouping every admin endpoint by resource. Content-type
+// (JSON vs multipart) is chosen per-call depending on whether the payload
+// includes file uploads.
+const adminApi = {
+  // ---- auth ----
+  adminLogin: (data) => apiJson.post(adminUrl.login, data),
+  adminLogout: () => apiJson.post(adminUrl.logout),
+  changePassword: (data) => apiJson.put(adminUrl.changePassword, data),
+
+  // ---- dashboard ----
+  getDashboardStats: () => apiJson.get(adminUrl.dashboard),
+
+  // ---- product ----
+  getProducts: () => apiJson.get(adminUrl.product),
+  getProductById: (id) => apiJson.get(adminUrl.productById(id)),
+  createProduct: (formData) => apiMultipart.post(adminUrl.product, formData),
+  updateProduct: (id, formData) => apiMultipart.put(adminUrl.productById(id), formData),
+  deleteProduct: (id) => apiJson.delete(adminUrl.productById(id)),
+
+  // ---- category ----
+  getCategories: () => apiJson.get(adminUrl.category),
+  createCategory: (formData) => apiMultipart.post(adminUrl.category, formData),
+  updateCategory: (id, formData) => apiMultipart.put(adminUrl.categoryById(id), formData),
+  deleteCategory: (id) => apiJson.delete(adminUrl.categoryById(id)),
+
+  // ---- order ----
+  getOrders: () => apiJson.get(adminUrl.order),
+  updateOrderStatus: (id, status) => apiJson.put(adminUrl.orderStatus(id), { status }),
+
+  // ---- customer ----
+  getCustomers: () => apiJson.get(adminUrl.customer),
+
+  // ---- coupon ----
+  getCoupons: () => apiJson.get(adminUrl.coupon),
+  createCoupon: (data) => apiJson.post(adminUrl.coupon, data),
+  updateCoupon: (id, data) => apiJson.put(adminUrl.couponById(id), data),
+  deleteCoupon: (id) => apiJson.delete(adminUrl.couponById(id)),
+
+  // ---- hero banner ----
+  getHeroBanners: () => apiJson.get(adminUrl.heroBanner),
+  createHeroBanner: (formData) => apiMultipart.post(adminUrl.heroBanner, formData),
+  updateHeroBanner: (id, formData) => apiMultipart.put(adminUrl.heroBannerById(id), formData),
+  deleteHeroBanner: (id) => apiJson.delete(adminUrl.heroBannerById(id)),
+  updateHeroBannerStatus: (id, status) => apiJson.put(adminUrl.heroBannerById(id), { status }),
+
+  // ---- testimonial ----
+  getTestimonials: () => apiJson.get(adminUrl.testimonial),
+  createTestimonial: (formData) => apiMultipart.post(adminUrl.testimonial, formData),
+  updateTestimonial: (id, formData) => apiMultipart.put(adminUrl.testimonialById(id), formData),
+  deleteTestimonial: (id) => apiJson.delete(adminUrl.testimonialById(id)),
+  updateTestimonialStatus: (id, status) => apiJson.put(adminUrl.testimonialById(id), { status }),
+
+  // ---- cms ----
+  getCmsPages: () => apiJson.get(adminUrl.cms),
+  getCmsPageById: (id) => apiJson.get(adminUrl.cmsById(id)),
+  updateCmsPage: (id, data) => apiJson.put(adminUrl.cmsById(id), data),
+
+  // ---- combo offers ----
+  getComboOffers: () => apiJson.get(adminUrl.comboOffer),
+  createComboOffer: (data) => apiJson.post(adminUrl.comboOffer, data),
+  updateComboOffer: (id, data) => apiJson.put(adminUrl.comboOfferById(id), data),
+  deleteComboOffer: (id) => apiJson.delete(adminUrl.comboOfferById(id)),
+
+  // ---- blog posts ----
+  getBlogPosts: () => apiJson.get(adminUrl.blogPost),
+  createBlogPost: (formData) => apiMultipart.post(adminUrl.blogPost, formData),
+  updateBlogPost: (id, formData) => apiMultipart.put(adminUrl.blogPostById(id), formData),
+  updateBlogPostStatus: (id, status) => apiJson.put(adminUrl.blogPostById(id), { status }),
+  deleteBlogPost: (id) => apiJson.delete(adminUrl.blogPostById(id)),
+
+  // ---- faqs ----
+  getFaqs: () => apiJson.get(adminUrl.faq),
+  createFaq: (data) => apiJson.post(adminUrl.faq, data),
+  updateFaq: (id, data) => apiJson.put(adminUrl.faqById(id), data),
+  deleteFaq: (id) => apiJson.delete(adminUrl.faqById(id)),
+
+  // ---- newsletter subscribers ----
+  getNewsletterSubscribers: () => apiJson.get(adminUrl.newsletterSubscriber),
+  deleteNewsletterSubscriber: (id) => apiJson.delete(adminUrl.newsletterSubscriberById(id)),
+};
+
+export default adminApi;
