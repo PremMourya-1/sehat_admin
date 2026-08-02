@@ -57,6 +57,12 @@ const adminUrl = {
   // newsletter subscribers
   newsletterSubscriber: "/newsletter-subscribers",
   newsletterSubscriberById: (id) => `/newsletter-subscribers/${id}`,
+
+  // integration settings (Shiprocket today; generic by key for future integrations)
+  integrationSettings: (key) => `/integrations/${key}`,
+
+  // web settings (site-wide business settings — COD toggle today)
+  webSettings: "/web-settings",
 };
 
 export default adminUrl;

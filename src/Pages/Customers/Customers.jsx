@@ -9,7 +9,7 @@ const Customers = () => {
   const [data, setData] = useState([]);
   const [isLoading, setIsLoading] = useState(true);
 
-  const { search, setSearch, filteredData } = UseFilter(data, ["name", "email", "mobile"]);
+  const { search, setSearch, filteredData } = UseFilter(data, ["name", "email", "mobileNumber"]);
 
   useEffect(() => {
     getCustomerData(setData, setIsLoading);

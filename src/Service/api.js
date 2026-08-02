@@ -80,6 +80,14 @@ const adminApi = {
   // ---- newsletter subscribers ----
   getNewsletterSubscribers: () => apiJson.get(adminUrl.newsletterSubscriber),
   deleteNewsletterSubscriber: (id) => apiJson.delete(adminUrl.newsletterSubscriberById(id)),
+
+  // ---- integration settings ----
+  getIntegrationSettings: (key) => apiJson.get(adminUrl.integrationSettings(key)),
+  updateIntegrationSettings: (key, data) => apiJson.put(adminUrl.integrationSettings(key), data),
+
+  // ---- web settings ----
+  getWebSettings: () => apiJson.get(adminUrl.webSettings),
+  updateWebSettings: (data) => apiJson.put(adminUrl.webSettings, data),
 };
 
 export default adminApi;

@@ -1,6 +1,9 @@
 import toast from "react-hot-toast";
 import adminApi from "../../Service/api";
-import { removeLoaleStorageItem, setLocaleStorageItem } from "../../Utils/localeStorage";
+import {
+  removeLoaleStorageItem,
+  setLocaleStorageItem,
+} from "../../Utils/localeStorage";
 import { loginToggleAction } from "../../Store/Slices/AuthSlice";
 import { ADMIN_DETAILS } from "../../Constant/Constant";
 
@@ -8,6 +11,7 @@ async function login(data, dispatch, setIsLoading, navigate) {
   try {
     setIsLoading(true);
     const res = await adminApi.adminLogin(data);
+    console.log(res);
     if (res.data.action) {
       setLocaleStorageItem(ADMIN_DETAILS, res.data.data);
       toast.success(res.data.message);

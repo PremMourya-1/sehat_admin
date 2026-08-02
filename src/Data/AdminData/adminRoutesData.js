@@ -14,6 +14,9 @@ import ComboOffer from "../../Pages/ComboOffer/ComboOffer";
 import BlogPost from "../../Pages/BlogPost/BlogPost";
 import Faq from "../../Pages/Faq/Faq";
 import Newsletter from "../../Pages/Newsletter/Newsletter";
+import ShiprocketSettings from "../../Pages/Settings/ShiprocketSettings";
+import RazorpaySettings from "../../Pages/Settings/RazorpaySettings";
+import WebSettings from "../../Pages/Settings/WebSettings";
 
 // Data-driven route table consumed by Routes/Route.jsx. Each entry is
 // rendered as a nested <Route> under the ProtectedRoute > AdminLayout shell.
@@ -34,6 +37,9 @@ const adminRoutes = [
   { path: "blog-posts", element: BlogPost },
   { path: "faqs", element: Faq },
   { path: "newsletter-subscribers", element: Newsletter },
+  { path: "integrations/shiprocket", element: ShiprocketSettings },
+  { path: "integrations/razorpay", element: RazorpaySettings },
+  { path: "web-settings", element: WebSettings },
 ];
 
 export default adminRoutes;

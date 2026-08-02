@@ -1,6 +1,22 @@
-import { MdDashboard, MdOutlineLocalOffer, MdOutlineQuestionAnswer, MdOutlineMailOutline } from "react-icons/md";
+import {
+  MdDashboard,
+  MdOutlineLocalOffer,
+  MdOutlineQuestionAnswer,
+  MdOutlineMailOutline,
+  MdOutlineSettings,
+} from "react-icons/md";
 import { BiCategory } from "react-icons/bi";
-import { FaBoxOpen, FaUsers, FaTags, FaRegImages, FaRegCommentDots, FaFileAlt, FaBlog } from "react-icons/fa";
+import {
+  FaBoxOpen,
+  FaUsers,
+  FaTags,
+  FaRegImages,
+  FaRegCommentDots,
+  FaFileAlt,
+  FaBlog,
+  FaShippingFast,
+  FaCreditCard,
+} from "react-icons/fa";
 import { HiOutlineClipboardList } from "react-icons/hi";
 
 // Sidebar navigation data consumed by Components/Common/SideBar/SideBar.jsx.
@@ -18,6 +34,9 @@ const adminSideBarData = [
   { label: "FAQs", path: "/faqs", icon: <MdOutlineQuestionAnswer /> },
   { label: "Newsletter", path: "/newsletter-subscribers", icon: <MdOutlineMailOutline /> },
   { label: "CMS Pages", path: "/cms", icon: <FaFileAlt /> },
+  { label: "Shiprocket", path: "/integrations/shiprocket", icon: <FaShippingFast /> },
+  { label: "Razorpay", path: "/integrations/razorpay", icon: <FaCreditCard /> },
+  { label: "Web Settings", path: "/web-settings", icon: <MdOutlineSettings /> },
 ];
 
 export default adminSideBarData;

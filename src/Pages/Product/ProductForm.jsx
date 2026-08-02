@@ -43,6 +43,7 @@ const ProductForm = ({ initialData, onSubmit, isSubmitting, submitLabel = "Save 
       status: true,
       showOnHome: false,
       isTrending: false,
+      codAvailable: true,
       variants: [emptyVariant()],
       nutrition: emptyNutrition(),
       composition: [],
@@ -76,6 +77,7 @@ const ProductForm = ({ initialData, onSubmit, isSubmitting, submitLabel = "Save 
         status: initialData.status ?? true,
         showOnHome: initialData.showOnHome ?? false,
         isTrending: initialData.isTrending ?? false,
+        codAvailable: initialData.codAvailable ?? true,
         variants:
           initialData.variants && initialData.variants.length > 0
             ? initialData.variants.map((v) => ({
@@ -121,6 +123,7 @@ const ProductForm = ({ initialData, onSubmit, isSubmitting, submitLabel = "Save 
     formData.append("status", data.status ? "1" : "0");
     formData.append("showOnHome", data.showOnHome ? "1" : "0");
     formData.append("isTrending", data.isTrending ? "1" : "0");
+    formData.append("codAvailable", data.codAvailable ? "1" : "0");
     formData.append("variants", JSON.stringify(data.variants));
     formData.append("nutrition", JSON.stringify(data.nutrition || {}));
     formData.append(
@@ -355,9 +358,13 @@ const ProductForm = ({ initialData, onSubmit, isSubmitting, submitLabel = "Save 
               <input type="checkbox" {...register("showOnHome")} className="h-4 w-4" />
               Featured (show on homepage)
             </label>
-            <label className="flex items-center gap-2 text-sm" style={{ color: "var(--text)" }}>
+            <label className="mb-3 flex items-center gap-2 text-sm" style={{ color: "var(--text)" }}>
               <input type="checkbox" {...register("isTrending")} className="h-4 w-4" />
               Trending (show in New Arrivals / Trending Now)
+            </label>
+            <label className="flex items-center gap-2 text-sm" style={{ color: "var(--text)" }}>
+              <input type="checkbox" {...register("codAvailable")} className="h-4 w-4" />
+              COD Available (Cash on Delivery allowed for this product)
             </label>
           </div>
 
