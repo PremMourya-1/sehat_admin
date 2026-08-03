@@ -1,10 +1,10 @@
-import { useEffect, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 import { useForm } from "react-hook-form";
-import BreadCrumb from "../../Components/Common/BreadCrumb/BreadCrumb";
 import Card from "../../Components/Card/Card";
 import InputBox from "../../Components/Form/InputBox/InputBox";
 import PreLoader from "../../Components/Common/Loader/PreLoader";
 import LoaderSpiner from "../../Components/Common/Loader/LoaderSpiner";
+import usePageReload from "../../Hooks/usePageReload";
 import { formatDate } from "../../Utils/utils";
 import { getShiprocketSettings, updateShiprocketSettings } from "./shiprocketSettingsService";
 
@@ -27,9 +27,8 @@ const ShiprocketSettings = () => {
     formState: { errors },
   } = useForm({ defaultValues: { email: "", password: "", pickupLocation: "" } });
 
-  useEffect(() => {
-    getShiprocketSettings(setSettings, setIsLoading);
-  }, []);
+  const fetchShiprocketSettings = useCallback(() => getShiprocketSettings(setSettings, setIsLoading), []);
+  usePageReload(fetchShiprocketSettings);
 
   useEffect(() => {
     if (settings) {
@@ -51,8 +50,6 @@ const ShiprocketSettings = () => {
 
   return (
     <div>
-      <BreadCrumb title="Shiprocket Settings" items={[{ label: "Integrations" }, { label: "Shiprocket" }]} />
-
       {isLoading ? (
         <PreLoader />
       ) : (

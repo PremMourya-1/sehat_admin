@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useCallback, useState } from "react";
 import { Controller, useForm } from "react-hook-form";
 import { MdEdit } from "react-icons/md";
 import BreadCrumb from "../../Components/Common/BreadCrumb/BreadCrumb";
@@ -8,6 +8,7 @@ import InputBox from "../../Components/Form/InputBox/InputBox";
 import RichTextEditor from "../../Components/Form/RichTextEditor/RichTextEditor";
 import PreLoader from "../../Components/Common/Loader/PreLoader";
 import LoaderSpiner from "../../Components/Common/Loader/LoaderSpiner";
+import usePageReload from "../../Hooks/usePageReload";
 import { CMS_PAGES } from "../../Constant/Constant";
 import { truncateText } from "../../Utils/utils";
 import { getCmsData, updateCmsPage } from "./cmsService";
@@ -27,9 +28,8 @@ const Cms = () => {
     formState: { errors },
   } = useForm({ defaultValues: { title: "", content: "" } });
 
-  useEffect(() => {
-    getCmsData(setData, setIsLoading);
-  }, []);
+  const fetchCmsPages = useCallback(() => getCmsData(setData, setIsLoading), []);
+  usePageReload(fetchCmsPages);
 
   const getPage = (slug) => data.find((item) => item.slug === slug);
 

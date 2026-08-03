@@ -9,7 +9,21 @@ const STATUS_BADGE = {
   cancelled: "badge-danger",
 };
 
-const useOrdersColumns = ({ onStatusChange }) => [
+const useOrdersColumns = ({ onStatusChange, selectedIds, onToggleSelect }) => [
+  {
+    key: "select",
+    label: "",
+    width: "36px",
+    render: (row) => (
+      <input
+        type="checkbox"
+        checked={selectedIds.has(row.id)}
+        onChange={() => onToggleSelect(row.id)}
+        className="h-4 w-4"
+        aria-label={`Select order ${row.orderNumber}`}
+      />
+    ),
+  },
   { key: "orderNumber", label: "Order #" },
   { key: "customer", label: "Customer", render: (row) => row.customer?.name || row.customer?.email || "-" },
   {

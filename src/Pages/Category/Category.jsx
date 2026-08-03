@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useCallback, useState } from "react";
 import { useForm } from "react-hook-form";
 import { MdAdd } from "react-icons/md";
 import BreadCrumb from "../../Components/Common/BreadCrumb/BreadCrumb";
@@ -10,6 +10,7 @@ import InputBox from "../../Components/Form/InputBox/InputBox";
 import SingleImageUpload from "../../Components/Form/FileUpload/SingleImageUpload";
 import LoaderSpiner from "../../Components/Common/Loader/LoaderSpiner";
 import UseFilter from "../../Hooks/UseFilter";
+import usePageReload from "../../Hooks/usePageReload";
 import useCategoryColumns from "./CategoryTable";
 import { createCategory, deleteCategory, getCategoryData, updateCategory } from "./categoryService";
 
@@ -33,9 +34,8 @@ const Category = () => {
     formState: { errors },
   } = useForm({ defaultValues: { name: "", shortDescription: "", status: true } });
 
-  useEffect(() => {
-    getCategoryData(setData, setIsLoading);
-  }, []);
+  const fetchCategories = useCallback(() => getCategoryData(setData, setIsLoading), []);
+  usePageReload(fetchCategories);
 
   const openAdd = () => {
     setEditing(null);

@@ -1,10 +1,11 @@
-import { useEffect, useState } from "react";
+import { useCallback, useState } from "react";
 import { MdAdd } from "react-icons/md";
 import BreadCrumb from "../../Components/Common/BreadCrumb/BreadCrumb";
 import Button from "../../Components/Button/Button";
 import Table from "../../Components/Table/Table";
 import ConfirmModal from "../../Components/Modal/ConfirmModal";
 import UseFilter from "../../Hooks/UseFilter";
+import usePageReload from "../../Hooks/usePageReload";
 import useProductColumns from "./ProductTable";
 import { deleteProduct, getProductData } from "./productService";
 
@@ -16,9 +17,8 @@ const Product = () => {
 
   const { search, setSearch, filteredData } = UseFilter(data, ["name"]);
 
-  useEffect(() => {
-    getProductData(setData, setIsLoading);
-  }, []);
+  const fetchProducts = useCallback(() => getProductData(setData, setIsLoading), []);
+  usePageReload(fetchProducts);
 
   const columns = useProductColumns({ onDelete: (row) => setToDelete(row) });
 

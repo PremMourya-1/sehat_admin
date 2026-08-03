@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useCallback, useState } from "react";
 import { useForm } from "react-hook-form";
 import { MdAdd, MdDeleteOutline, MdEdit } from "react-icons/md";
 import BreadCrumb from "../../Components/Common/BreadCrumb/BreadCrumb";
@@ -11,6 +11,7 @@ import SingleImageUpload from "../../Components/Form/FileUpload/SingleImageUploa
 import PreLoader from "../../Components/Common/Loader/PreLoader";
 import NoRecords from "../../Components/NoRecords/NoRecords";
 import LoaderSpiner from "../../Components/Common/Loader/LoaderSpiner";
+import usePageReload from "../../Hooks/usePageReload";
 import { getImageUrl } from "../../Utils/utils";
 import {
   createHeroBanner,
@@ -37,9 +38,8 @@ const HeroBanner = () => {
     formState: { errors },
   } = useForm({ defaultValues: { title: "", description: "" } });
 
-  useEffect(() => {
-    getHeroBannerData(setData, setIsLoading);
-  }, []);
+  const fetchHeroBanners = useCallback(() => getHeroBannerData(setData, setIsLoading), []);
+  usePageReload(fetchHeroBanners);
 
   const openAdd = () => {
     setEditing(null);

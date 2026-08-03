@@ -1,10 +1,11 @@
-import { useEffect, useState } from "react";
+import { useCallback, useState } from "react";
 import { FaBoxOpen, FaUsers, FaRupeeSign } from "react-icons/fa";
 import { BiCategory } from "react-icons/bi";
 import { HiOutlineClipboardList } from "react-icons/hi";
 import BreadCrumb from "../../Components/Common/BreadCrumb/BreadCrumb";
 import Card from "../../Components/Card/Card";
 import PreLoader from "../../Components/Common/Loader/PreLoader";
+import usePageReload from "../../Hooks/usePageReload";
 import { formatCurrency } from "../../Utils/utils";
 import { getDashboardStats } from "./dashboardService";
 
@@ -12,9 +13,8 @@ const Dashboard = () => {
   const [stats, setStats] = useState(null);
   const [isLoading, setIsLoading] = useState(true);
 
-  useEffect(() => {
-    getDashboardStats(setStats, setIsLoading);
-  }, []);
+  const fetchStats = useCallback(() => getDashboardStats(setStats, setIsLoading), []);
+  usePageReload(fetchStats);
 
   const cards = [
     {

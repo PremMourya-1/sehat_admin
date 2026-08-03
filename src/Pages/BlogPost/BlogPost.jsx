@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useCallback, useState } from "react";
 import { Controller, useForm } from "react-hook-form";
 import { MdAdd, MdDeleteOutline, MdEdit } from "react-icons/md";
 import BreadCrumb from "../../Components/Common/BreadCrumb/BreadCrumb";
@@ -12,6 +12,7 @@ import SingleImageUpload from "../../Components/Form/FileUpload/SingleImageUploa
 import PreLoader from "../../Components/Common/Loader/PreLoader";
 import NoRecords from "../../Components/NoRecords/NoRecords";
 import LoaderSpiner from "../../Components/Common/Loader/LoaderSpiner";
+import usePageReload from "../../Hooks/usePageReload";
 import { getImageUrl } from "../../Utils/utils";
 import {
   createBlogPost,
@@ -41,9 +42,8 @@ const BlogPost = () => {
     formState: { errors },
   } = useForm({ defaultValues: DEFAULT_VALUES });
 
-  useEffect(() => {
-    getBlogPostData(setData, setIsLoading);
-  }, []);
+  const fetchBlogPosts = useCallback(() => getBlogPostData(setData, setIsLoading), []);
+  usePageReload(fetchBlogPosts);
 
   const openAdd = () => {
     setEditing(null);

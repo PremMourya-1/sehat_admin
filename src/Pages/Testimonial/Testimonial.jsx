@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useCallback, useState } from "react";
 import { useForm } from "react-hook-form";
 import { MdAdd, MdDeleteOutline, MdEdit, MdStar } from "react-icons/md";
 import BreadCrumb from "../../Components/Common/BreadCrumb/BreadCrumb";
@@ -11,6 +11,7 @@ import SingleImageUpload from "../../Components/Form/FileUpload/SingleImageUploa
 import PreLoader from "../../Components/Common/Loader/PreLoader";
 import NoRecords from "../../Components/NoRecords/NoRecords";
 import LoaderSpiner from "../../Components/Common/Loader/LoaderSpiner";
+import usePageReload from "../../Hooks/usePageReload";
 import { getImageUrl } from "../../Utils/utils";
 import {
   createTestimonial,
@@ -45,9 +46,8 @@ const Testimonial = () => {
     formState: { errors },
   } = useForm({ defaultValues: { name: "", designation: "", message: "", rating: 5, status: true } });
 
-  useEffect(() => {
-    getTestimonialData(setData, setIsLoading);
-  }, []);
+  const fetchTestimonials = useCallback(() => getTestimonialData(setData, setIsLoading), []);
+  usePageReload(fetchTestimonials);
 
   const openAdd = () => {
     setEditing(null);

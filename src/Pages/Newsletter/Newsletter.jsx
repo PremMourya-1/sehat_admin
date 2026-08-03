@@ -1,8 +1,9 @@
-import { useEffect, useState } from "react";
+import { useCallback, useState } from "react";
 import BreadCrumb from "../../Components/Common/BreadCrumb/BreadCrumb";
 import Table from "../../Components/Table/Table";
 import ConfirmModal from "../../Components/Modal/ConfirmModal";
 import UseFilter from "../../Hooks/UseFilter";
+import usePageReload from "../../Hooks/usePageReload";
 import useNewsletterColumns from "./NewsletterTable";
 import { deleteSubscriber, getSubscriberData } from "./newsletterService";
 
@@ -14,9 +15,8 @@ const Newsletter = () => {
 
   const { search, setSearch, filteredData } = UseFilter(data, ["email"]);
 
-  useEffect(() => {
-    getSubscriberData(setData, setIsLoading);
-  }, []);
+  const fetchSubscribers = useCallback(() => getSubscriberData(setData, setIsLoading), []);
+  usePageReload(fetchSubscribers);
 
   const columns = useNewsletterColumns({ onDelete: (row) => setToDelete(row) });
 

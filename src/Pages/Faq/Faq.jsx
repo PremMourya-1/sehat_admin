@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useCallback, useState } from "react";
 import { useForm } from "react-hook-form";
 import { MdAdd, MdDeleteOutline, MdEdit } from "react-icons/md";
 import BreadCrumb from "../../Components/Common/BreadCrumb/BreadCrumb";
@@ -10,6 +10,7 @@ import InputBox from "../../Components/Form/InputBox/InputBox";
 import PreLoader from "../../Components/Common/Loader/PreLoader";
 import NoRecords from "../../Components/NoRecords/NoRecords";
 import LoaderSpiner from "../../Components/Common/Loader/LoaderSpiner";
+import usePageReload from "../../Hooks/usePageReload";
 import { createFaq, deleteFaq, getFaqData, toggleFaqStatus, updateFaq } from "./faqService";
 
 const DEFAULT_VALUES = { question: "", answer: "" };
@@ -30,9 +31,8 @@ const Faq = () => {
     formState: { errors },
   } = useForm({ defaultValues: DEFAULT_VALUES });
 
-  useEffect(() => {
-    getFaqData(setData, setIsLoading);
-  }, []);
+  const fetchFaqs = useCallback(() => getFaqData(setData, setIsLoading), []);
+  usePageReload(fetchFaqs);
 
   const openAdd = () => {
     setEditing(null);

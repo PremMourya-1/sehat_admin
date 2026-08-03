@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useCallback, useState } from "react";
 import { useForm } from "react-hook-form";
 import { MdAdd } from "react-icons/md";
 import BreadCrumb from "../../Components/Common/BreadCrumb/BreadCrumb";
@@ -9,6 +9,7 @@ import ConfirmModal from "../../Components/Modal/ConfirmModal";
 import InputBox from "../../Components/Form/InputBox/InputBox";
 import LoaderSpiner from "../../Components/Common/Loader/LoaderSpiner";
 import UseFilter from "../../Hooks/UseFilter";
+import usePageReload from "../../Hooks/usePageReload";
 import useCouponColumns from "./CouponTable";
 import { createCoupon, deleteCoupon, getCouponData, updateCoupon } from "./couponService";
 
@@ -40,9 +41,8 @@ const Coupon = () => {
     },
   });
 
-  useEffect(() => {
-    getCouponData(setData, setIsLoading);
-  }, []);
+  const fetchCoupons = useCallback(() => getCouponData(setData, setIsLoading), []);
+  usePageReload(fetchCoupons);
 
   const openAdd = () => {
     setEditing(null);

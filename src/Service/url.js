@@ -22,6 +22,7 @@ const adminUrl = {
   order: "/orders",
   orderById: (id) => `/orders/${id}`,
   orderStatus: (id) => `/orders/${id}/status`,
+  orderBulkStatus: "/orders/bulk-status",
 
   // customer
   customer: "/customers",
@@ -61,8 +62,13 @@ const adminUrl = {
   // integration settings (Shiprocket today; generic by key for future integrations)
   integrationSettings: (key) => `/integrations/${key}`,
 
-  // web settings (site-wide business settings — COD toggle today)
+  // web settings (site-wide business settings — COD toggle, notification delivery channels)
   webSettings: "/web-settings",
+
+  // notifications (new-order alerts)
+  notifications: "/notifications",
+  notificationRead: (id) => `/notifications/${id}/read`,
+  notificationMarkAllRead: "/notifications/mark-all-read",
 };
 
 export default adminUrl;

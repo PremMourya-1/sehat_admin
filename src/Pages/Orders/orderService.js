@@ -27,3 +27,22 @@ export async function updateOrderStatus(id, status, setData) {
     toast.error(e?.response?.data?.message || "Failed to update order status");
   }
 }
+
+export async function bulkUpdateOrderStatus(orderIds, status, setData, setIsSubmitting) {
+  try {
+    setIsSubmitting(true);
+    const res = await adminApi.bulkUpdateOrderStatus(orderIds, status);
+    if (res.data.action) {
+      toast.success(res.data.message || `${orderIds.length} order(s) updated`);
+      setData((prev) => prev.map((item) => (orderIds.includes(item.id) ? { ...item, status } : item)));
+      return true;
+    }
+    toast.error(res.data.message);
+    return false;
+  } catch (e) {
+    toast.error(e?.response?.data?.message || "Failed to update orders");
+    return false;
+  } finally {
+    setIsSubmitting(false);
+  }
+}

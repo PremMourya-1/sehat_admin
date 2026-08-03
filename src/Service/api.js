@@ -29,6 +29,7 @@ const adminApi = {
   // ---- order ----
   getOrders: () => apiJson.get(adminUrl.order),
   updateOrderStatus: (id, status) => apiJson.put(adminUrl.orderStatus(id), { status }),
+  bulkUpdateOrderStatus: (orderIds, status) => apiJson.put(adminUrl.orderBulkStatus, { orderIds, status }),
 
   // ---- customer ----
   getCustomers: () => apiJson.get(adminUrl.customer),
@@ -88,6 +89,11 @@ const adminApi = {
   // ---- web settings ----
   getWebSettings: () => apiJson.get(adminUrl.webSettings),
   updateWebSettings: (data) => apiJson.put(adminUrl.webSettings, data),
+
+  // ---- notifications ----
+  getNotifications: (params) => apiJson.get(adminUrl.notifications, { params }),
+  markNotificationRead: (id) => apiJson.patch(adminUrl.notificationRead(id)),
+  markAllNotificationsRead: () => apiJson.patch(adminUrl.notificationMarkAllRead),
 };
 
 export default adminApi;

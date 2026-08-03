@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useCallback, useState } from "react";
 import { useForm } from "react-hook-form";
 import { MdAdd, MdDeleteOutline, MdEdit } from "react-icons/md";
 import BreadCrumb from "../../Components/Common/BreadCrumb/BreadCrumb";
@@ -10,6 +10,7 @@ import InputBox from "../../Components/Form/InputBox/InputBox";
 import PreLoader from "../../Components/Common/Loader/PreLoader";
 import NoRecords from "../../Components/NoRecords/NoRecords";
 import LoaderSpiner from "../../Components/Common/Loader/LoaderSpiner";
+import usePageReload from "../../Hooks/usePageReload";
 import {
   createComboOffer,
   deleteComboOffer,
@@ -36,9 +37,8 @@ const ComboOffer = () => {
     formState: { errors },
   } = useForm({ defaultValues: DEFAULT_VALUES });
 
-  useEffect(() => {
-    getComboOfferData(setData, setIsLoading);
-  }, []);
+  const fetchComboOffers = useCallback(() => getComboOfferData(setData, setIsLoading), []);
+  usePageReload(fetchComboOffers);
 
   const openAdd = () => {
     setEditing(null);

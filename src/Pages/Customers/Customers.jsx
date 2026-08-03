@@ -1,7 +1,8 @@
-import { useEffect, useState } from "react";
+import { useCallback, useState } from "react";
 import BreadCrumb from "../../Components/Common/BreadCrumb/BreadCrumb";
 import Table from "../../Components/Table/Table";
 import UseFilter from "../../Hooks/UseFilter";
+import usePageReload from "../../Hooks/usePageReload";
 import useCustomersColumns from "./CustomersTable";
 import { getCustomerData } from "./customerService";
 
@@ -11,9 +12,8 @@ const Customers = () => {
 
   const { search, setSearch, filteredData } = UseFilter(data, ["name", "email", "mobileNumber"]);
 
-  useEffect(() => {
-    getCustomerData(setData, setIsLoading);
-  }, []);
+  const fetchCustomers = useCallback(() => getCustomerData(setData, setIsLoading), []);
+  usePageReload(fetchCustomers);
 
   const columns = useCustomersColumns();
 
