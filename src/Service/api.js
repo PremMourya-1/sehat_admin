@@ -28,8 +28,12 @@ const adminApi = {
 
   // ---- order ----
   getOrders: () => apiJson.get(adminUrl.order),
+  getOrderById: (id) => apiJson.get(adminUrl.orderById(id)),
   updateOrderStatus: (id, status) => apiJson.put(adminUrl.orderStatus(id), { status }),
   bulkUpdateOrderStatus: (orderIds, status) => apiJson.put(adminUrl.orderBulkStatus, { orderIds, status }),
+  generateOrderLabel: (id) => apiJson.post(adminUrl.orderGenerateLabel(id)),
+  downloadOrderLabels: (orderIds) =>
+    apiJson.post(adminUrl.orderDownloadLabels, { orderIds }, { responseType: "blob" }),
 
   // ---- customer ----
   getCustomers: () => apiJson.get(adminUrl.customer),
@@ -94,6 +98,12 @@ const adminApi = {
   getNotifications: (params) => apiJson.get(adminUrl.notifications, { params }),
   markNotificationRead: (id) => apiJson.patch(adminUrl.notificationRead(id)),
   markAllNotificationsRead: () => apiJson.patch(adminUrl.notificationMarkAllRead),
+
+  // ---- shipping zones ----
+  getShippingZones: () => apiJson.get(adminUrl.shippingZone),
+  createShippingZone: (data) => apiJson.post(adminUrl.shippingZone, data),
+  updateShippingZone: (id, data) => apiJson.put(adminUrl.shippingZoneById(id), data),
+  deleteShippingZone: (id) => apiJson.delete(adminUrl.shippingZoneById(id)),
 };
 
 export default adminApi;

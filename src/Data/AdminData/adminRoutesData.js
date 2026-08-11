@@ -5,6 +5,8 @@ import Customers from "../../Pages/Customers/Customers";
 import Dashboard from "../../Pages/Dashboard/Dashboard";
 import HeroBanner from "../../Pages/HeroBanner/HeroBanner";
 import Orders from "../../Pages/Orders/Orders";
+import TodayOrders from "../../Pages/Orders/TodayOrders";
+import OrderView from "../../Pages/Orders/OrderView";
 import ProductAdd from "../../Pages/Product/ProductAdd";
 import ProductEdit from "../../Pages/Product/ProductEdit";
 import Product from "../../Pages/Product/Product";
@@ -26,6 +28,8 @@ const adminRoutes = [
   { path: "products/view/:id", element: ProductView },
   { path: "categories", element: Category },
   { path: "orders", element: Orders },
+  { path: "orders/today", element: TodayOrders },
+  { path: "orders/:id", element: OrderView },
   { path: "customers", element: Customers },
   { path: "coupons", element: Coupon },
   { path: "hero-banners", element: HeroBanner },

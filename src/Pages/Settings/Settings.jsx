@@ -4,16 +4,20 @@ import GeneralSettings from "./GeneralSettings";
 import NotificationSettings from "./NotificationSettings";
 import ShiprocketSettings from "./ShiprocketSettings";
 import RazorpaySettings from "./RazorpaySettings";
+import ResendSettings from "./ResendSettings";
+import ShippingZones from "./ShippingZones";
 
 const TABS = [
   { key: "general", label: "General" },
   { key: "notifications", label: "Notifications" },
+  { key: "shipping", label: "Shipping Zones" },
   { key: "integrations", label: "Integrations" },
 ];
 
 const INTEGRATIONS = [
   { key: "shiprocket", label: "Shiprocket" },
   { key: "razorpay", label: "Razorpay" },
+  { key: "resend", label: "Resend" },
 ];
 
 // Single umbrella page for every admin setting — General (site-wide
@@ -48,6 +52,7 @@ const Settings = () => {
 
       {activeTab === "general" && <GeneralSettings />}
       {activeTab === "notifications" && <NotificationSettings />}
+      {activeTab === "shipping" && <ShippingZones />}
 
       {activeTab === "integrations" && (
         <div>
@@ -66,6 +71,7 @@ const Settings = () => {
 
           {activeIntegration === "shiprocket" && <ShiprocketSettings />}
           {activeIntegration === "razorpay" && <RazorpaySettings />}
+          {activeIntegration === "resend" && <ResendSettings />}
         </div>
       )}
     </div>

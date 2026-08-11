@@ -4,6 +4,7 @@ import {
   MdOutlineQuestionAnswer,
   MdOutlineMailOutline,
   MdOutlineSettings,
+  MdToday,
 } from "react-icons/md";
 import { BiCategory } from "react-icons/bi";
 import { FaBoxOpen, FaUsers, FaTags, FaRegImages, FaRegCommentDots, FaFileAlt, FaBlog } from "react-icons/fa";
@@ -14,7 +15,14 @@ const adminSideBarData = [
   { label: "Dashboard", path: "/", icon: <MdDashboard /> },
   { label: "Products", path: "/products", icon: <FaBoxOpen /> },
   { label: "Categories", path: "/categories", icon: <BiCategory /> },
-  { label: "Orders", path: "/orders", icon: <HiOutlineClipboardList /> },
+  {
+    label: "Orders",
+    icon: <HiOutlineClipboardList />,
+    children: [
+      { label: "All Orders", path: "/orders", icon: <HiOutlineClipboardList /> },
+      { label: "Today's Orders", path: "/orders/today", icon: <MdToday /> },
+    ],
+  },
   { label: "Customers", path: "/customers", icon: <FaUsers /> },
   { label: "Coupons", path: "/coupons", icon: <FaTags /> },
   { label: "Hero Banners", path: "/hero-banners", icon: <FaRegImages /> },

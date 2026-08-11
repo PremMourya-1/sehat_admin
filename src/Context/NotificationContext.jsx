@@ -10,6 +10,13 @@ const NotificationContext = createContext(null);
 
 const hasBrowserNotifications = typeof window !== "undefined" && "Notification" in window;
 
+// Matches the backend's DEFAULT_SETTINGS (utils/webSettings.js) — used as
+// the fallback when a new-order event races the initial settings fetch
+// (e.g. an order lands right after the panel loads). Falling back to `{}`
+// would read every toggle as off, silently dropping toast/sound/push even
+// though the documented default is "all on".
+const DEFAULT_CHANNELS = { chromePushEnabled: true, toastPopupEnabled: true, soundEnabled: true };
+
 // The in-app bell/drawer notification below is always on — settings.notifications
 // only gates the three *extra* delivery channels layered on top of it (Part 3).
 export const NotificationProvider = ({ children }) => {
@@ -66,6 +73,31 @@ export const NotificationProvider = ({ children }) => {
     Notification.requestPermission().then(setBrowserPermission);
   }, [settings?.notifications?.chromePushEnabled]);
 
+  // Browsers block audio.play() from JS until the page has seen a real user
+  // gesture (click/keypress) in that tab — otherwise the very first
+  // new-order sound of the session silently fails. Priming (play+immediately
+  // pause, muted) on the admin's first interaction unlocks it ahead of time
+  // instead of losing that first notification's sound.
+  useEffect(() => {
+    const unlockAudio = () => {
+      const audio = new Audio("/sounds/notification.wav");
+      audio.volume = 0;
+      audio
+        .play()
+        .then(() => {
+          audio.pause();
+          audio.currentTime = 0;
+        })
+        .catch(() => {});
+    };
+    window.addEventListener("pointerdown", unlockAudio, { once: true });
+    window.addEventListener("keydown", unlockAudio, { once: true });
+    return () => {
+      window.removeEventListener("pointerdown", unlockAudio);
+      window.removeEventListener("keydown", unlockAudio);
+    };
+  }, []);
+
   const goToOrder = useCallback(
     (orderId) => {
       if (orderId) navigate(`/orders`);
@@ -79,7 +111,7 @@ export const NotificationProvider = ({ children }) => {
     const handleNewOrder = ({ notification, order }) => {
       mergeNotifications([notification]);
       const currentSettings = settingsRef.current;
-      const channels = currentSettings?.notifications || {};
+      const channels = currentSettings?.notifications || DEFAULT_CHANNELS;
 
       if (channels.toastPopupEnabled) {
         toast.custom(

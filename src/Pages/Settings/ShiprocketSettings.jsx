@@ -25,7 +25,7 @@ const ShiprocketSettings = () => {
     handleSubmit,
     reset,
     formState: { errors },
-  } = useForm({ defaultValues: { email: "", password: "", pickupLocation: "" } });
+  } = useForm({ defaultValues: { email: "", password: "", pickupLocation: "", webhookSecret: "" } });
 
   const fetchShiprocketSettings = useCallback(() => getShiprocketSettings(setSettings, setIsLoading), []);
   usePageReload(fetchShiprocketSettings);
@@ -36,15 +36,18 @@ const ShiprocketSettings = () => {
         email: settings.config?.email || "",
         password: "",
         pickupLocation: settings.config?.pickupLocation || "",
+        webhookSecret: "",
       });
     }
   }, [settings, reset]);
 
   const hasPassword = Boolean(settings?.config?.hasPassword);
+  const hasWebhookSecret = Boolean(settings?.config?.hasWebhookSecret);
 
   const onSubmit = async (values) => {
     const config = { email: values.email, pickupLocation: values.pickupLocation };
     if (values.password) config.password = values.password;
+    if (values.webhookSecret) config.webhookSecret = values.webhookSecret;
     await updateShiprocketSettings(config, setSettings, setIsSubmitting);
   };
 
@@ -97,6 +100,19 @@ const ShiprocketSettings = () => {
               placeholder="Pickup address nickname from your Shiprocket dashboard"
               required
             />
+            <InputBox
+              label="Webhook Secret"
+              name="webhookSecret"
+              type="password"
+              register={register}
+              error={errors.webhookSecret}
+              placeholder={hasWebhookSecret ? "Leave blank to keep current webhook secret" : "Paste the secret you set in Shiprocket's webhook config"}
+            />
+            <p className="mb-4 -mt-2 text-xs text-muted">
+              Used to verify incoming order-status webhooks are really from Shiprocket. Set the same value in Shiprocket&apos;s
+              dashboard (Settings &gt; API &gt; Configure Webhook) — see shiprocket-configuration.md for the exact webhook URL to
+              register.
+            </p>
             <button type="submit" className="btn-primary w-full" disabled={isSubmitting}>
               {isSubmitting ? <LoaderSpiner size={18} /> : "Save Settings"}
             </button>

@@ -23,6 +23,8 @@ const adminUrl = {
   orderById: (id) => `/orders/${id}`,
   orderStatus: (id) => `/orders/${id}/status`,
   orderBulkStatus: "/orders/bulk-status",
+  orderGenerateLabel: (id) => `/orders/${id}/generate-label`,
+  orderDownloadLabels: "/orders/download-labels",
 
   // customer
   customer: "/customers",
@@ -69,6 +71,10 @@ const adminUrl = {
   notifications: "/notifications",
   notificationRead: (id) => `/notifications/${id}/read`,
   notificationMarkAllRead: "/notifications/mark-all-read",
+
+  // shipping zones (checkout shipping charge)
+  shippingZone: "/shipping-zones",
+  shippingZoneById: (id) => `/shipping-zones/${id}`,
 };
 
 export default adminUrl;
