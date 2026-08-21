@@ -34,6 +34,7 @@ const adminApi = {
   generateOrderLabel: (id) => apiJson.post(adminUrl.orderGenerateLabel(id)),
   downloadOrderLabels: (orderIds) =>
     apiJson.post(adminUrl.orderDownloadLabels, { orderIds }, { responseType: "blob" }),
+  simulateOrderStatus: (id, status) => apiJson.post(adminUrl.orderSimulateStatus(id), { status }),
 
   // ---- customer ----
   getCustomers: () => apiJson.get(adminUrl.customer),

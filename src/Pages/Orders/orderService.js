@@ -54,6 +54,38 @@ export async function generateOrderLabel(id, setData, setIsGenerating, onError) 
   }
 }
 
+// Internal testing tool only (see shiprocket-configuration.md "Admin Test
+// Status Simulator") — drives an order through the real
+// processStatusUpdate() logic the Shiprocket webhook itself uses, so
+// customerStatus/emails can be tested without a real courier. Returns the
+// full result object (not just a boolean) so the caller can show whether
+// the update was skipped (forward-only guard) and which email fired.
+export async function simulateOrderStatus(id, status, setData, setIsSimulating) {
+  try {
+    setIsSimulating(true);
+    const res = await adminApi.simulateOrderStatus(id, status);
+    if (res.data.action) {
+      const { order, skipped, reason, emailTriggered } = res.data.data;
+      setData(order);
+      if (skipped) {
+        toast(`No change — ${reason}`);
+      } else {
+        toast.success(
+          emailTriggered ? `Status simulated — "${emailTriggered}" email sent` : "Status simulated successfully",
+        );
+      }
+      return { success: true, skipped, emailTriggered };
+    }
+    toast.error(res.data.message);
+    return { success: false };
+  } catch (e) {
+    toast.error(e?.response?.data?.message || "Failed to simulate status update");
+    return { success: false };
+  } finally {
+    setIsSimulating(false);
+  }
+}
+
 // Bulk-friendly variant of generateOrderLabel — no toast per call (the bulk
 // runner shows its own progress/summary instead) and always resolves with a
 // result object instead of a boolean, since a bulk run needs the per-order
