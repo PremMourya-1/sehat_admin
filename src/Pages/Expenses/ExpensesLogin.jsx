@@ -26,7 +26,9 @@ const ExpensesLogin = () => {
       setError("Password is required");
       return;
     }
-    await expensesLogin({ name, password }, setIsLoading, navigate).catch(() => {});
+    await expensesLogin({ name, password }, setIsLoading, navigate).catch(
+      () => {},
+    );
   };
 
   return (
@@ -48,7 +50,8 @@ const ExpensesLogin = () => {
           <form onSubmit={handleSubmit} noValidate>
             <div className="formGroup">
               <label className="form-label">
-                Who&apos;s logging in?<span style={{ color: "var(--danger)" }}> *</span>
+                Who&apos;s logging in?
+                <span style={{ color: "var(--danger)" }}> *</span>
               </label>
               <div className="grid grid-cols-2 gap-3">
                 {EXPENSE_USERS.map((user) => (
@@ -62,7 +65,10 @@ const ExpensesLogin = () => {
                     )}
                     style={
                       name === user.value
-                        ? { backgroundColor: "var(--primary)", borderColor: "var(--primary)" }
+                        ? {
+                            backgroundColor: "var(--primary)",
+                            borderColor: "var(--primary)",
+                          }
                         : { borderColor: "var(--border)", color: "var(--text)" }
                     }
                   >
@@ -101,7 +107,11 @@ const ExpensesLogin = () => {
               {error && <p className="form-error">{error}</p>}
             </div>
 
-            <button type="submit" className="btn-primary mt-2 w-full" disabled={isLoading}>
+            <button
+              type="submit"
+              className="btn-primary mt-2 w-full"
+              disabled={isLoading}
+            >
               {isLoading ? <LoaderSpiner size={18} /> : "Login"}
             </button>
           </form>

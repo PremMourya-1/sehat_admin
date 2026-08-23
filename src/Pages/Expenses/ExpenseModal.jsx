@@ -49,7 +49,7 @@ const ExpenseModal = ({ open, onClose, onSubmit, editing, isSubmitting }) => {
       open={open}
       onClose={onClose}
       title={editing ? "Edit Expense" : "Add Expense"}
-      size="xs"
+      size="sm"
       body={
         <form onSubmit={submit} noValidate>
           <InputBox
@@ -61,21 +61,33 @@ const ExpenseModal = ({ open, onClose, onSubmit, editing, isSubmitting }) => {
             placeholder="e.g. Almonds bulk pack"
             required
           />
-          <InputBox
-            label="Purchase Price (₹)"
-            name="purchasePrice"
-            type="number"
-            step="0.01"
-            min="0"
-            register={register}
-            rules={{
-              required: "Purchase price is required",
-              min: { value: 0, message: "Price cannot be negative" },
-            }}
-            error={errors.purchasePrice}
-            placeholder="0.00"
-            required
-          />
+          <div className="formGroup">
+            <label htmlFor="purchasePrice" className="form-label">
+              Purchase Price
+              <span style={{ color: "var(--danger)" }}> *</span>
+            </label>
+            <div className="relative">
+              <span
+                className="pointer-events-none absolute left-3.5 top-1/2 -translate-y-1/2 text-sm"
+                style={{ color: "var(--text-light)" }}
+              >
+                ₹
+              </span>
+              <input
+                id="purchasePrice"
+                type="number"
+                step="0.01"
+                min="0"
+                placeholder="0.00"
+                className={`inputBox pl-7 ${errors.purchasePrice ? "has-error" : ""}`}
+                {...register("purchasePrice", {
+                  required: "Purchase price is required",
+                  min: { value: 0, message: "Price cannot be negative" },
+                })}
+              />
+            </div>
+            {errors.purchasePrice && <p className="form-error">{errors.purchasePrice.message}</p>}
+          </div>
           <InputBox
             label="Purchase Date"
             name="purchaseDate"
@@ -93,7 +105,7 @@ const ExpenseModal = ({ open, onClose, onSubmit, editing, isSubmitting }) => {
             placeholder="Optional"
           />
 
-          <div className="mt-2 flex gap-3">
+          <div className="mt-5 flex gap-3 border-t pt-4" style={{ borderColor: "var(--border)" }}>
             <button type="button" className="btn-outline flex-1" onClick={onClose} disabled={isSubmitting}>
               Cancel
             </button>

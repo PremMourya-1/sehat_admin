@@ -1,8 +1,7 @@
 import { useEffect, useState } from "react";
-import { MdAdd } from "react-icons/md";
+import { MdAdd, MdAccountBalanceWallet } from "react-icons/md";
 import { FaSignOutAlt } from "react-icons/fa";
 import { useNavigate } from "react-router-dom";
-import Card from "../../Components/Card/Card";
 import ConfirmModal from "../../Components/Modal/ConfirmModal";
 import { cx, formatCurrency } from "../../Utils/utils";
 import { BRAND_NAME } from "../../Constant/Constant";
@@ -78,81 +77,95 @@ const Expenses = () => {
           below means "at or below 640px" (mobile), the reverse of
           Tailwind's normal mobile-first default. Base classes are the
           desktop layout; sm: overrides are the mobile layout. */}
-      <div className="mx-auto max-w-5xl px-6 py-6 sm:px-4">
+      <div className="mx-auto max-w-5xl px-6 py-8 sm:px-4 sm:py-5">
         {/* Header */}
-        <div className="mb-6 flex flex-wrap items-center justify-between gap-3">
+        <div className="mb-8 flex flex-wrap items-center justify-between gap-4 sm:mb-6">
           <div>
-            <h1 className="brand-logo text-2xl">Expenses</h1>
-            <p className="text-xs text-muted">{BRAND_NAME}</p>
+            <h1 className="brand-logo text-3xl sm:text-2xl">Expenses</h1>
+            <p className="mt-1 text-sm text-muted">{BRAND_NAME} · Purchase Tracker</p>
           </div>
           <div className="flex items-center gap-3">
             <span className="text-sm text-muted">
-              Logged in as <span className="font-semibold" style={{ color: "var(--text)" }}>{addedByLabel(loggedInName)}</span>
+              Logged in as{" "}
+              <span className="font-semibold" style={{ color: "var(--text)" }}>
+                {addedByLabel(loggedInName)}
+              </span>
             </span>
-            <button
-              type="button"
-              className="btn-outline"
-              onClick={() => expensesLogout(navigate)}
-            >
+            <button type="button" className="btn-outline" onClick={() => expensesLogout(navigate)}>
               <FaSignOutAlt />
               Logout
             </button>
           </div>
         </div>
 
-        {/* Filter bar */}
-        <div className="mb-4 flex flex-wrap items-center justify-between gap-3">
-          <div className="flex gap-2">
-            {FILTER_TABS.map((tab) => (
-              <button
-                key={tab.value}
-                type="button"
-                onClick={() => setAddedByFilter(tab.value)}
-                className={cx(
-                  "rounded-lg px-4 py-2 text-sm font-medium transition-colors duration-150",
-                  addedByFilter === tab.value ? "text-white" : "bg-white",
-                )}
-                style={
-                  addedByFilter === tab.value
-                    ? { backgroundColor: "var(--primary)" }
-                    : { border: "1px solid var(--border)", color: "var(--text)" }
-                }
-              >
-                {tab.label}
-              </button>
-            ))}
+        {/* Total stat card */}
+        <div className="card mb-6 flex items-center gap-5 sm:gap-4">
+          <div
+            className="flex h-14 w-14 shrink-0 items-center justify-center rounded-full text-2xl"
+            style={{ backgroundColor: "var(--primary-tp)", color: "var(--primary)" }}
+          >
+            <MdAccountBalanceWallet />
           </div>
-
-          <div className="flex flex-wrap items-center gap-2">
-            <input
-              type="date"
-              className="inputBox !w-auto"
-              value={dateRange.startDate}
-              onChange={(e) => setDateRange((prev) => ({ ...prev, startDate: e.target.value }))}
-              aria-label="From date"
-            />
-            <span className="text-sm text-muted">to</span>
-            <input
-              type="date"
-              className="inputBox !w-auto"
-              value={dateRange.endDate}
-              onChange={(e) => setDateRange((prev) => ({ ...prev, endDate: e.target.value }))}
-              aria-label="To date"
-            />
+          <div>
+            <p className="text-sm font-medium text-muted">Kul Kharch</p>
+            <h2 className="mt-1 text-3xl font-semibold sm:text-2xl" style={{ color: "var(--text)" }}>
+              {formatCurrency(data.total)}
+            </h2>
+            <p className="mt-1 text-xs text-muted">
+              {data.count} {data.count === 1 ? "entry" : "entries"}
+            </p>
           </div>
         </div>
 
-        {/* Total card + add button */}
-        <div className="mb-6 flex flex-row items-center justify-between gap-3 sm:flex-col sm:items-stretch">
-          <Card className="flex-1">
-            <p className="text-sm font-medium text-muted">Kul kharch</p>
-            <h2 className="mt-1 text-3xl font-semibold" style={{ color: "var(--primary)" }}>
-              {formatCurrency(data.total)}
-            </h2>
-            <p className="mt-1 text-xs text-muted">{data.count} entries</p>
-          </Card>
+        {/* Toolbar: filters + add button */}
+        <div className="mb-5 flex flex-row flex-wrap items-center justify-between gap-4 sm:flex-col sm:items-stretch">
+          <div className="flex flex-wrap items-center gap-3">
+            <div className="flex gap-2">
+              {FILTER_TABS.map((tab) => (
+                <button
+                  key={tab.value}
+                  type="button"
+                  onClick={() => setAddedByFilter(tab.value)}
+                  className={cx(
+                    "rounded-lg px-4 py-2 text-sm font-medium transition-colors duration-150",
+                    addedByFilter === tab.value ? "text-white" : "bg-white",
+                  )}
+                  style={
+                    addedByFilter === tab.value
+                      ? { backgroundColor: "var(--primary)" }
+                      : { border: "1px solid var(--border)", color: "var(--text)" }
+                  }
+                >
+                  {tab.label}
+                </button>
+              ))}
+            </div>
 
-          <button type="button" className="btn-primary" onClick={openAdd}>
+            <div
+              className="flex items-center gap-2 rounded-lg border bg-white px-3 py-2"
+              style={{ borderColor: "var(--border)" }}
+            >
+              <input
+                type="date"
+                className="border-0 bg-transparent p-0 text-sm outline-none"
+                style={{ color: "var(--text)" }}
+                value={dateRange.startDate}
+                onChange={(e) => setDateRange((prev) => ({ ...prev, startDate: e.target.value }))}
+                aria-label="From date"
+              />
+              <span className="text-xs text-muted">to</span>
+              <input
+                type="date"
+                className="border-0 bg-transparent p-0 text-sm outline-none"
+                style={{ color: "var(--text)" }}
+                value={dateRange.endDate}
+                onChange={(e) => setDateRange((prev) => ({ ...prev, endDate: e.target.value }))}
+                aria-label="To date"
+              />
+            </div>
+          </div>
+
+          <button type="button" className="btn-primary shrink-0 sm:w-full" onClick={openAdd}>
             <MdAdd size={18} />
             Add Expense
           </button>
