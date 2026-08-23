@@ -86,6 +86,31 @@ export async function simulateOrderStatus(id, status, setData, setIsSimulating) 
   }
 }
 
+// Admin cancel — unlike the customer's own self-cancel (only while
+// customerStatus is "confirmed"), this works at any stage; the backend
+// handles cancelling the Shiprocket shipment first if one exists (see
+// adminOrderController.cancelOrder) and refuses to touch the order at all
+// if that fails, so a caught error here means the order is genuinely still
+// active, not cancelled.
+export async function cancelOrder(id, reason, setData, setIsCancelling) {
+  try {
+    setIsCancelling(true);
+    const res = await adminApi.cancelOrder(id, reason);
+    if (res.data.action) {
+      toast.success(res.data.message || "Order cancelled successfully");
+      setData(res.data.data);
+      return true;
+    }
+    toast.error(res.data.message);
+    return false;
+  } catch (e) {
+    toast.error(e?.response?.data?.message || "Failed to cancel order");
+    return false;
+  } finally {
+    setIsCancelling(false);
+  }
+}
+
 // Bulk-friendly variant of generateOrderLabel — no toast per call (the bulk
 // runner shows its own progress/summary instead) and always resolves with a
 // result object instead of a boolean, since a bulk run needs the per-order

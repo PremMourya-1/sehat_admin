@@ -26,6 +26,7 @@ const adminUrl = {
   orderGenerateLabel: (id) => `/orders/${id}/generate-label`,
   orderDownloadLabels: "/orders/download-labels",
   orderSimulateStatus: (id) => `/orders/${id}/simulate-status`,
+  orderCancel: (id) => `/orders/${id}/cancel`,
 
   // customer
   customer: "/customers",

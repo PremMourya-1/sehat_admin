@@ -23,21 +23,21 @@ const ResendSettings = () => {
     handleSubmit,
     reset,
     formState: { errors },
-  } = useForm({ defaultValues: { apiKey: "", fromEmail: "" } });
+  } = useForm({ defaultValues: { apiKey: "", fromEmail: "", replyTo: "" } });
 
   const fetchResendSettings = useCallback(() => getResendSettings(setSettings, setIsLoading), []);
   usePageReload(fetchResendSettings);
 
   useEffect(() => {
     if (settings) {
-      reset({ apiKey: "", fromEmail: settings.config?.fromEmail || "" });
+      reset({ apiKey: "", fromEmail: settings.config?.fromEmail || "", replyTo: settings.config?.replyTo || "" });
     }
   }, [settings, reset]);
 
   const hasApiKey = Boolean(settings?.config?.hasApiKey);
 
   const onSubmit = async (values) => {
-    const config = { fromEmail: values.fromEmail };
+    const config = { fromEmail: values.fromEmail, replyTo: values.replyTo || "" };
     if (values.apiKey) config.apiKey = values.apiKey;
     await updateResendSettings(config, setSettings, setIsSubmitting);
   };
@@ -81,6 +81,14 @@ const ResendSettings = () => {
               error={errors.fromEmail}
               placeholder="orders@yourdomain.com"
               required
+            />
+            <InputBox
+              label="Reply-To Email (optional)"
+              name="replyTo"
+              type="email"
+              register={register}
+              error={errors.replyTo}
+              placeholder="you@gmail.com — where customer replies should land"
             />
             <button type="submit" className="btn-primary w-full" disabled={isSubmitting}>
               {isSubmitting ? <LoaderSpiner size={18} /> : "Save Settings"}

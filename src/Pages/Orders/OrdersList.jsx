@@ -141,19 +141,18 @@ const OrdersList = ({
     });
   };
 
-  // Orders that already have a label are skipped, not re-processed — same
-  // skip-already-done behavior generateLabelAndFulfill already applies
-  // per-step server-side, just decided up front here so the progress count
-  // and summary reflect it honestly (and so the bulk run doesn't burn a
-  // request on something the backend would've no-op'd anyway).
+  // Orders that already have a label, or are cancelled, are skipped rather
+  // than re-processed — same skip-already-done behavior
+  // generateLabelAndFulfill/validateOrderForShipment already enforce
+  // per-step server-side (a cancelled order fails there with "Order is
+  // cancelled" — see utils/shiprocket.js), just decided up front here so
+  // the progress count and summary reflect it honestly, and so the bulk run
+  // doesn't burn a request on something the backend would've rejected anyway.
   const handleBulkGenerateLabel = async () => {
     const selectedOrders = data.filter((order) => selectedIds.has(order.id));
-    const toProcess = selectedOrders.filter(
-      (order) => order.labelStatus !== "generated",
-    );
-    const skipped = selectedOrders.filter(
-      (order) => order.labelStatus === "generated",
-    );
+    const isEligible = (order) => order.labelStatus !== "generated" && order.customerStatus !== "cancelled";
+    const toProcess = selectedOrders.filter(isEligible);
+    const skipped = selectedOrders.filter((order) => !isEligible(order));
 
     setBulkResults(null);
     setIsBulkRunning(true);
@@ -188,6 +187,7 @@ const OrdersList = ({
       skipped: skipped.map((order) => ({
         id: order.id,
         orderNumber: order.orderNumber,
+        reason: order.customerStatus === "cancelled" ? "cancelled" : "already labeled",
       })),
     });
     setIsBulkRunning(false);
@@ -363,7 +363,7 @@ const OrdersList = ({
                 {bulkResults.failed.length} failed
               </span>
               <span className="badge-muted">
-                {bulkResults.skipped.length} skipped (already labeled)
+                {bulkResults.skipped.length} skipped (already labeled or cancelled)
               </span>
             </div>
             <button

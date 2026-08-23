@@ -22,6 +22,10 @@ const GeneralSettings = () => {
     await updateWebSettings({ codEnabled: event.target.checked }, setSettings, setIsSubmitting);
   };
 
+  const handleToggleMobileVerification = async (event) => {
+    await updateWebSettings({ mobileVerificationRequired: event.target.checked }, setSettings, setIsSubmitting);
+  };
+
   if (isLoading) return <PreLoader />;
 
   return (
@@ -43,6 +47,32 @@ const GeneralSettings = () => {
             type="checkbox"
             checked={Boolean(settings?.codEnabled)}
             onChange={handleToggleCod}
+            disabled={isSubmitting}
+            className="h-4 w-4"
+          />
+        </span>
+      </label>
+
+      <label
+        className="mt-3 flex cursor-pointer items-center justify-between gap-3 rounded-lg border py-3"
+        style={{ borderColor: "var(--border)" }}
+      >
+        <div>
+          <p className="text-sm font-medium" style={{ color: "var(--text)" }}>
+            Require mobile OTP verification at checkout
+          </p>
+          <p className="text-xs text-muted">
+            Off by default until a real SMS provider is configured (OTP_PROVIDER in the backend&apos;s
+            .env). While off, customers skip straight to entering shipping details — a plain phone
+            number field there is still required per order, just not OTP-verified.
+          </p>
+        </div>
+        <span className="flex items-center gap-2">
+          {isSubmitting && <LoaderSpiner size={16} />}
+          <input
+            type="checkbox"
+            checked={Boolean(settings?.mobileVerificationRequired)}
+            onChange={handleToggleMobileVerification}
             disabled={isSubmitting}
             className="h-4 w-4"
           />

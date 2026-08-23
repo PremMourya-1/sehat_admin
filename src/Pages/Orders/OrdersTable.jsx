@@ -19,6 +19,7 @@ const CUSTOMER_STATUS_BADGE = {
   out_for_delivery: "badge-primary",
   delivered: "badge-success",
   rto: "badge-danger",
+  cancelled: "badge-danger",
 };
 
 const LABEL_STATUS_BADGE = {
@@ -92,6 +93,11 @@ const useOrdersColumns = ({ selectedIds, onToggleSelect }) => {
           {(row.labelStatus || "not_generated").replace(/_/g, " ")}
         </span>
       ),
+    },
+    {
+      key: "estimatedDeliveryDate",
+      label: "Est. Delivery",
+      render: (row) => formatDate(row.estimatedDeliveryDate),
     },
     {
       key: "actions",

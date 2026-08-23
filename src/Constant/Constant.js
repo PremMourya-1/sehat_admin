@@ -34,6 +34,7 @@ export const CUSTOMER_STATUS_LABELS = {
   out_for_delivery: "Out for Delivery",
   delivered: "Delivered",
   rto: "Returned to Origin",
+  cancelled: "Cancelled",
 };
 
 // All Indian states + UTs — used for the shipping-zone state assignment
