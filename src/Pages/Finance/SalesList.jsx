@@ -2,16 +2,16 @@ import { MdDeleteOutline, MdOutlineEdit } from "react-icons/md";
 import PreLoader from "../../Components/Common/Loader/PreLoader";
 import NoRecords from "../../Components/NoRecords/NoRecords";
 import { formatCurrency, formatDate } from "../../Utils/utils";
-import { ADDED_BY_BADGE_CLASS, addedByLabel } from "./expensesConstants";
+import { ADDED_BY_BADGE_CLASS, addedByLabel } from "./financeConstants";
 
 // Always a table, on every screen size — the wrapper's overflow-x-auto lets
 // it scroll horizontally on narrow phones rather than reflowing into cards.
-const ExpensesList = ({ expenses, isLoading, onEdit, onDelete }) => {
+const SalesList = ({ sales, isLoading, onEdit, onDelete }) => {
   if (isLoading) return <PreLoader />;
-  if (expenses.length === 0) {
+  if (sales.length === 0) {
     return (
       <div className="card">
-        <NoRecords message="Abhi koi expense add nahi hua. Pehla add karo." />
+        <NoRecords message="Abhi koi sale add nahi hui. Pehli add karo." />
       </div>
     );
   }
@@ -29,23 +29,23 @@ const ExpensesList = ({ expenses, isLoading, onEdit, onDelete }) => {
           </tr>
         </thead>
         <tbody>
-          {expenses.map((expense) => (
-            <tr key={expense.id}>
+          {sales.map((sale) => (
+            <tr key={sale.id}>
               <td>
                 <p className="font-medium" style={{ color: "var(--text)" }}>
-                  {expense.itemName}
+                  {sale.itemName}
                 </p>
-                {expense.notes && (
-                  <p className="mt-0.5 max-w-xs truncate text-xs text-muted">{expense.notes}</p>
+                {sale.notes && (
+                  <p className="mt-0.5 max-w-xs truncate text-xs text-muted">{sale.notes}</p>
                 )}
               </td>
               <td className="font-semibold" style={{ textAlign: "right", color: "var(--primary)" }}>
-                {formatCurrency(expense.purchasePrice)}
+                {formatCurrency(sale.salePrice)}
               </td>
-              <td>{formatDate(expense.purchaseDate)}</td>
+              <td>{formatDate(sale.saleDate)}</td>
               <td>
-                <span className={ADDED_BY_BADGE_CLASS[expense.addedBy] || "badge-muted"}>
-                  {addedByLabel(expense.addedBy)}
+                <span className={ADDED_BY_BADGE_CLASS[sale.addedBy] || "badge-muted"}>
+                  {addedByLabel(sale.addedBy)}
                 </span>
               </td>
               <td>
@@ -53,16 +53,16 @@ const ExpensesList = ({ expenses, isLoading, onEdit, onDelete }) => {
                   <button
                     type="button"
                     className="action-icon-edit"
-                    onClick={() => onEdit(expense)}
-                    aria-label={`Edit ${expense.itemName}`}
+                    onClick={() => onEdit(sale)}
+                    aria-label={`Edit ${sale.itemName}`}
                   >
                     <MdOutlineEdit size={18} />
                   </button>
                   <button
                     type="button"
                     className="action-icon-delete"
-                    onClick={() => onDelete(expense)}
-                    aria-label={`Delete ${expense.itemName}`}
+                    onClick={() => onDelete(sale)}
+                    aria-label={`Delete ${sale.itemName}`}
                   >
                     <MdDeleteOutline size={18} />
                   </button>
@@ -76,4 +76,4 @@ const ExpensesList = ({ expenses, isLoading, onEdit, onDelete }) => {
   );
 };
 
-export default ExpensesList;
+export default SalesList;

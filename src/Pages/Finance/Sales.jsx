@@ -1,26 +1,20 @@
 import { useEffect, useState } from "react";
-import { MdAdd, MdAccountBalanceWallet } from "react-icons/md";
-import { FaSignOutAlt } from "react-icons/fa";
-import { useNavigate } from "react-router-dom";
+import { MdAdd, MdPointOfSale } from "react-icons/md";
 import ConfirmModal from "../../Components/Modal/ConfirmModal";
 import { cx, formatCurrency } from "../../Utils/utils";
-import { BRAND_NAME } from "../../Constant/Constant";
-import { EXPENSES_USER_KEY, EXPENSE_USERS, addedByLabel } from "./expensesConstants";
-import { expensesLogout } from "./expensesAuthService";
-import { getExpensesData, createExpense, updateExpense, deleteExpense } from "./expensesService";
-import ExpensesList from "./ExpensesList";
-import ExpenseModal from "./ExpenseModal";
+import { FINANCE_USERS } from "./financeConstants";
+import { getSalesData, createSale, updateSale, deleteSale } from "./salesService";
+import SalesList from "./SalesList";
+import SaleModal from "./SaleModal";
+import FinanceHeader from "./FinanceHeader";
 
-const FILTER_TABS = [{ value: "all", label: "Sab" }, ...EXPENSE_USERS];
+const FILTER_TABS = [{ value: "all", label: "Sab" }, ...FINANCE_USERS];
 
-const Expenses = () => {
-  const navigate = useNavigate();
-  const loggedInName = localStorage.getItem(EXPENSES_USER_KEY);
-
+const Sales = () => {
   const [addedByFilter, setAddedByFilter] = useState("all");
   const [dateRange, setDateRange] = useState({ startDate: "", endDate: "" });
 
-  const [data, setData] = useState({ expenses: [], total: 0, count: 0 });
+  const [data, setData] = useState({ sales: [], total: 0, count: 0 });
   const [isLoading, setIsLoading] = useState(true);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [isDeleting, setIsDeleting] = useState(false);
@@ -29,44 +23,44 @@ const Expenses = () => {
   const [editing, setEditing] = useState(null);
   const [toDelete, setToDelete] = useState(null);
 
-  const fetchExpenses = () => {
+  const fetchSales = () => {
     const filters = { addedBy: addedByFilter };
     if (dateRange.startDate) filters.startDate = dateRange.startDate;
     if (dateRange.endDate) filters.endDate = dateRange.endDate;
-    getExpensesData(filters, setData, setIsLoading);
+    getSalesData(filters, setData, setIsLoading);
   };
 
   // eslint-disable-next-line react-hooks/exhaustive-deps
-  useEffect(fetchExpenses, [addedByFilter, dateRange.startDate, dateRange.endDate]);
+  useEffect(fetchSales, [addedByFilter, dateRange.startDate, dateRange.endDate]);
 
   const openAdd = () => {
     setEditing(null);
     setModalOpen(true);
   };
 
-  const openEdit = (expense) => {
-    setEditing(expense);
+  const openEdit = (sale) => {
+    setEditing(sale);
     setModalOpen(true);
   };
 
   const handleSubmit = (values) => {
     if (editing) {
-      updateExpense(editing.id, values, setIsSubmitting, () => {
+      updateSale(editing.id, values, setIsSubmitting, () => {
         setModalOpen(false);
-        fetchExpenses();
+        fetchSales();
       });
     } else {
-      createExpense(values, setIsSubmitting, () => {
+      createSale(values, setIsSubmitting, () => {
         setModalOpen(false);
-        fetchExpenses();
+        fetchSales();
       });
     }
   };
 
   const handleConfirmDelete = () => {
-    deleteExpense(toDelete.id, setIsDeleting, () => {
+    deleteSale(toDelete.id, setIsDeleting, () => {
       setToDelete(null);
-      fetchExpenses();
+      fetchSales();
     });
   };
 
@@ -78,25 +72,7 @@ const Expenses = () => {
           Tailwind's normal mobile-first default. Base classes are the
           desktop layout; sm: overrides are the mobile layout. */}
       <div className="mx-auto max-w-5xl px-6 py-8 sm:px-4 sm:py-5">
-        {/* Header */}
-        <div className="mb-8 flex flex-wrap items-center justify-between gap-4 sm:mb-6">
-          <div>
-            <h1 className="brand-logo text-3xl sm:text-2xl">Expenses</h1>
-            <p className="mt-1 text-sm text-muted">{BRAND_NAME} · Purchase Tracker</p>
-          </div>
-          <div className="flex items-center gap-3">
-            <span className="text-sm text-muted">
-              Logged in as{" "}
-              <span className="font-semibold" style={{ color: "var(--text)" }}>
-                {addedByLabel(loggedInName)}
-              </span>
-            </span>
-            <button type="button" className="btn-outline" onClick={() => expensesLogout(navigate)}>
-              <FaSignOutAlt />
-              Logout
-            </button>
-          </div>
-        </div>
+        <FinanceHeader title="Sales" />
 
         {/* Total stat card */}
         <div className="card mb-6 flex items-center gap-5 sm:gap-4">
@@ -104,10 +80,10 @@ const Expenses = () => {
             className="flex h-14 w-14 shrink-0 items-center justify-center rounded-full text-2xl"
             style={{ backgroundColor: "var(--primary-tp)", color: "var(--primary)" }}
           >
-            <MdAccountBalanceWallet />
+            <MdPointOfSale />
           </div>
           <div>
-            <p className="text-sm font-medium text-muted">Kul Kharch</p>
+            <p className="text-sm font-medium text-muted">Kul Sale</p>
             <h2 className="mt-1 text-3xl font-semibold sm:text-2xl" style={{ color: "var(--text)" }}>
               {formatCurrency(data.total)}
             </h2>
@@ -167,20 +143,20 @@ const Expenses = () => {
 
           <button type="button" className="btn-primary shrink-0 sm:w-full" onClick={openAdd}>
             <MdAdd size={18} />
-            Add Expense
+            Add Sale
           </button>
         </div>
 
         {/* List */}
-        <ExpensesList
-          expenses={data.expenses}
+        <SalesList
+          sales={data.sales}
           isLoading={isLoading}
           onEdit={openEdit}
-          onDelete={(expense) => setToDelete(expense)}
+          onDelete={(sale) => setToDelete(sale)}
         />
       </div>
 
-      <ExpenseModal
+      <SaleModal
         open={modalOpen}
         onClose={() => setModalOpen(false)}
         onSubmit={handleSubmit}
@@ -200,4 +176,4 @@ const Expenses = () => {
   );
 };
 
-export default Expenses;
+export default Sales;

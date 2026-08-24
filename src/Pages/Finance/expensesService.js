@@ -1,5 +1,5 @@
 import toast from "react-hot-toast";
-import expensesApi from "../../Service/expensesApi";
+import financeApi from "../../Service/financeApi";
 
 // GET — server does the filtering/sorting/totaling (see
 // controllers/expensesController.js), so this always replaces the whole
@@ -7,7 +7,7 @@ import expensesApi from "../../Service/expensesApi";
 export async function getExpensesData(filters, setData, setIsLoading) {
   try {
     setIsLoading(true);
-    const res = await expensesApi.getExpenses(filters);
+    const res = await financeApi.getExpenses(filters);
     if (res.data.action) setData(res.data.data);
     else toast.error(res.data.message);
   } catch (e) {
@@ -20,7 +20,7 @@ export async function getExpensesData(filters, setData, setIsLoading) {
 export async function createExpense(data, setIsSubmitting, onDone) {
   try {
     setIsSubmitting(true);
-    const res = await expensesApi.createExpense(data);
+    const res = await financeApi.createExpense(data);
     if (res.data.action) {
       toast.success(res.data.message || "Expense added successfully");
       onDone?.();
@@ -39,7 +39,7 @@ export async function createExpense(data, setIsSubmitting, onDone) {
 export async function updateExpense(id, data, setIsSubmitting, onDone) {
   try {
     setIsSubmitting(true);
-    const res = await expensesApi.updateExpense(id, data);
+    const res = await financeApi.updateExpense(id, data);
     if (res.data.action) {
       toast.success(res.data.message || "Expense updated successfully");
       onDone?.();
@@ -58,7 +58,7 @@ export async function updateExpense(id, data, setIsSubmitting, onDone) {
 export async function deleteExpense(id, setIsDeleting, onDone) {
   try {
     setIsDeleting(true);
-    const res = await expensesApi.deleteExpense(id);
+    const res = await financeApi.deleteExpense(id);
     if (res.data.action) {
       toast.success(res.data.message || "Expense deleted successfully");
       onDone?.();

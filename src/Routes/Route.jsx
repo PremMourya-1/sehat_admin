@@ -4,9 +4,10 @@ import AdminLayout from "../Layout/AdminLayout/AdminLayout";
 import Login from "../Pages/Auth/Login";
 import Error from "../Pages/Status/Error";
 import ProtectedRoute from "./ProtectedRoute";
-import ExpensesProtectedRoute from "./ExpensesProtectedRoute";
-import ExpensesLogin from "../Pages/Expenses/ExpensesLogin";
-import Expenses from "../Pages/Expenses/Expenses";
+import FinanceProtectedRoute from "./FinanceProtectedRoute";
+import FinanceLogin from "../Pages/Finance/FinanceLogin";
+import Expenses from "../Pages/Finance/Expenses";
+import Sales from "../Pages/Finance/Sales";
 
 function RouteData() {
   return (
@@ -26,17 +27,25 @@ function RouteData() {
       </Route>
       <Route path="/login" element={<Login />} />
 
-      {/* Expenses Tracker — a completely separate mini-app with its own
-          auth (see EXPENSES.md), sibling to the admin routes above, not
-          nested under ProtectedRoute/AdminLayout and not listed in the
-          admin sidebar. */}
-      <Route path="/expenses/login" element={<ExpensesLogin />} />
+      {/* Finance mini-app (Expenses + Sales) — a completely separate
+          mini-app with its own auth (see FINANCE.md), sibling to the admin
+          routes above, not nested under ProtectedRoute/AdminLayout and not
+          listed in the admin sidebar. */}
+      <Route path="/finance/login" element={<FinanceLogin />} />
       <Route
-        path="/expenses"
+        path="/finance/expenses"
         element={
-          <ExpensesProtectedRoute>
+          <FinanceProtectedRoute>
             <Expenses />
-          </ExpensesProtectedRoute>
+          </FinanceProtectedRoute>
+        }
+      />
+      <Route
+        path="/finance/sales"
+        element={
+          <FinanceProtectedRoute>
+            <Sales />
+          </FinanceProtectedRoute>
         }
       />
 

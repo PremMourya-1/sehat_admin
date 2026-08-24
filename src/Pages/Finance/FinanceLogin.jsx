@@ -4,10 +4,10 @@ import { FaEye, FaEyeSlash } from "react-icons/fa";
 import { BRAND_NAME } from "../../Constant/Constant";
 import LoaderSpiner from "../../Components/Common/Loader/LoaderSpiner";
 import { cx } from "../../Utils/utils";
-import { EXPENSE_USERS } from "./expensesConstants";
-import { expensesLogin } from "./expensesAuthService";
+import { FINANCE_USERS } from "./financeConstants";
+import { financeLogin } from "./financeAuthService";
 
-const ExpensesLogin = () => {
+const FinanceLogin = () => {
   const navigate = useNavigate();
   const [name, setName] = useState("");
   const [password, setPassword] = useState("");
@@ -26,7 +26,7 @@ const ExpensesLogin = () => {
       setError("Password is required");
       return;
     }
-    await expensesLogin({ name, password }, setIsLoading, navigate).catch(
+    await financeLogin({ name, password }, setIsLoading, navigate).catch(
       () => {},
     );
   };
@@ -40,12 +40,12 @@ const ExpensesLogin = () => {
         <div className="mb-8 text-center">
           <span className="text-4xl">💰</span>
           <h1 className="brand-logo mt-2 text-3xl">{BRAND_NAME}</h1>
-          <p className="brand-tagline mt-1 text-sm">Expenses Tracker</p>
+          <p className="brand-tagline mt-1 text-sm">Finance — Expenses &amp; Sales</p>
         </div>
 
         <div className="card">
-          <h2 className="section-title mb-1">Expenses Login</h2>
-          <p className="mb-5 text-sm text-muted">Sign in to track purchases</p>
+          <h2 className="section-title mb-1">Finance Login</h2>
+          <p className="mb-5 text-sm text-muted">Sign in to track purchases &amp; offline sales</p>
 
           <form onSubmit={handleSubmit} noValidate>
             <div className="formGroup">
@@ -54,7 +54,7 @@ const ExpensesLogin = () => {
                 <span style={{ color: "var(--danger)" }}> *</span>
               </label>
               <div className="grid grid-cols-2 gap-3">
-                {EXPENSE_USERS.map((user) => (
+                {FINANCE_USERS.map((user) => (
                   <button
                     key={user.value}
                     type="button"
@@ -79,13 +79,13 @@ const ExpensesLogin = () => {
             </div>
 
             <div className="formGroup">
-              <label htmlFor="expenses-password" className="form-label">
+              <label htmlFor="finance-password" className="form-label">
                 Password
                 <span style={{ color: "var(--danger)" }}> *</span>
               </label>
               <div className="relative">
                 <input
-                  id="expenses-password"
+                  id="finance-password"
                   type={showPassword ? "text" : "password"}
                   placeholder="••••••••"
                   className="inputBox pr-10"
@@ -121,4 +121,4 @@ const ExpensesLogin = () => {
   );
 };
 
-export default ExpensesLogin;
+export default FinanceLogin;
