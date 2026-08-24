@@ -1,5 +1,6 @@
-import { useCallback, useState } from "react";
+import { useCallback, useEffect, useMemo, useState } from "react";
 import { useForm } from "react-hook-form";
+import toast from "react-hot-toast";
 import { MdAdd, MdDeleteOutline, MdEdit } from "react-icons/md";
 import BreadCrumb from "../../Components/Common/BreadCrumb/BreadCrumb";
 import Button from "../../Components/Button/Button";
@@ -11,6 +12,9 @@ import PreLoader from "../../Components/Common/Loader/PreLoader";
 import NoRecords from "../../Components/NoRecords/NoRecords";
 import LoaderSpiner from "../../Components/Common/Loader/LoaderSpiner";
 import usePageReload from "../../Hooks/usePageReload";
+import { formatCurrency, getImageUrl } from "../../Utils/utils";
+import { getProductData } from "../Product/productService";
+import ComboItemsBuilder from "./ComboItemsBuilder";
 import {
   createComboOffer,
   deleteComboOffer,
@@ -19,30 +23,66 @@ import {
   updateComboOffer,
 } from "./comboOfferService";
 
-const DEFAULT_VALUES = { title: "", description: "", discountLabel: "", ctaLabel: "Shop Now", ctaLink: "/products" };
+const DEFAULT_VALUES = { title: "", description: "", comboPrice: "", discountLabel: "" };
+
+// A row of ComboOfferItem (as returned by the API, nested Product/variant
+// included) into the flat, display-ready shape ComboItemsBuilder works
+// with — mirrors what the builder itself produces when adding a fresh item.
+function toBuilderItem(row) {
+  return {
+    id: row.id,
+    productId: row.productId,
+    variantId: row.variantId,
+    quantity: row.quantity,
+    productName: row.Product?.name,
+    productImage: row.Product?.image,
+    weight: row.variant?.weight,
+    price: Number(row.variant?.price || 0),
+  };
+}
 
 const ComboOffer = () => {
   const [data, setData] = useState([]);
   const [isLoading, setIsLoading] = useState(true);
+  const [products, setProducts] = useState([]);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [isDeleting, setIsDeleting] = useState(false);
   const [drawerOpen, setDrawerOpen] = useState(false);
   const [editing, setEditing] = useState(null);
   const [toDelete, setToDelete] = useState(null);
+  const [items, setItems] = useState([]);
 
   const {
     register,
     handleSubmit,
     reset,
+    watch,
     formState: { errors },
   } = useForm({ defaultValues: DEFAULT_VALUES });
 
   const fetchComboOffers = useCallback(() => getComboOfferData(setData, setIsLoading), []);
   usePageReload(fetchComboOffers);
 
+  // Loaded once for the product picker — same full-catalog call
+  // Pages/Product/Product.jsx already uses, filtered client-side. Plain
+  // effect (not usePageReload) since only one fetch per page can be wired
+  // to the header's reload button, and combo offers is this page's own
+  // primary content.
+  useEffect(() => {
+    getProductData(setProducts, () => {});
+  }, []);
+
+  const individualTotal = useMemo(
+    () => items.reduce((sum, item) => sum + item.price * item.quantity, 0),
+    [items],
+  );
+  const comboPriceValue = Number(watch("comboPrice")) || 0;
+  const savings = individualTotal - comboPriceValue;
+
   const openAdd = () => {
     setEditing(null);
     reset(DEFAULT_VALUES);
+    setItems([]);
     setDrawerOpen(true);
   };
 
@@ -51,18 +91,34 @@ const ComboOffer = () => {
     reset({
       title: row.title,
       description: row.description || "",
+      comboPrice: row.comboPrice,
       discountLabel: row.discountLabel || "",
-      ctaLabel: row.ctaLabel || "Shop Now",
-      ctaLink: row.ctaLink || "/products",
     });
+    setItems((row.items || []).map(toBuilderItem));
     setDrawerOpen(true);
   };
 
   const onSubmit = (values) => {
+    const distinctProducts = new Set(items.map((i) => i.productId));
+    if (distinctProducts.size < 2) {
+      toast.error("Add at least 2 distinct products to this combo");
+      return;
+    }
+
+    const payload = {
+      ...values,
+      items: items.map((item) => ({
+        id: item.id,
+        productId: item.productId,
+        variantId: item.variantId,
+        quantity: item.quantity,
+      })),
+    };
+
     if (editing) {
-      updateComboOffer(editing.id, values, setData, setIsSubmitting, () => setDrawerOpen(false));
+      updateComboOffer(editing.id, payload, setData, setIsSubmitting, () => setDrawerOpen(false));
     } else {
-      createComboOffer(values, setData, setIsSubmitting, () => setDrawerOpen(false));
+      createComboOffer(payload, setData, setIsSubmitting, () => setDrawerOpen(false));
     }
   };
 
@@ -95,6 +151,30 @@ const ComboOffer = () => {
               )}
               <h3 className="section-title">{offer.title}</h3>
               <p className="mt-1 text-sm text-muted">{offer.description}</p>
+
+              <div className="mt-3 flex items-center gap-2">
+                {(offer.items || []).slice(0, 4).map((item) => (
+                  <div
+                    key={item.id}
+                    className="h-10 w-10 overflow-hidden rounded-lg border"
+                    style={{ borderColor: "var(--border)" }}
+                  >
+                    {item.Product?.image ? (
+                      <img
+                        src={getImageUrl(item.Product.image)}
+                        alt={item.Product.name}
+                        className="h-full w-full object-cover"
+                      />
+                    ) : (
+                      <div className="h-full w-full" style={{ backgroundColor: "var(--background-light)" }} />
+                    )}
+                  </div>
+                ))}
+                <span className="ml-1 font-semibold" style={{ color: "var(--primary)" }}>
+                  {formatCurrency(offer.comboPrice)}
+                </span>
+              </div>
+
               <div className="mt-3 flex items-center justify-between">
                 <label className="flex items-center gap-2 text-sm" style={{ color: "var(--text)" }}>
                   <input
@@ -119,7 +199,12 @@ const ComboOffer = () => {
         </div>
       )}
 
-      <Drawer open={drawerOpen} onClose={() => setDrawerOpen(false)} title={editing ? "Edit Combo Offer" : "Add Combo Offer"}>
+      <Drawer
+        open={drawerOpen}
+        onClose={() => setDrawerOpen(false)}
+        title={editing ? "Edit Combo Offer" : "Add Combo Offer"}
+        size="md"
+      >
         <form onSubmit={handleSubmit(onSubmit)} noValidate>
           <InputBox
             label="Title"
@@ -127,7 +212,7 @@ const ComboOffer = () => {
             register={register}
             rules={{ required: "Title is required" }}
             error={errors.title}
-            placeholder="e.g. Buy 2 Get 10% Off"
+            placeholder="e.g. Daily Nuts Combo"
             required
           />
           <InputBox
@@ -137,14 +222,52 @@ const ComboOffer = () => {
             register={register}
             placeholder="Short line explaining the offer"
           />
+
+          <ComboItemsBuilder items={items} onChange={setItems} products={products} />
+
+          <div className="formGroup">
+            <label htmlFor="comboPrice" className="form-label">
+              Combo Price
+              <span style={{ color: "var(--danger)" }}> *</span>
+            </label>
+            <div className="relative">
+              <span
+                className="pointer-events-none absolute left-3.5 top-1/2 -translate-y-1/2 text-sm"
+                style={{ color: "var(--text-light)" }}
+              >
+                ₹
+              </span>
+              <input
+                id="comboPrice"
+                type="number"
+                step="0.01"
+                min="0"
+                placeholder="0.00"
+                className={`inputBox pl-7 ${errors.comboPrice ? "has-error" : ""}`}
+                {...register("comboPrice", {
+                  required: "Combo price is required",
+                  min: { value: 0, message: "Price cannot be negative" },
+                })}
+              />
+            </div>
+            {errors.comboPrice && <p className="form-error">{errors.comboPrice.message}</p>}
+            {items.length > 0 && (
+              <p className="mt-1 text-xs text-muted">
+                Individual total: {formatCurrency(individualTotal)}
+                {savings > 0 && (
+                  <span style={{ color: "var(--success)" }}> · You&apos;re saving {formatCurrency(savings)}</span>
+                )}
+              </p>
+            )}
+          </div>
+
           <InputBox
             label="Discount Label"
             name="discountLabel"
             register={register}
-            placeholder="e.g. 10% OFF"
+            placeholder="e.g. Save 15%"
           />
-          <InputBox label="CTA Label" name="ctaLabel" register={register} placeholder="Shop Now" />
-          <InputBox label="CTA Link" name="ctaLink" register={register} placeholder="/products" />
+
           <button type="submit" className="btn-primary w-full" disabled={isSubmitting}>
             {isSubmitting ? <LoaderSpiner size={18} /> : editing ? "Update Offer" : "Create Offer"}
           </button>

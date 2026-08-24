@@ -120,6 +120,9 @@ const OrderView = () => {
                     <td>
                       {item.Product?.name || "Product"}
                       {item.weight ? ` (${item.weight})` : ""}
+                      {item.ComboOffer && (
+                        <span className="ml-2 badge-accent">Combo: {item.ComboOffer.title}</span>
+                      )}
                     </td>
                     <td>{item.quantity}</td>
                     <td>{formatCurrency(item.price)}</td>
