@@ -14,6 +14,17 @@ const FinanceLogin = () => {
   const [showPassword, setShowPassword] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState("");
+  const [brandArmed, setBrandArmed] = useState(false);
+
+  // Hidden shortcut for Shinu/Komal: double-click the brand name, then
+  // double-click "Finance Login" to autofill the shared password instead
+  // of typing it every time.
+  const handleAutofillPassword = () => {
+    if (!brandArmed) return;
+    setPassword("SehatKharch@2026");
+    setError("");
+    setBrandArmed(false);
+  };
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -39,12 +50,22 @@ const FinanceLogin = () => {
       <div className="w-full max-w-md">
         <div className="mb-8 text-center">
           <span className="text-4xl">💰</span>
-          <h1 className="brand-logo mt-2 text-3xl">{BRAND_NAME}</h1>
+          <h1
+            className="brand-logo mt-2 text-3xl select-none"
+            onDoubleClick={() => setBrandArmed(true)}
+          >
+            {BRAND_NAME}
+          </h1>
           <p className="brand-tagline mt-1 text-sm">Finance — Expenses &amp; Sales</p>
         </div>
 
         <div className="card">
-          <h2 className="section-title mb-1">Finance Login</h2>
+          <h2
+            className="section-title mb-1 select-none"
+            onDoubleClick={handleAutofillPassword}
+          >
+            Finance Login
+          </h2>
           <p className="mb-5 text-sm text-muted">Sign in to track purchases &amp; offline sales</p>
 
           <form onSubmit={handleSubmit} noValidate>
