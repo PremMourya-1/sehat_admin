@@ -61,6 +61,32 @@ export async function updateProduct(id, formData, setIsSubmitting, navigate) {
   }
 }
 
+// Quick inline update from the grid view's "Build Your Own Mix" toggle —
+// sends only the two mix-related fields, not the whole product. The
+// backend's update handler only touches fields present in the request
+// (see adminProductController.js), so name/variants/images/etc are
+// left untouched.
+export async function updateProductMixSettings(id, { isMixIngredient, mixCategory }, setData, setIsSubmitting) {
+  try {
+    setIsSubmitting(true);
+    const formData = new FormData();
+    formData.append("isMixIngredient", isMixIngredient ? "1" : "0");
+    formData.append("mixCategory", isMixIngredient ? mixCategory || "" : "");
+    const res = await adminApi.updateProduct(id, formData);
+    if (res.data.action) {
+      setData((prev) => prev.map((p) => (p.id === id ? res.data.data : p)));
+      return true;
+    }
+    toast.error(res.data.message);
+    return false;
+  } catch (e) {
+    toast.error(e?.response?.data?.message || "Failed to update product");
+    return false;
+  } finally {
+    setIsSubmitting(false);
+  }
+}
+
 export async function deleteProduct(id, setData, setIsDeleting, onDone) {
   try {
     setIsDeleting(true);
