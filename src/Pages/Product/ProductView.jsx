@@ -29,7 +29,7 @@ const ProductView = () => {
           <div className="card mb-5">
             <h3 className="section-title mb-3">Details</h3>
             <p className="mb-2 text-sm text-muted">Category</p>
-            <p className="mb-4">{product.category?.name || "-"}</p>
+            <p className="mb-4">{product.Category?.name || "-"}</p>
             <p className="mb-2 text-sm text-muted">Short Description</p>
             <p className="mb-4">{product.shortDescription || "-"}</p>
             <p className="mb-2 text-sm text-muted">Long Description</p>

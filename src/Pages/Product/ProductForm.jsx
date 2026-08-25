@@ -72,7 +72,15 @@ const ProductForm = ({ initialData, onSubmit, isSubmitting, submitLabel = "Save 
   }, []);
 
   useEffect(() => {
-    if (initialData) {
+    // Waits on categories too, not just initialData: the "Category" field
+    // is a plain uncontrolled <select> (see Components/Form/InputBox), so
+    // setting its value via reset() before the matching <option> exists in
+    // the DOM (categories loads async, separately, in the effect above)
+    // gets silently ignored by the browser — the select then shows the
+    // placeholder forever even though the correct categoryId is sitting in
+    // form state the whole time. Once both are ready, the <option> list is
+    // already committed before this effect runs, so the value takes.
+    if (initialData && categories.length > 0) {
       reset({
         name: initialData.name || "",
         categoryId: initialData.categoryId || "",
@@ -113,7 +121,7 @@ const ProductForm = ({ initialData, onSubmit, isSubmitting, submitLabel = "Save 
             : [],
       });
     }
-  }, [initialData, reset]);
+  }, [initialData, categories, reset]);
 
   const submitHandler = (data) => {
     if (!data.variants || data.variants.length === 0) {

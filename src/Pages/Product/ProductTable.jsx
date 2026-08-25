@@ -59,7 +59,16 @@ const useProductColumns = ({ onDelete }) => {
       },
     },
     { key: "name", label: "Name" },
-    { key: "category", label: "Category", render: (row) => row.category?.name || "-" },
+    {
+      key: "category",
+      label: "Category",
+      // The admin API's Product<->Category include has no `as` alias, so
+      // Sequelize's default association key is "Category" (capitalized,
+      // matching the model name), not "category" — this was silently
+      // rendering "-" for every row regardless of the product's real
+      // category.
+      render: (row) => row.Category?.name || "-",
+    },
     { key: "variants", label: "Weights", render: (row) => (row.variants || []).map((v) => v.weight).join(", ") || "-" },
     { key: "price", label: "Price", render: renderPrice },
     {
