@@ -106,6 +106,12 @@ const adminApi = {
   createShippingZone: (data) => apiJson.post(adminUrl.shippingZone, data),
   updateShippingZone: (id, data) => apiJson.put(adminUrl.shippingZoneById(id), data),
   deleteShippingZone: (id) => apiJson.delete(adminUrl.shippingZoneById(id)),
+
+  // ---- cart reward tiers ----
+  getCartRewards: () => apiJson.get(adminUrl.cartReward),
+  createCartReward: (data) => apiJson.post(adminUrl.cartReward, data),
+  updateCartReward: (id, data) => apiJson.put(adminUrl.cartRewardById(id), data),
+  deleteCartReward: (id) => apiJson.delete(adminUrl.cartRewardById(id)),
 };
 
 export default adminApi;

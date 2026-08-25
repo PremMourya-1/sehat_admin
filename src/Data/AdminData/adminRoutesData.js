@@ -13,6 +13,7 @@ import Product from "../../Pages/Product/Product";
 import ProductView from "../../Pages/Product/ProductView";
 import Testimonial from "../../Pages/Testimonial/Testimonial";
 import ComboOffer from "../../Pages/ComboOffer/ComboOffer";
+import CartReward from "../../Pages/CartReward/CartReward";
 import BlogPost from "../../Pages/BlogPost/BlogPost";
 import Faq from "../../Pages/Faq/Faq";
 import Newsletter from "../../Pages/Newsletter/Newsletter";
@@ -36,6 +37,7 @@ const adminRoutes = [
   { path: "testimonials", element: Testimonial },
   { path: "cms", element: Cms },
   { path: "combo-offers", element: ComboOffer },
+  { path: "cart-rewards", element: CartReward },
   { path: "blog-posts", element: BlogPost },
   { path: "faqs", element: Faq },
   { path: "newsletter-subscribers", element: Newsletter },

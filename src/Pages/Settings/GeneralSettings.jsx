@@ -30,6 +30,11 @@ const GeneralSettings = () => {
     await updateWebSettings({ mobileVerificationRequired: event.target.checked }, setSettings, setIsSubmitting);
   };
 
+  const [isSavingRewardMode, setIsSavingRewardMode] = useState(false);
+  const handleCartRewardMode = async (mode) => {
+    await updateWebSettings({ cartRewardMode: mode }, setSettings, setIsSavingRewardMode);
+  };
+
   const increments = settings?.mixWeightIncrementsGrams || [];
 
   const addIncrement = async () => {
@@ -163,6 +168,50 @@ const GeneralSettings = () => {
           <MdAdd size={16} />
           Add
         </button>
+      </div>
+    </Card>
+
+    <Card className="mt-5 max-w-xl">
+      <h3 className="section-title mb-1">Cart Reward Tiers</h3>
+      <p className="mb-4 text-sm text-muted">
+        When a cart clears several reward thresholds at once (see the Cart Rewards page), choose
+        whether the customer gets only the single best-qualifying gift, or every qualifying tier&apos;s
+        gift stacked together.
+      </p>
+
+      <div className="flex flex-col gap-2 sm:flex-row">
+        {[
+          { value: "highest", title: "Only the highest tier", desc: "One free gift — the best one they qualify for." },
+          { value: "all", title: "Stack all qualifying tiers", desc: "A free gift for every threshold cleared." },
+        ].map((option) => (
+          <label
+            key={option.value}
+            className="flex flex-1 cursor-pointer items-start gap-3 rounded-lg border p-3"
+            style={{
+              borderColor:
+                (settings?.cartRewardMode || "highest") === option.value ? "var(--primary)" : "var(--border)",
+              backgroundColor:
+                (settings?.cartRewardMode || "highest") === option.value ? "var(--primary-tp)" : "transparent",
+            }}
+          >
+            <input
+              type="radio"
+              name="cartRewardMode"
+              value={option.value}
+              checked={(settings?.cartRewardMode || "highest") === option.value}
+              onChange={() => handleCartRewardMode(option.value)}
+              disabled={isSavingRewardMode}
+              className="mt-1 h-4 w-4"
+            />
+            <span>
+              <p className="text-sm font-medium" style={{ color: "var(--text)" }}>
+                {option.title}
+              </p>
+              <p className="text-xs text-muted">{option.desc}</p>
+            </span>
+          </label>
+        ))}
+        {isSavingRewardMode && <LoaderSpiner size={16} />}
       </div>
     </Card>
     </>

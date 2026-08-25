@@ -5,6 +5,7 @@ import {
   MdOutlineMailOutline,
   MdOutlineSettings,
   MdToday,
+  MdCardGiftcard,
 } from "react-icons/md";
 import { BiCategory } from "react-icons/bi";
 import { FaBoxOpen, FaUsers, FaTags, FaRegImages, FaRegCommentDots, FaFileAlt, FaBlog } from "react-icons/fa";
@@ -28,6 +29,7 @@ const adminSideBarData = [
   { label: "Hero Banners", path: "/hero-banners", icon: <FaRegImages /> },
   { label: "Testimonials", path: "/testimonials", icon: <FaRegCommentDots /> },
   { label: "Combo Offers", path: "/combo-offers", icon: <MdOutlineLocalOffer /> },
+  { label: "Cart Rewards", path: "/cart-rewards", icon: <MdCardGiftcard /> },
   { label: "Blog Posts", path: "/blog-posts", icon: <FaBlog /> },
   { label: "FAQs", path: "/faqs", icon: <MdOutlineQuestionAnswer /> },
   { label: "Newsletter", path: "/newsletter-subscribers", icon: <MdOutlineMailOutline /> },

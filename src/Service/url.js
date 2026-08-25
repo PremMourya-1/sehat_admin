@@ -77,6 +77,10 @@ const adminUrl = {
   // shipping zones (checkout shipping charge)
   shippingZone: "/shipping-zones",
   shippingZoneById: (id) => `/shipping-zones/${id}`,
+
+  // cart reward tiers ("spend ₹X, get a free gift")
+  cartReward: "/cart-rewards",
+  cartRewardById: (id) => `/cart-rewards/${id}`,
 };
 
 export default adminUrl;
