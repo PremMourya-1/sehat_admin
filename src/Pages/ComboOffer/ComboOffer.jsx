@@ -203,70 +203,94 @@ const ComboOffer = () => {
         open={drawerOpen}
         onClose={() => setDrawerOpen(false)}
         title={editing ? "Edit Combo Offer" : "Add Combo Offer"}
-        size="md"
+        size="lg"
       >
-        <form onSubmit={handleSubmit(onSubmit)} noValidate>
-          <InputBox
-            label="Title"
-            name="title"
-            register={register}
-            rules={{ required: "Title is required" }}
-            error={errors.title}
-            placeholder="e.g. Daily Nuts Combo"
-            required
-          />
-          <InputBox
-            label="Description"
-            name="description"
-            as="textarea"
-            register={register}
-            placeholder="Short line explaining the offer"
-          />
-
-          <ComboItemsBuilder items={items} onChange={setItems} products={products} />
-
-          <div className="formGroup">
-            <label htmlFor="comboPrice" className="form-label">
-              Combo Price
-              <span style={{ color: "var(--danger)" }}> *</span>
-            </label>
-            <div className="relative">
-              <span
-                className="pointer-events-none absolute left-3.5 top-1/2 -translate-y-1/2 text-sm"
-                style={{ color: "var(--text-light)" }}
-              >
-                ₹
-              </span>
-              <input
-                id="comboPrice"
-                type="number"
-                step="0.01"
-                min="0"
-                placeholder="0.00"
-                className={`inputBox pl-7 ${errors.comboPrice ? "has-error" : ""}`}
-                {...register("comboPrice", {
-                  required: "Combo price is required",
-                  min: { value: 0, message: "Price cannot be negative" },
-                })}
-              />
-            </div>
-            {errors.comboPrice && <p className="form-error">{errors.comboPrice.message}</p>}
-            {items.length > 0 && (
-              <p className="mt-1 text-xs text-muted">
-                Individual total: {formatCurrency(individualTotal)}
-                {savings > 0 && (
-                  <span style={{ color: "var(--success)" }}> · You&apos;re saving {formatCurrency(savings)}</span>
-                )}
-              </p>
-            )}
+        <form onSubmit={handleSubmit(onSubmit)} noValidate className="flex flex-col gap-5">
+          <div className="card">
+            <h3 className="section-title mb-4">Basic Details</h3>
+            <InputBox
+              label="Title"
+              name="title"
+              register={register}
+              rules={{ required: "Title is required" }}
+              error={errors.title}
+              placeholder="e.g. Daily Nuts Combo"
+              required
+              containerClassName="!mb-4"
+            />
+            <InputBox
+              label="Description"
+              name="description"
+              as="textarea"
+              register={register}
+              placeholder="Short line explaining the offer"
+              containerClassName="!mb-0"
+            />
           </div>
 
-          <InputBox
-            label="Discount Label"
-            name="discountLabel"
-            register={register}
-            placeholder="e.g. Save 15%"
-          />
+          <div className="card">
+            <h3 className="section-title mb-1">Products</h3>
+            <p className="mb-4 text-sm text-muted">Add at least 2 products to bundle into this combo.</p>
+            <ComboItemsBuilder items={items} onChange={setItems} products={products} />
+          </div>
+
+          <div className="card">
+            <h3 className="section-title mb-4">Pricing</h3>
+            <div className="grid grid-cols-2 gap-4 sm:grid-cols-1">
+              <div className="formGroup !mb-0">
+                <label htmlFor="comboPrice" className="form-label">
+                  Combo Price
+                  <span style={{ color: "var(--danger)" }}> *</span>
+                </label>
+                <div className="relative">
+                  <span
+                    className="pointer-events-none absolute left-3.5 top-1/2 -translate-y-1/2 text-sm"
+                    style={{ color: "var(--text-light)" }}
+                  >
+                    ₹
+                  </span>
+                  <input
+                    id="comboPrice"
+                    type="number"
+                    step="0.01"
+                    min="0"
+                    placeholder="0.00"
+                    className={`inputBox pl-7 ${errors.comboPrice ? "has-error" : ""}`}
+                    {...register("comboPrice", {
+                      required: "Combo price is required",
+                      min: { value: 0, message: "Price cannot be negative" },
+                    })}
+                  />
+                </div>
+                {errors.comboPrice && <p className="form-error">{errors.comboPrice.message}</p>}
+              </div>
+
+              <InputBox
+                label="Discount Label"
+                name="discountLabel"
+                register={register}
+                placeholder="e.g. Save 15%"
+                containerClassName="!mb-0"
+              />
+            </div>
+
+            {items.length > 0 && (
+              <div
+                className="mt-4 flex items-center justify-between rounded-lg px-4 py-3 text-sm"
+                style={{ backgroundColor: "var(--background-light)" }}
+              >
+                <span className="text-muted">Individual total</span>
+                <span className="font-semibold" style={{ color: "var(--text)" }}>
+                  {formatCurrency(individualTotal)}
+                  {savings > 0 && (
+                    <span className="ml-2 font-medium" style={{ color: "var(--success)" }}>
+                      You&apos;re saving {formatCurrency(savings)}
+                    </span>
+                  )}
+                </span>
+              </div>
+            )}
+          </div>
 
           <button type="submit" className="btn-primary w-full" disabled={isSubmitting}>
             {isSubmitting ? <LoaderSpiner size={18} /> : editing ? "Update Offer" : "Create Offer"}

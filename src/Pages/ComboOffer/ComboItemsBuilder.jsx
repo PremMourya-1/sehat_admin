@@ -1,13 +1,13 @@
 import { useState } from "react";
-import { MdAdd, MdDeleteOutline, MdSearch } from "react-icons/md";
+import { MdAdd, MdDeleteOutline, MdInventory2, MdSearch } from "react-icons/md";
 import UseFilter from "../../Hooks/UseFilter";
 import { formatCurrency, getImageUrl } from "../../Utils/utils";
 
 // Product photo + name + weight, read straight off the Product/ProductVariant
 // records — never re-entered manually. Same thumbnail convention as
 // Product/ProductTable.jsx (h-12 w-12 rounded-lg border).
-const ItemThumb = ({ image, name }) => (
-  <div className="h-12 w-12 shrink-0 overflow-hidden rounded-lg border" style={{ borderColor: "var(--border)" }}>
+const ItemThumb = ({ image, name, size = "h-12 w-12" }) => (
+  <div className={`${size} shrink-0 overflow-hidden rounded-lg border`} style={{ borderColor: "var(--border)" }}>
     {image ? (
       <img src={getImageUrl(image)} alt={name} className="h-full w-full object-cover" />
     ) : (
@@ -79,9 +79,7 @@ const ComboItemsBuilder = ({ items, onChange, products }) => {
   };
 
   return (
-    <div className="formGroup">
-      <label className="form-label">Products in this Combo</label>
-
+    <div>
       <div className="relative">
         <MdSearch
           size={18}
@@ -107,7 +105,7 @@ const ComboItemsBuilder = ({ items, onChange, products }) => {
                   key={product.id}
                   type="button"
                   onClick={() => selectProduct(product)}
-                  className="flex w-full items-center gap-3 p-2 text-left hover:bg-(--background-light)"
+                  className="flex w-full items-center gap-3 p-2 text-left transition-colors hover:bg-[var(--background-light)]"
                 >
                   <ItemThumb image={product.image || product.images?.[0]?.image} name={product.name} />
                   <span className="text-sm font-medium" style={{ color: "var(--text)" }}>
@@ -122,55 +120,71 @@ const ComboItemsBuilder = ({ items, onChange, products }) => {
 
       {pickedProduct && (
         <div
-          className="mt-3 flex flex-wrap items-center gap-3 rounded-lg border p-3"
-          style={{ borderColor: "var(--border)", backgroundColor: "var(--background-light)" }}
+          className="mt-3 rounded-lg border-2 border-dashed p-3"
+          style={{ borderColor: "var(--primary)", backgroundColor: "var(--primary-tp)" }}
         >
-          <ItemThumb image={pickedProduct.image || pickedProduct.images?.[0]?.image} name={pickedProduct.name} />
-          <span className="text-sm font-medium" style={{ color: "var(--text)" }}>
-            {pickedProduct.name}
-          </span>
+          <div className="flex items-center gap-3">
+            <ItemThumb image={pickedProduct.image || pickedProduct.images?.[0]?.image} name={pickedProduct.name} />
+            <span className="min-w-0 flex-1 truncate text-sm font-medium" style={{ color: "var(--text)" }}>
+              {pickedProduct.name}
+            </span>
+          </div>
 
           {pickedProduct.variants?.length > 0 ? (
-            <>
-              <select
-                value={pickedVariantId}
-                onChange={(e) => setPickedVariantId(e.target.value)}
-                className="inputBox w-auto"
-              >
-                {pickedProduct.variants.map((v) => (
-                  <option key={v.id} value={v.id}>
-                    {v.weight} — {formatCurrency(v.price)}
-                  </option>
-                ))}
-              </select>
-              <input
-                type="number"
-                min="1"
-                value={pickedQty}
-                onChange={(e) => setPickedQty(e.target.value)}
-                className="inputBox w-20"
-                aria-label="Quantity"
-              />
-              <button type="button" className="btn-primary" onClick={addItem}>
+            <div className="mt-3 grid grid-cols-[1fr_auto_auto] items-end gap-2 sm:grid-cols-2">
+              <div className="flex flex-col gap-1">
+                <label className="text-xs text-muted">Weight</label>
+                <select
+                  value={pickedVariantId}
+                  onChange={(e) => setPickedVariantId(e.target.value)}
+                  className="inputBox"
+                >
+                  {pickedProduct.variants.map((v) => (
+                    <option key={v.id} value={v.id}>
+                      {v.weight} — {formatCurrency(v.price)}
+                    </option>
+                  ))}
+                </select>
+              </div>
+              <div className="flex flex-col gap-1">
+                <label className="text-xs text-muted">Qty</label>
+                <input
+                  type="number"
+                  min="1"
+                  value={pickedQty}
+                  onChange={(e) => setPickedQty(e.target.value)}
+                  className="inputBox w-20"
+                  aria-label="Quantity"
+                />
+              </div>
+              <button type="button" className="btn-primary sm:col-span-2" onClick={addItem}>
                 <MdAdd size={18} />
-                Add
+                Add to Combo
               </button>
-            </>
+            </div>
           ) : (
-            <span className="text-sm text-muted">This product has no weight variants to add.</span>
+            <p className="mt-2 text-sm text-muted">This product has no weight variants to add.</p>
           )}
         </div>
       )}
 
-      {items.length > 0 && (
+      {items.length === 0 ? (
+        <div
+          className="mt-4 flex flex-col items-center gap-2 rounded-lg border border-dashed py-8 text-center"
+          style={{ borderColor: "var(--border)" }}
+        >
+          <MdInventory2 size={28} style={{ color: "var(--text-light)" }} />
+          <p className="text-sm text-muted">No products added yet. Search above to add the first one.</p>
+        </div>
+      ) : (
         <div className="mt-4 flex flex-col gap-2">
           {items.map((item, index) => (
             <div
               key={`${item.productId}-${item.variantId}`}
-              className="flex items-center gap-3 rounded-lg border p-2"
+              className="flex flex-wrap items-center gap-3 rounded-lg border p-2.5 sm:gap-2"
               style={{ borderColor: "var(--border)" }}
             >
-              <ItemThumb image={item.productImage} name={item.productName} />
+              <ItemThumb image={item.productImage} name={item.productName} size="h-11 w-11" />
               <div className="min-w-0 flex-1">
                 <p className="truncate text-sm font-medium" style={{ color: "var(--text)" }}>
                   {item.productName}
