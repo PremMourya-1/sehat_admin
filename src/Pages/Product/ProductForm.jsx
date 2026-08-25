@@ -9,7 +9,7 @@ import MultiImageUpload from "../../Components/Form/FileUpload/MultiImageUpload"
 import LoaderSpiner from "../../Components/Common/Loader/LoaderSpiner";
 import Button from "../../Components/Button/Button";
 import adminApi from "../../Service/api";
-import { PRODUCT_TAGS, VARIANT_WEIGHTS } from "../../Constant/Constant";
+import { MIX_CATEGORIES, PRODUCT_TAGS, VARIANT_WEIGHTS } from "../../Constant/Constant";
 
 const emptyVariant = () => ({ weight: "250g", mrp: "", price: "", stock: "" });
 const emptyCompositionRow = () => ({ ingredient: "", percentage: "" });
@@ -32,6 +32,7 @@ const ProductForm = ({ initialData, onSubmit, isSubmitting, submitLabel = "Save 
     handleSubmit,
     control,
     reset,
+    watch,
     formState: { errors },
   } = useForm({
     defaultValues: {
@@ -44,11 +45,15 @@ const ProductForm = ({ initialData, onSubmit, isSubmitting, submitLabel = "Save 
       showOnHome: false,
       isTrending: false,
       codAvailable: true,
+      isMixIngredient: false,
+      mixCategory: "",
       variants: [emptyVariant()],
       nutrition: emptyNutrition(),
       composition: [],
     },
   });
+
+  const isMixIngredient = watch("isMixIngredient");
 
   const { fields, append, remove } = useFieldArray({ control, name: "variants" });
   const {
@@ -78,6 +83,8 @@ const ProductForm = ({ initialData, onSubmit, isSubmitting, submitLabel = "Save 
         showOnHome: initialData.showOnHome ?? false,
         isTrending: initialData.isTrending ?? false,
         codAvailable: initialData.codAvailable ?? true,
+        isMixIngredient: initialData.isMixIngredient ?? false,
+        mixCategory: initialData.mixCategory || "",
         variants:
           initialData.variants && initialData.variants.length > 0
             ? initialData.variants.map((v) => ({
@@ -124,6 +131,8 @@ const ProductForm = ({ initialData, onSubmit, isSubmitting, submitLabel = "Save 
     formData.append("showOnHome", data.showOnHome ? "1" : "0");
     formData.append("isTrending", data.isTrending ? "1" : "0");
     formData.append("codAvailable", data.codAvailable ? "1" : "0");
+    formData.append("isMixIngredient", data.isMixIngredient ? "1" : "0");
+    formData.append("mixCategory", data.isMixIngredient ? data.mixCategory || "" : "");
     formData.append("variants", JSON.stringify(data.variants));
     formData.append("nutrition", JSON.stringify(data.nutrition || {}));
     formData.append(
@@ -366,6 +375,33 @@ const ProductForm = ({ initialData, onSubmit, isSubmitting, submitLabel = "Save 
               <input type="checkbox" {...register("codAvailable")} className="h-4 w-4" />
               COD Available (Cash on Delivery allowed for this product)
             </label>
+          </div>
+
+          <div className="card mb-5">
+            <h3 className="section-title mb-1">Build Your Own Mix</h3>
+            <p className="mb-4 text-sm text-muted">
+              Only products flagged here are selectable as ingredients on the storefront&apos;s mix builder.
+              Pricing is derived from this product&apos;s smallest weight variant.
+            </p>
+            <label className="flex items-center gap-2 text-sm" style={{ color: "var(--text)" }}>
+              <input type="checkbox" {...register("isMixIngredient")} className="h-4 w-4" />
+              Available as a mix ingredient
+            </label>
+
+            {isMixIngredient && (
+              <InputBox
+                label="Base Category"
+                name="mixCategory"
+                as="select"
+                register={register}
+                rules={{ required: "Choose a base category for this ingredient" }}
+                error={errors.mixCategory}
+                placeholder="Select a category"
+                options={MIX_CATEGORIES}
+                containerClassName="mt-3 !mb-0"
+                required
+              />
+            )}
           </div>
 
           <div className="flex gap-3">

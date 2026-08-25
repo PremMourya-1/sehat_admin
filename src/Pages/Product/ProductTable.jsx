@@ -73,6 +73,11 @@ const useProductColumns = ({ onDelete }) => {
       render: (row) => (row.showOnHome ? <span className="badge-accent">Featured</span> : <span className="badge-muted">-</span>),
     },
     {
+      key: "isMixIngredient",
+      label: "Mix Ingredient",
+      render: (row) => (row.isMixIngredient ? <span className="badge-accent">Mix</span> : <span className="badge-muted">-</span>),
+    },
+    {
       key: "actions",
       label: "Actions",
       render: (row) => (

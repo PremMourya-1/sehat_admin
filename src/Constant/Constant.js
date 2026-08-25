@@ -12,6 +12,14 @@ export const PRODUCT_TAGS = [
 // Fixed set of selectable product-variant weight options.
 export const VARIANT_WEIGHTS = ["250g", "500g", "1kg"];
 
+// "Choose your base" filter categories on the storefront's Build Your Own
+// Mix page — must match backend Product.ALLOWED_MIX_CATEGORIES.
+export const MIX_CATEGORIES = [
+  { value: "nuts", label: "Nuts" },
+  { value: "seeds", label: "Seeds" },
+  { value: "dried_fruit", label: "Dried Fruit" },
+];
+
 // Order status options (must match backend ENUM).
 export const ORDER_STATUS_OPTIONS = [
   "pending",

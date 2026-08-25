@@ -123,6 +123,11 @@ const OrderView = () => {
                       {item.ComboOffer && (
                         <span className="ml-2 badge-accent">Combo: {item.ComboOffer.title}</span>
                       )}
+                      {item.customMixId && (
+                        <span className="ml-2 badge-accent">
+                          Mix: {item.customMixName || "Custom Mix"}
+                        </span>
+                      )}
                     </td>
                     <td>{item.quantity}</td>
                     <td>{formatCurrency(item.price)}</td>
