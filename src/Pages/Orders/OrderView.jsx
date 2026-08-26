@@ -286,6 +286,12 @@ const OrderView = () => {
                 AWB {order.awbCode} · {order.courierName}
               </p>
             )}
+            {order.shippingCostActual !== null && order.shippingCostActual !== undefined && (
+              <p className="mt-2 text-xs text-muted">
+                Actual Shipping Cost: <span style={{ color: "var(--text)" }}>{formatCurrency(order.shippingCostActual)}</span>
+                {" · "}Charged to customer: {formatCurrency(order.shippingCharge)}
+              </p>
+            )}
             {order.pickupDate && (
               <p className="mt-2 text-xs text-muted">Pickup expected {formatDate(order.pickupDate, "DD MMM YYYY")}</p>
             )}

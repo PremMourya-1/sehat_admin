@@ -1,4 +1,4 @@
-import { useCallback, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 import toast from "react-hot-toast";
 import { MdAdd, MdClose, MdDeleteSweep } from "react-icons/md";
 import Card from "../../Components/Card/Card";
@@ -9,6 +9,23 @@ import usePageReload from "../../Hooks/usePageReload";
 import { useSettings } from "../../Context/SettingsContext";
 import { updateWebSettings } from "./webSettingsService";
 import adminApi from "../../Service/api";
+
+// datetime-local inputs want "YYYY-MM-DDTHH:mm" in the browser's own local
+// time — new Date(iso) + these getters already resolve to local time, no
+// timezone math needed since admin and storefront both run on IST.
+function toDatetimeLocalValue(isoString) {
+  const d = new Date(isoString);
+  const pad = (n) => String(n).padStart(2, "0");
+  return `${d.getFullYear()}-${pad(d.getMonth() + 1)}-${pad(d.getDate())}T${pad(d.getHours())}:${pad(d.getMinutes())}`;
+}
+
+const DEFAULT_COUNTDOWN_FORM = {
+  enabled: false,
+  title: "",
+  description: "",
+  targetDate: "",
+  position: "below-header",
+};
 
 // Site-wide business settings — starts with just the COD toggle; more
 // settings (maintenanceMode, minOrderValue, ...) get added here later as
@@ -54,6 +71,46 @@ const GeneralSettings = () => {
       setIsCleaningCarts(false);
       setConfirmCleanupOpen(false);
     }
+  };
+
+  // Local draft buffer — text/date fields save on an explicit "Save
+  // changes" click, not per keystroke like the plain toggles above. Seeded
+  // once from settings the first time launchCountdown arrives.
+  const [countdownForm, setCountdownForm] = useState(DEFAULT_COUNTDOWN_FORM);
+  const [countdownLoaded, setCountdownLoaded] = useState(false);
+  const [isSavingCountdown, setIsSavingCountdown] = useState(false);
+
+  useEffect(() => {
+    if (countdownLoaded || !settings?.launchCountdown) return;
+    const lc = settings.launchCountdown;
+    setCountdownForm({
+      enabled: Boolean(lc.enabled),
+      title: lc.title || "",
+      description: lc.description || "",
+      targetDate: lc.targetDate ? toDatetimeLocalValue(lc.targetDate) : "",
+      position: lc.position || "below-header",
+    });
+    setCountdownLoaded(true);
+  }, [settings, countdownLoaded]);
+
+  const handleSaveCountdown = async () => {
+    if (countdownForm.enabled && !countdownForm.targetDate) {
+      toast.error("Set a target date before enabling the countdown");
+      return;
+    }
+    await updateWebSettings(
+      {
+        launchCountdown: {
+          enabled: countdownForm.enabled,
+          title: countdownForm.title,
+          description: countdownForm.description,
+          targetDate: countdownForm.targetDate ? new Date(countdownForm.targetDate).toISOString() : null,
+          position: countdownForm.position,
+        },
+      },
+      setSettings,
+      setIsSavingCountdown,
+    );
   };
 
   const increments = settings?.mixWeightIncrementsGrams || [];
@@ -233,6 +290,96 @@ const GeneralSettings = () => {
           </label>
         ))}
         {isSavingRewardMode && <LoaderSpiner size={16} />}
+      </div>
+    </Card>
+
+    <Card className="mt-5 max-w-xl">
+      <h3 className="section-title mb-1">Launch / Sale Countdown</h3>
+      <p className="mb-4 text-sm text-muted">
+        A dismissible countdown banner shown on the storefront, ticking down to a date you set here.
+        Reusable for any future campaign, not just the initial launch — just edit these fields again
+        and re-enable whenever the next sale needs one. It also stops showing itself automatically
+        the moment the target date/time passes, so there&apos;s nothing to remember to switch off.
+      </p>
+
+      <label
+        className="flex cursor-pointer items-center justify-between gap-3 rounded-lg border px-3 py-3"
+        style={{ borderColor: "var(--border)" }}
+      >
+        <div>
+          <p className="text-sm font-medium" style={{ color: "var(--text)" }}>
+            Show countdown on the website
+          </p>
+          <p className="text-xs text-muted">Needs a target date set below before it can be enabled.</p>
+        </div>
+        <input
+          type="checkbox"
+          checked={countdownForm.enabled}
+          onChange={(e) => setCountdownForm((f) => ({ ...f, enabled: e.target.checked }))}
+          className="h-4 w-4"
+        />
+      </label>
+
+      <div className="mt-4 grid gap-3">
+        <div>
+          <label className="mb-1 block text-xs font-medium text-muted">Heading</label>
+          <input
+            type="text"
+            value={countdownForm.title}
+            onChange={(e) => setCountdownForm((f) => ({ ...f, title: e.target.value }))}
+            placeholder="Sehat Potli is launching soon."
+            maxLength={120}
+            className="inputBox w-full"
+          />
+        </div>
+
+        <div>
+          <label className="mb-1 block text-xs font-medium text-muted">Description</label>
+          <textarea
+            value={countdownForm.description}
+            onChange={(e) => setCountdownForm((f) => ({ ...f, description: e.target.value }))}
+            placeholder="Get ready to shop goodness for every home."
+            maxLength={280}
+            rows={2}
+            className="inputBox w-full"
+          />
+        </div>
+
+        <div className="grid gap-3 sm:grid-cols-2">
+          <div>
+            <label className="mb-1 block text-xs font-medium text-muted">Target date &amp; time</label>
+            <input
+              type="datetime-local"
+              value={countdownForm.targetDate}
+              onChange={(e) => setCountdownForm((f) => ({ ...f, targetDate: e.target.value }))}
+              className="inputBox w-full"
+            />
+          </div>
+
+          <div>
+            <label className="mb-1 block text-xs font-medium text-muted">Where to show it</label>
+            <select
+              value={countdownForm.position}
+              onChange={(e) => setCountdownForm((f) => ({ ...f, position: e.target.value }))}
+              className="inputBox w-full"
+            >
+              <option value="below-header">Bar below the header (scrolls with the page)</option>
+              <option value="fixed-center">Floating card, centered (fixed while scrolling)</option>
+            </select>
+          </div>
+        </div>
+      </div>
+
+      <div className="mt-4 flex items-center gap-2">
+        <button
+          type="button"
+          className="btn-primary"
+          onClick={handleSaveCountdown}
+          disabled={isSavingCountdown}
+        >
+          Save changes
+        </button>
+        {isSavingCountdown && <LoaderSpiner size={16} />}
       </div>
     </Card>
 

@@ -12,6 +12,7 @@ const adminApi = {
 
   // ---- dashboard ----
   getDashboardStats: () => apiJson.get(adminUrl.dashboard),
+  getWalletBalance: () => apiJson.get(adminUrl.walletBalance),
 
   // ---- product ----
   getProducts: () => apiJson.get(adminUrl.product),
@@ -83,6 +84,11 @@ const adminApi = {
   createFaq: (data) => apiJson.post(adminUrl.faq, data),
   updateFaq: (id, data) => apiJson.put(adminUrl.faqById(id), data),
   deleteFaq: (id) => apiJson.delete(adminUrl.faqById(id)),
+
+  // ---- product reviews (moderation only) ----
+  getReviews: (status) => apiJson.get(adminUrl.review, { params: status ? { status } : undefined }),
+  approveReview: (id) => apiJson.put(adminUrl.reviewApprove(id)),
+  deleteReview: (id) => apiJson.delete(adminUrl.reviewById(id)),
 
   // ---- newsletter subscribers ----
   getNewsletterSubscribers: () => apiJson.get(adminUrl.newsletterSubscriber),

@@ -8,7 +8,7 @@ import {
   MdCardGiftcard,
 } from "react-icons/md";
 import { BiCategory } from "react-icons/bi";
-import { FaBoxOpen, FaUsers, FaTags, FaRegImages, FaRegCommentDots, FaFileAlt, FaBlog } from "react-icons/fa";
+import { FaBoxOpen, FaUsers, FaTags, FaRegImages, FaRegCommentDots, FaFileAlt, FaBlog, FaRegStar } from "react-icons/fa";
 import { HiOutlineClipboardList } from "react-icons/hi";
 
 // Sidebar navigation data consumed by Components/Common/SideBar/SideBar.jsx.
@@ -32,6 +32,7 @@ const adminSideBarData = [
   { label: "Cart Rewards", path: "/cart-rewards", icon: <MdCardGiftcard /> },
   { label: "Blog Posts", path: "/blog-posts", icon: <FaBlog /> },
   { label: "FAQs", path: "/faqs", icon: <MdOutlineQuestionAnswer /> },
+  { label: "Reviews", path: "/reviews", icon: <FaRegStar /> },
   { label: "Newsletter", path: "/newsletter-subscribers", icon: <MdOutlineMailOutline /> },
   { label: "CMS Pages", path: "/cms", icon: <FaFileAlt /> },
   { label: "Settings", path: "/settings", icon: <MdOutlineSettings /> },

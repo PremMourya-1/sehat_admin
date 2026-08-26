@@ -100,6 +100,14 @@ const useOrdersColumns = ({ selectedIds, onToggleSelect }) => {
       render: (row) => formatDate(row.estimatedDeliveryDate),
     },
     {
+      key: "shippingCostActual",
+      label: "Actual Shipping",
+      render: (row) =>
+        row.shippingCostActual !== null && row.shippingCostActual !== undefined
+          ? formatCurrency(row.shippingCostActual)
+          : "-",
+    },
+    {
       key: "actions",
       label: "Actions",
       render: (row) => <ActionButtons onView={() => navigate(`/orders/${row.id}`)} />,

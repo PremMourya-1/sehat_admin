@@ -9,6 +9,7 @@ const adminUrl = {
 
   // dashboard
   dashboard: "/dashboard",
+  walletBalance: "/dashboard/wallet-balance",
 
   // product
   product: "/products",
@@ -58,6 +59,11 @@ const adminUrl = {
   // faqs
   faq: "/faqs",
   faqById: (id) => `/faqs/${id}`,
+
+  // product reviews (moderation only)
+  review: "/reviews",
+  reviewApprove: (id) => `/reviews/${id}/approve`,
+  reviewById: (id) => `/reviews/${id}`,
 
   // newsletter subscribers
   newsletterSubscriber: "/newsletter-subscribers",

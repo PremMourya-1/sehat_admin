@@ -16,6 +16,7 @@ import ComboOffer from "../../Pages/ComboOffer/ComboOffer";
 import CartReward from "../../Pages/CartReward/CartReward";
 import BlogPost from "../../Pages/BlogPost/BlogPost";
 import Faq from "../../Pages/Faq/Faq";
+import Review from "../../Pages/Review/Review";
 import Newsletter from "../../Pages/Newsletter/Newsletter";
 import Settings from "../../Pages/Settings/Settings";
 
@@ -40,6 +41,7 @@ const adminRoutes = [
   { path: "cart-rewards", element: CartReward },
   { path: "blog-posts", element: BlogPost },
   { path: "faqs", element: Faq },
+  { path: "reviews", element: Review },
   { path: "newsletter-subscribers", element: Newsletter },
   { path: "settings", element: Settings },
 ];
