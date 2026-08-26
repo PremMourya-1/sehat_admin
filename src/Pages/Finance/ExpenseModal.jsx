@@ -66,26 +66,18 @@ const ExpenseModal = ({ open, onClose, onSubmit, editing, isSubmitting }) => {
               Purchase Price
               <span style={{ color: "var(--danger)" }}> *</span>
             </label>
-            <div className="relative">
-              <span
-                className="pointer-events-none absolute left-3.5 top-1/2 -translate-y-1/2 text-sm"
-                style={{ color: "var(--text-light)" }}
-              >
-                ₹
-              </span>
-              <input
-                id="purchasePrice"
-                type="number"
-                step="0.01"
-                min="0"
-                placeholder="0.00"
-                className={`inputBox pl-7 ${errors.purchasePrice ? "has-error" : ""}`}
-                {...register("purchasePrice", {
-                  required: "Purchase price is required",
-                  min: { value: 0, message: "Price cannot be negative" },
-                })}
-              />
-            </div>
+            <input
+              id="purchasePrice"
+              type="number"
+              step="0.01"
+              min="0"
+              placeholder="0.00"
+              className={`inputBox ${errors.purchasePrice ? "has-error" : ""}`}
+              {...register("purchasePrice", {
+                required: "Purchase price is required",
+                min: { value: 0, message: "Price cannot be negative" },
+              })}
+            />
             {errors.purchasePrice && <p className="form-error">{errors.purchasePrice.message}</p>}
           </div>
           <InputBox

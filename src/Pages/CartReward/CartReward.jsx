@@ -1,7 +1,7 @@
 import { useCallback, useEffect, useState } from "react";
 import { useForm } from "react-hook-form";
 import toast from "react-hot-toast";
-import { MdAdd, MdDeleteOutline, MdEdit, MdSearch } from "react-icons/md";
+import { MdAdd, MdDeleteOutline, MdEdit } from "react-icons/md";
 import BreadCrumb from "../../Components/Common/BreadCrumb/BreadCrumb";
 import Button from "../../Components/Button/Button";
 import Card from "../../Components/Card/Card";
@@ -201,26 +201,18 @@ const CartReward = () => {
                   Minimum Cart Amount
                   <span style={{ color: "var(--danger)" }}> *</span>
                 </label>
-                <div className="relative">
-                  <span
-                    className="pointer-events-none absolute left-3.5 top-1/2 -translate-y-1/2 text-sm"
-                    style={{ color: "var(--text-light)" }}
-                  >
-                    ₹
-                  </span>
-                  <input
-                    id="minCartAmount"
-                    type="number"
-                    step="0.01"
-                    min="0"
-                    placeholder="1000"
-                    className={`inputBox pl-7 ${errors.minCartAmount ? "has-error" : ""}`}
-                    {...register("minCartAmount", {
-                      required: "Minimum cart amount is required",
-                      min: { value: 0.01, message: "Must be greater than 0" },
-                    })}
-                  />
-                </div>
+                <input
+                  id="minCartAmount"
+                  type="number"
+                  step="0.01"
+                  min="0"
+                  placeholder="1000"
+                  className={`inputBox ${errors.minCartAmount ? "has-error" : ""}`}
+                  {...register("minCartAmount", {
+                    required: "Minimum cart amount is required",
+                    min: { value: 0.01, message: "Must be greater than 0" },
+                  })}
+                />
                 {errors.minCartAmount && <p className="form-error">{errors.minCartAmount.message}</p>}
               </div>
 
@@ -241,16 +233,11 @@ const CartReward = () => {
             </p>
 
             <div className="relative">
-              <MdSearch
-                size={18}
-                className="pointer-events-none absolute left-3 top-1/2 -translate-y-1/2"
-                style={{ color: "var(--text-light)" }}
-              />
               <input
                 value={search}
                 onChange={(e) => setSearch(e.target.value)}
                 placeholder="Search products..."
-                className="inputBox pl-9"
+                className="inputBox"
               />
               {search && (
                 <div

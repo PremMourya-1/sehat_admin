@@ -23,7 +23,7 @@ import {
   updateComboOffer,
 } from "./comboOfferService";
 
-const DEFAULT_VALUES = { title: "", description: "", comboPrice: "", discountLabel: "" };
+const DEFAULT_VALUES = { title: "", description: "", comboPrice: "" };
 
 // A row of ComboOfferItem (as returned by the API, nested Product/variant
 // included) into the flat, display-ready shape ComboItemsBuilder works
@@ -78,6 +78,10 @@ const ComboOffer = () => {
   );
   const comboPriceValue = Number(watch("comboPrice")) || 0;
   const savings = individualTotal - comboPriceValue;
+  // Same math the backend uses to auto-generate discountLabel (see
+  // adminComboOfferController.js) — shown here just as a live preview
+  // while filling the form, never submitted as an editable field.
+  const discountPercent = individualTotal > 0 ? Math.round((savings / individualTotal) * 100) : 0;
 
   const openAdd = () => {
     setEditing(null);
@@ -92,7 +96,6 @@ const ComboOffer = () => {
       title: row.title,
       description: row.description || "",
       comboPrice: row.comboPrice,
-      discountLabel: row.discountLabel || "",
     });
     setItems((row.items || []).map(toBuilderItem));
     setDrawerOpen(true);
@@ -236,42 +239,24 @@ const ComboOffer = () => {
 
           <div className="card">
             <h3 className="section-title mb-4">Pricing</h3>
-            <div className="grid grid-cols-2 gap-4 sm:grid-cols-1">
-              <div className="formGroup !mb-0">
-                <label htmlFor="comboPrice" className="form-label">
-                  Combo Price
-                  <span style={{ color: "var(--danger)" }}> *</span>
-                </label>
-                <div className="relative">
-                  <span
-                    className="pointer-events-none absolute left-3.5 top-1/2 -translate-y-1/2 text-sm"
-                    style={{ color: "var(--text-light)" }}
-                  >
-                    ₹
-                  </span>
-                  <input
-                    id="comboPrice"
-                    type="number"
-                    step="0.01"
-                    min="0"
-                    placeholder="0.00"
-                    className={`inputBox pl-7 ${errors.comboPrice ? "has-error" : ""}`}
-                    {...register("comboPrice", {
-                      required: "Combo price is required",
-                      min: { value: 0, message: "Price cannot be negative" },
-                    })}
-                  />
-                </div>
-                {errors.comboPrice && <p className="form-error">{errors.comboPrice.message}</p>}
-              </div>
-
-              <InputBox
-                label="Discount Label"
-                name="discountLabel"
-                register={register}
-                placeholder="e.g. Save 15%"
-                containerClassName="!mb-0"
+            <div className="formGroup !mb-0 max-w-xs">
+              <label htmlFor="comboPrice" className="form-label">
+                Combo Price
+                <span style={{ color: "var(--danger)" }}> *</span>
+              </label>
+              <input
+                id="comboPrice"
+                type="number"
+                step="0.01"
+                min="0"
+                placeholder="0.00"
+                className={`inputBox ${errors.comboPrice ? "has-error" : ""}`}
+                {...register("comboPrice", {
+                  required: "Combo price is required",
+                  min: { value: 0, message: "Price cannot be negative" },
+                })}
               />
+              {errors.comboPrice && <p className="form-error">{errors.comboPrice.message}</p>}
             </div>
 
             {items.length > 0 && (
@@ -284,7 +269,8 @@ const ComboOffer = () => {
                   {formatCurrency(individualTotal)}
                   {savings > 0 && (
                     <span className="ml-2 font-medium" style={{ color: "var(--success)" }}>
-                      You&apos;re saving {formatCurrency(savings)}
+                      You&apos;re saving {formatCurrency(savings)} ({discountPercent}% off) — this becomes the
+                      discount label shown to customers automatically
                     </span>
                   )}
                 </span>

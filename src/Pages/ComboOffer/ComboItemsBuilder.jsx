@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { MdAdd, MdDeleteOutline, MdInventory2, MdSearch } from "react-icons/md";
+import { MdAdd, MdDeleteOutline, MdInventory2 } from "react-icons/md";
 import UseFilter from "../../Hooks/UseFilter";
 import { formatCurrency, getImageUrl } from "../../Utils/utils";
 
@@ -81,16 +81,11 @@ const ComboItemsBuilder = ({ items, onChange, products }) => {
   return (
     <div>
       <div className="relative">
-        <MdSearch
-          size={18}
-          className="pointer-events-none absolute left-3 top-1/2 -translate-y-1/2"
-          style={{ color: "var(--text-light)" }}
-        />
         <input
           value={search}
           onChange={(e) => setSearch(e.target.value)}
           placeholder="Search products to add..."
-          className="inputBox pl-9"
+          className="inputBox"
         />
         {search && (
           <div

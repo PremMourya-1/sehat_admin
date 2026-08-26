@@ -70,26 +70,18 @@ const SaleModal = ({ open, onClose, onSubmit, editing, isSubmitting }) => {
               Sale Price
               <span style={{ color: "var(--danger)" }}> *</span>
             </label>
-            <div className="relative">
-              <span
-                className="pointer-events-none absolute left-3.5 top-1/2 -translate-y-1/2 text-sm"
-                style={{ color: "var(--text-light)" }}
-              >
-                ₹
-              </span>
-              <input
-                id="salePrice"
-                type="number"
-                step="0.01"
-                min="0"
-                placeholder="0.00"
-                className={`inputBox pl-7 ${errors.salePrice ? "has-error" : ""}`}
-                {...register("salePrice", {
-                  required: "Sale price is required",
-                  min: { value: 0, message: "Price cannot be negative" },
-                })}
-              />
-            </div>
+            <input
+              id="salePrice"
+              type="number"
+              step="0.01"
+              min="0"
+              placeholder="0.00"
+              className={`inputBox ${errors.salePrice ? "has-error" : ""}`}
+              {...register("salePrice", {
+                required: "Sale price is required",
+                min: { value: 0, message: "Price cannot be negative" },
+              })}
+            />
             {errors.salePrice && <p className="form-error">{errors.salePrice.message}</p>}
           </div>
           <InputBox
