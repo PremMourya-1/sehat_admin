@@ -112,6 +112,9 @@ const adminApi = {
   createCartReward: (data) => apiJson.post(adminUrl.cartReward, data),
   updateCartReward: (id, data) => apiJson.put(adminUrl.cartRewardById(id), data),
   deleteCartReward: (id) => apiJson.delete(adminUrl.cartRewardById(id)),
+
+  // ---- cart housekeeping ----
+  cleanupAbandonedCarts: () => apiJson.post(adminUrl.cartsCleanupAbandoned),
 };
 
 export default adminApi;

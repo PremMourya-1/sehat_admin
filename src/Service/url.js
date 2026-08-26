@@ -81,6 +81,9 @@ const adminUrl = {
   // cart reward tiers ("spend ₹X, get a free gift")
   cartReward: "/cart-rewards",
   cartRewardById: (id) => `/cart-rewards/${id}`,
+
+  // cart housekeeping
+  cartsCleanupAbandoned: "/carts/cleanup-abandoned",
 };
 
 export default adminUrl;

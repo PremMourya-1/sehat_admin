@@ -1,12 +1,14 @@
 import { useCallback, useState } from "react";
 import toast from "react-hot-toast";
-import { MdAdd, MdClose } from "react-icons/md";
+import { MdAdd, MdClose, MdDeleteSweep } from "react-icons/md";
 import Card from "../../Components/Card/Card";
 import PreLoader from "../../Components/Common/Loader/PreLoader";
 import LoaderSpiner from "../../Components/Common/Loader/LoaderSpiner";
+import ConfirmModal from "../../Components/Modal/ConfirmModal";
 import usePageReload from "../../Hooks/usePageReload";
 import { useSettings } from "../../Context/SettingsContext";
 import { updateWebSettings } from "./webSettingsService";
+import adminApi from "../../Service/api";
 
 // Site-wide business settings — starts with just the COD toggle; more
 // settings (maintenanceMode, minOrderValue, ...) get added here later as
@@ -33,6 +35,25 @@ const GeneralSettings = () => {
   const [isSavingRewardMode, setIsSavingRewardMode] = useState(false);
   const handleCartRewardMode = async (mode) => {
     await updateWebSettings({ cartRewardMode: mode }, setSettings, setIsSavingRewardMode);
+  };
+
+  const [confirmCleanupOpen, setConfirmCleanupOpen] = useState(false);
+  const [isCleaningCarts, setIsCleaningCarts] = useState(false);
+  const handleCleanupAbandonedCarts = async () => {
+    try {
+      setIsCleaningCarts(true);
+      const res = await adminApi.cleanupAbandonedCarts();
+      if (res.data.action) {
+        toast.success(res.data.message || "Cleanup complete");
+      } else {
+        toast.error(res.data.message);
+      }
+    } catch (e) {
+      toast.error(e?.response?.data?.message || "Failed to clean up abandoned carts");
+    } finally {
+      setIsCleaningCarts(false);
+      setConfirmCleanupOpen(false);
+    }
   };
 
   const increments = settings?.mixWeightIncrementsGrams || [];
@@ -214,6 +235,32 @@ const GeneralSettings = () => {
         {isSavingRewardMode && <LoaderSpiner size={16} />}
       </div>
     </Card>
+
+    <Card className="mt-5 max-w-xl">
+      <h3 className="section-title mb-1">Cart Housekeeping</h3>
+      <p className="mb-4 text-sm text-muted">
+        Removes customer Cart rows (and their items) that haven&apos;t been touched in 60+ days —
+        pure database hygiene, has no effect on any customer&apos;s current shopping session. Not
+        automatic yet (no scheduler is set up for this project) — run it manually now and then.
+      </p>
+      <button
+        type="button"
+        className="btn-outline"
+        onClick={() => setConfirmCleanupOpen(true)}
+      >
+        <MdDeleteSweep size={16} />
+        Clean up abandoned carts
+      </button>
+    </Card>
+
+    <ConfirmModal
+      open={confirmCleanupOpen}
+      onClose={() => setConfirmCleanupOpen(false)}
+      onConfirm={handleCleanupAbandonedCarts}
+      isLoading={isCleaningCarts}
+      title="Clean up abandoned carts?"
+      message="Permanently deletes any customer cart untouched for 60+ days. This cannot be undone, though a customer's cart is simply recreated empty the next time they add something."
+    />
     </>
   );
 };
