@@ -164,33 +164,50 @@ const ComboOffer = () => {
                 <h3 className="section-title">{offer.title}</h3>
                 <p className="mt-1 text-sm text-muted">{offer.description}</p>
 
-                <div className="mt-3 flex items-center gap-2">
-                  {(offer.items || []).slice(0, 4).map((item) => (
+                {/* Each item shown as its own labeled chip — a bare 40px
+                    thumbnail wasn't enough to tell which product (or what
+                    size) was actually in the combo without opening Edit. */}
+                <div className="mt-3 flex flex-wrap gap-2">
+                  {(offer.items || []).map((item) => (
                     <div
                       key={item.id}
-                      className="h-10 w-10 overflow-hidden rounded-lg border"
+                      className="flex items-center gap-2 rounded-lg border p-1.5 pr-3"
                       style={{ borderColor: "var(--border)" }}
                     >
-                      {item.Product?.image ? (
-                        <img
-                          src={getImageUrl(item.Product.image)}
-                          alt={item.Product.name}
-                          className="h-full w-full object-cover"
-                        />
-                      ) : (
-                        <div className="h-full w-full" style={{ backgroundColor: "var(--background-light)" }} />
-                      )}
+                      <div
+                        className="h-11 w-11 shrink-0 overflow-hidden rounded-md border"
+                        style={{ borderColor: "var(--border)" }}
+                      >
+                        {item.Product?.image ? (
+                          <img
+                            src={getImageUrl(item.Product.image)}
+                            alt={item.Product.name}
+                            className="h-full w-full object-cover"
+                          />
+                        ) : (
+                          <div className="h-full w-full" style={{ backgroundColor: "var(--background-light)" }} />
+                        )}
+                      </div>
+                      <div className="min-w-0">
+                        <p className="truncate text-xs font-medium" style={{ color: "var(--text)" }}>
+                          {item.Product?.name}
+                        </p>
+                        <p className="text-[11px] text-muted">
+                          {item.variant?.weight} × {item.quantity}
+                        </p>
+                      </div>
                     </div>
                   ))}
-                  <span className="ml-1 flex items-baseline gap-1.5">
-                    {individualTotal > offer.comboPrice && (
-                      <span className="text-xs line-through" style={{ color: "var(--text-light)" }}>
-                        {formatCurrency(individualTotal)}
-                      </span>
-                    )}
-                    <span className="font-semibold" style={{ color: "var(--primary)" }}>
-                      {formatCurrency(offer.comboPrice)}
+                </div>
+
+                <div className="mt-3 flex items-baseline gap-1.5">
+                  {individualTotal > offer.comboPrice && (
+                    <span className="text-xs line-through" style={{ color: "var(--text-light)" }}>
+                      {formatCurrency(individualTotal)}
                     </span>
+                  )}
+                  <span className="font-semibold" style={{ color: "var(--primary)" }}>
+                    {formatCurrency(offer.comboPrice)}
                   </span>
                 </div>
 
