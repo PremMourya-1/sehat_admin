@@ -28,6 +28,13 @@ const DEFAULT_VALUES = { title: "", description: "", comboPrice: "" };
 // A row of ComboOfferItem (as returned by the API, nested Product/variant
 // included) into the flat, display-ready shape ComboItemsBuilder works
 // with — mirrors what the builder itself produces when adding a fresh item.
+// Sum of each item's own variant price × quantity — the "actual price"
+// shown struck through next to the combo price on each card, so it's
+// obvious at a glance what the customer would've paid buying separately.
+function calculateIndividualTotal(offer) {
+  return (offer.items || []).reduce((sum, item) => sum + Number(item.variant?.price || 0) * item.quantity, 0);
+}
+
 function toBuilderItem(row) {
   return {
     id: row.id,
@@ -145,60 +152,70 @@ const ComboOffer = () => {
         <NoRecords message="No combo offers found" />
       ) : (
         <div className="grid grid-cols-3 gap-4 lg:grid-cols-2 xs:grid-cols-1">
-          {data.map((offer) => (
-            <Card key={offer.id}>
-              {offer.discountLabel && (
-                <span className="mb-2 inline-block w-fit rounded-full px-3 py-1 text-xs font-semibold" style={{ backgroundColor: "var(--primary-tp)", color: "var(--primary)" }}>
-                  {offer.discountLabel}
-                </span>
-              )}
-              <h3 className="section-title">{offer.title}</h3>
-              <p className="mt-1 text-sm text-muted">{offer.description}</p>
+          {data.map((offer) => {
+            const individualTotal = calculateIndividualTotal(offer);
+            return (
+              <Card key={offer.id}>
+                {offer.discountLabel && (
+                  <span className="mb-2 inline-block w-fit rounded-full px-3 py-1 text-xs font-semibold" style={{ backgroundColor: "var(--primary-tp)", color: "var(--primary)" }}>
+                    {offer.discountLabel}
+                  </span>
+                )}
+                <h3 className="section-title">{offer.title}</h3>
+                <p className="mt-1 text-sm text-muted">{offer.description}</p>
 
-              <div className="mt-3 flex items-center gap-2">
-                {(offer.items || []).slice(0, 4).map((item) => (
-                  <div
-                    key={item.id}
-                    className="h-10 w-10 overflow-hidden rounded-lg border"
-                    style={{ borderColor: "var(--border)" }}
-                  >
-                    {item.Product?.image ? (
-                      <img
-                        src={getImageUrl(item.Product.image)}
-                        alt={item.Product.name}
-                        className="h-full w-full object-cover"
-                      />
-                    ) : (
-                      <div className="h-full w-full" style={{ backgroundColor: "var(--background-light)" }} />
+                <div className="mt-3 flex items-center gap-2">
+                  {(offer.items || []).slice(0, 4).map((item) => (
+                    <div
+                      key={item.id}
+                      className="h-10 w-10 overflow-hidden rounded-lg border"
+                      style={{ borderColor: "var(--border)" }}
+                    >
+                      {item.Product?.image ? (
+                        <img
+                          src={getImageUrl(item.Product.image)}
+                          alt={item.Product.name}
+                          className="h-full w-full object-cover"
+                        />
+                      ) : (
+                        <div className="h-full w-full" style={{ backgroundColor: "var(--background-light)" }} />
+                      )}
+                    </div>
+                  ))}
+                  <span className="ml-1 flex items-baseline gap-1.5">
+                    {individualTotal > offer.comboPrice && (
+                      <span className="text-xs line-through" style={{ color: "var(--text-light)" }}>
+                        {formatCurrency(individualTotal)}
+                      </span>
                     )}
-                  </div>
-                ))}
-                <span className="ml-1 font-semibold" style={{ color: "var(--primary)" }}>
-                  {formatCurrency(offer.comboPrice)}
-                </span>
-              </div>
-
-              <div className="mt-3 flex items-center justify-between">
-                <label className="flex items-center gap-2 text-sm" style={{ color: "var(--text)" }}>
-                  <input
-                    type="checkbox"
-                    checked={!!offer.status}
-                    onChange={(e) => toggleComboOfferStatus(offer.id, e.target.checked, setData)}
-                    className="h-4 w-4"
-                  />
-                  {offer.status ? "Active" : "Inactive"}
-                </label>
-                <div className="flex items-center gap-2">
-                  <button type="button" className="action-icon-edit" onClick={() => openEdit(offer)} aria-label="Edit offer">
-                    <MdEdit />
-                  </button>
-                  <button type="button" className="action-icon-delete" onClick={() => setToDelete(offer)} aria-label="Delete offer">
-                    <MdDeleteOutline />
-                  </button>
+                    <span className="font-semibold" style={{ color: "var(--primary)" }}>
+                      {formatCurrency(offer.comboPrice)}
+                    </span>
+                  </span>
                 </div>
-              </div>
-            </Card>
-          ))}
+
+                <div className="mt-3 flex items-center justify-between">
+                  <label className="flex items-center gap-2 text-sm" style={{ color: "var(--text)" }}>
+                    <input
+                      type="checkbox"
+                      checked={!!offer.status}
+                      onChange={(e) => toggleComboOfferStatus(offer.id, e.target.checked, setData)}
+                      className="h-4 w-4"
+                    />
+                    {offer.status ? "Active" : "Inactive"}
+                  </label>
+                  <div className="flex items-center gap-2">
+                    <button type="button" className="action-icon-edit" onClick={() => openEdit(offer)} aria-label="Edit offer">
+                      <MdEdit />
+                    </button>
+                    <button type="button" className="action-icon-delete" onClick={() => setToDelete(offer)} aria-label="Delete offer">
+                      <MdDeleteOutline />
+                    </button>
+                  </div>
+                </div>
+              </Card>
+            );
+          })}
         </div>
       )}
 
