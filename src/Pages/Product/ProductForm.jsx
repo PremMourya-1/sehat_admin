@@ -27,12 +27,17 @@ const ProductForm = ({ initialData, onSubmit, isSubmitting, submitLabel = "Save 
   const [files, setFiles] = useState([]);
   const [removedImageIds, setRemovedImageIds] = useState([]);
 
+  const [quickAdjust, setQuickAdjust] = useState({ direction: "increase", type: "percentage", value: "" });
+  const [isQuickAdjusting, setIsQuickAdjusting] = useState(false);
+
   const {
     register,
     handleSubmit,
     control,
     reset,
     watch,
+    getValues,
+    setValue,
     formState: { errors },
   } = useForm({
     defaultValues: {
@@ -156,6 +161,50 @@ const ProductForm = ({ initialData, onSubmit, isSubmitting, submitLabel = "Save 
     onSubmit(formData);
   };
 
+  // Quick single-product price adjustment — applies to every variant of
+  // this product in one go (same "whole product, not per-variant" rule as
+  // the bulk "Manage Product Pricing" tool, see utils/pricingCalculator.js
+  // on the backend). Calls the exact same bulk-update endpoint with a
+  // one-item productIds array; no separate endpoint for the single case.
+  const handleQuickAdjust = async () => {
+    const numValue = Number(quickAdjust.value);
+    if (!Number.isFinite(numValue) || numValue <= 0) {
+      toast.error("Enter a valid positive value");
+      return;
+    }
+    setIsQuickAdjusting(true);
+    try {
+      const res = await adminApi.bulkUpdatePricing({
+        productIds: [initialData.id],
+        direction: quickAdjust.direction,
+        type: quickAdjust.type,
+        value: numValue,
+      });
+      if (res.data.action) {
+        const item = res.data.data.items.find((i) => i.productId === initialData.id);
+        if (item?.excluded) {
+          toast.error(item.exclusionReason || "This adjustment would result in an invalid price");
+        } else if (item) {
+          // Reflect the new prices straight into the open form — matched
+          // by variant id, not index, since row order in the form may not
+          // match the backend's.
+          getValues("variants").forEach((v, index) => {
+            const updated = item.variants.find((nv) => nv.variantId === v.id);
+            if (updated) setValue(`variants.${index}.price`, updated.newPrice);
+          });
+          toast.success("Price updated");
+          setQuickAdjust((prev) => ({ ...prev, value: "" }));
+        }
+      } else {
+        toast.error(res.data.message);
+      }
+    } catch (e) {
+      toast.error(e?.response?.data?.message || "Failed to adjust price");
+    } finally {
+      setIsQuickAdjusting(false);
+    }
+  };
+
   return (
     <form onSubmit={handleSubmit(submitHandler)} noValidate>
       <div className="grid grid-cols-3 gap-5 lg:grid-cols-1">
@@ -216,6 +265,53 @@ const ProductForm = ({ initialData, onSubmit, isSubmitting, submitLabel = "Save 
                 Add Variant
               </Button>
             </div>
+
+            {initialData?.id && (
+              <div
+                className="mb-4 flex flex-wrap items-end gap-2 rounded-lg border p-3"
+                style={{ borderColor: "var(--border)", backgroundColor: "var(--background-light)" }}
+              >
+                <div className="flex flex-col gap-1">
+                  <span className="text-xs font-medium text-muted">Quick Adjust (all variants)</span>
+                  <div className="flex flex-wrap items-center gap-2">
+                    <select
+                      className="inputBox !mb-0 w-auto"
+                      value={quickAdjust.direction}
+                      onChange={(e) => setQuickAdjust((prev) => ({ ...prev, direction: e.target.value }))}
+                    >
+                      <option value="increase">Increase</option>
+                      <option value="decrease">Decrease</option>
+                    </select>
+                    <select
+                      className="inputBox !mb-0 w-auto"
+                      value={quickAdjust.type}
+                      onChange={(e) => setQuickAdjust((prev) => ({ ...prev, type: e.target.value }))}
+                    >
+                      <option value="percentage">%</option>
+                      <option value="fixed">₹</option>
+                    </select>
+                    <input
+                      type="number"
+                      step="0.01"
+                      min="0"
+                      placeholder="Value"
+                      className="inputBox !mb-0 w-24"
+                      value={quickAdjust.value}
+                      onChange={(e) => setQuickAdjust((prev) => ({ ...prev, value: e.target.value }))}
+                    />
+                    <Button
+                      type="button"
+                      variant="outline"
+                      size="sm"
+                      onClick={handleQuickAdjust}
+                      disabled={isQuickAdjusting}
+                    >
+                      {isQuickAdjusting ? <LoaderSpiner size={14} /> : "Apply"}
+                    </Button>
+                  </div>
+                </div>
+              </div>
+            )}
 
             <div className="flex flex-col gap-3">
               {fields.map((field, index) => (

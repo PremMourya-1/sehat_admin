@@ -11,6 +11,7 @@ import ProductAdd from "../../Pages/Product/ProductAdd";
 import ProductEdit from "../../Pages/Product/ProductEdit";
 import Product from "../../Pages/Product/Product";
 import ProductView from "../../Pages/Product/ProductView";
+import ManageProductPricing from "../../Pages/Pricing/ManageProductPricing";
 import Testimonial from "../../Pages/Testimonial/Testimonial";
 import ComboOffer from "../../Pages/ComboOffer/ComboOffer";
 import CartReward from "../../Pages/CartReward/CartReward";
@@ -28,6 +29,7 @@ const adminRoutes = [
   { path: "products/add", element: ProductAdd },
   { path: "products/edit/:id", element: ProductEdit },
   { path: "products/view/:id", element: ProductView },
+  { path: "products/pricing", element: ManageProductPricing },
   { path: "categories", element: Category },
   { path: "orders", element: Orders },
   { path: "orders/today", element: TodayOrders },

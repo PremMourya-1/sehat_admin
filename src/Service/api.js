@@ -20,6 +20,13 @@ const adminApi = {
   getAnalyticsBreakdown: (params) => apiJson.get(adminUrl.analyticsBreakdown, { params }),
   getBestSellers: (params) => apiJson.get(adminUrl.analyticsBestSellers, { params }),
 
+  // ---- product pricing ----
+  // Also called directly by the product edit page's quick-adjust widget
+  // (Pages/Product/ProductForm.jsx) with a single-item productIds array —
+  // same endpoint, no separate one for the single-product case.
+  getPricingPreview: (params) => apiJson.get(adminUrl.pricingPreview, { params }),
+  bulkUpdatePricing: (data) => apiJson.post(adminUrl.pricingBulkUpdate, data),
+
   // ---- product ----
   getProducts: () => apiJson.get(adminUrl.product),
   getProductById: (id) => apiJson.get(adminUrl.productById(id)),

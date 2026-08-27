@@ -6,6 +6,7 @@ import {
   MdOutlineSettings,
   MdToday,
   MdCardGiftcard,
+  MdOutlineSell,
 } from "react-icons/md";
 import { BiCategory } from "react-icons/bi";
 import {
@@ -31,6 +32,7 @@ const adminSideBarData = [
   { label: "Dashboard", path: "/", icon: <MdDashboard /> },
 
   { label: "Products", path: "/products", icon: <FaBoxOpen />, group: "Catalog" },
+  { label: "Manage Pricing", path: "/products/pricing", icon: <MdOutlineSell />, group: "Catalog" },
   { label: "Categories", path: "/categories", icon: <BiCategory />, group: "Catalog" },
   { label: "Combo Offers", path: "/combo-offers", icon: <MdOutlineLocalOffer />, group: "Catalog" },
   { label: "Cart Rewards", path: "/cart-rewards", icon: <MdCardGiftcard />, group: "Catalog" },
