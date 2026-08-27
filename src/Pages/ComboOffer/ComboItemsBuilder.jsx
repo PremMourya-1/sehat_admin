@@ -89,7 +89,7 @@ const ComboItemsBuilder = ({ items, onChange, products }) => {
         />
         {search && (
           <div
-            className="absolute z-10 mt-1 max-h-56 w-full overflow-y-auto rounded-lg border bg-white shadow-md"
+            className="absolute z-10 mt-1 max-h-56 w-full overflow-y-auto rounded-lg border bg-[var(--surface)] shadow-md"
             style={{ borderColor: "var(--border)" }}
           >
             {matches.length === 0 ? (

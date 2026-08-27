@@ -9,9 +9,9 @@
   bottom: 0;
   z-index: 40;
   width: 260px;
-  background-color: var(--primary);
-  color: #fff;
-  transition: width 0.25s ease;
+  background-color: var(--sidebar-bg);
+  color: var(--sidebar-text);
+  transition: width 0.25s ease, background-color 0.2s ease;
   display: flex;
   flex-direction: column;
   overflow-x: hidden;
@@ -26,12 +26,12 @@
   align-items: center;
   gap: 0.75rem;
   padding: 1.25rem 1.25rem;
-  border-bottom: 1px solid rgba(255, 255, 255, 0.12);
+  border-bottom: 1px solid var(--sidebar-border);
   min-height: 68px;
 }
 
 .sidebar-header .brand-logo {
-  color: #fff;
+  color: var(--sidebar-text-active);
   font-size: 1.25rem;
   white-space: nowrap;
 }
@@ -42,15 +42,32 @@
   padding: 1rem 0.75rem;
 }
 
+/* A grouped set of nav items gets a small uppercase label above it — see
+   adminSideBarData.js's optional `group` field and SideBar.jsx. */
+.sidebar-group-label {
+  padding: 0.9rem 0.85rem 0.35rem;
+  font-size: 0.68rem;
+  font-weight: 600;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: color-mix(in srgb, var(--sidebar-text) 65%, transparent);
+  white-space: nowrap;
+}
+
+.sidebar.collapsed .sidebar-group-label {
+  text-align: center;
+  padding: 0.9rem 0.25rem 0.35rem;
+}
+
 .sidebar-link {
   display: flex;
   align-items: center;
   gap: 0.85rem;
-  padding: 0.65rem 0.85rem;
+  padding: 0.6rem 0.85rem;
   border-radius: 0.6rem;
-  color: rgba(255, 255, 255, 0.78);
+  color: var(--sidebar-text);
   font-size: 0.9rem;
-  margin-bottom: 0.25rem;
+  margin-bottom: 0.2rem;
   white-space: nowrap;
   cursor: pointer;
   transition: background-color 0.15s ease, color 0.15s ease;
@@ -58,19 +75,43 @@
 }
 
 .sidebar-link:hover {
-  background-color: rgba(255, 255, 255, 0.08);
-  color: #fff;
+  background-color: var(--sidebar-hover-bg);
+  color: var(--sidebar-text-active);
 }
 
+.sidebar-link:focus-visible {
+  outline: 2px solid var(--sidebar-active-accent);
+  outline-offset: -2px;
+}
+
+/* Premium-SaaS active state — a soft tinted background + a colored left
+   accent bar, rather than a solid filled pill (which read more like a
+   generic admin template than something like Linear/Vercel's own nav). */
 .sidebar-link.active {
-  background-color: var(--accent);
-  color: var(--text);
+  background-color: var(--sidebar-active-bg);
+  color: var(--sidebar-text-active);
   font-weight: 600;
+}
+
+.sidebar-link.active::before {
+  content: "";
+  position: absolute;
+  left: 0;
+  top: 0.35rem;
+  bottom: 0.35rem;
+  width: 3px;
+  border-radius: 0 3px 3px 0;
+  background-color: var(--sidebar-active-accent);
+}
+
+.sidebar-link.active .icon {
+  color: var(--sidebar-active-accent);
 }
 
 .sidebar-link .icon {
   font-size: 1.15rem;
   flex-shrink: 0;
+  transition: color 0.15s ease;
 }
 
 .sidebar.collapsed .sidebar-link span.label {
@@ -92,10 +133,11 @@
   top: 0;
   margin-left: 0.5rem;
   min-width: 190px;
-  background-color: #fff;
+  background-color: var(--surface);
   color: var(--text);
+  border: 1px solid var(--border);
   border-radius: 0.6rem;
-  box-shadow: 0 6px 24px rgba(0, 0, 0, 0.15);
+  box-shadow: var(--shadow-lg);
   padding: 0.5rem;
   z-index: 50;
   display: none;
@@ -135,11 +177,39 @@
   display: none;
 }
 
+/* Off-canvas backdrop — only rendered in the DOM while the mobile sidebar
+   is open (see SideBar.jsx), and only actually visible/clickable at this
+   same breakpoint; harmless no-op above it. */
+.sidebar-backdrop {
+  position: fixed;
+  inset: 0;
+  z-index: 39;
+  background-color: rgba(0, 0, 0, 0.45);
+  display: none;
+}
+
 @media (max-width: 992px) {
   .sidebar {
     transform: translateX(-100%);
+    box-shadow: var(--shadow-lg);
   }
+  /* Full width even if the desktop "collapsed" (icon-only) preference is
+     also set — an 80px-wide off-canvas panel isn't usable as a real menu. */
   .sidebar.mobile-open {
     transform: translateX(0);
+    width: 260px;
+  }
+  .sidebar.mobile-open .sidebar-link span.label,
+  .sidebar.mobile-open .sidebar-group-label {
+    display: block;
+  }
+  .sidebar.mobile-open .sidebar-link {
+    justify-content: flex-start;
+  }
+  .sidebar.mobile-open .sidebar-dropdown-submenu {
+    display: block;
+  }
+  .sidebar-backdrop {
+    display: block;
   }
 }

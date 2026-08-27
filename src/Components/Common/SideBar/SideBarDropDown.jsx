@@ -8,7 +8,7 @@ import { cx } from "../../../Utils/utils";
  * submenu expands inline; when collapsed, it flies out on hover instead
  * (handled purely in CSS via .sidebar-dropdown-menu).
  */
-const SideBarDropDown = ({ item, collapsed }) => {
+const SideBarDropDown = ({ item, collapsed, onNavigate }) => {
   const [open, setOpen] = useState(false);
 
   return (
@@ -31,6 +31,7 @@ const SideBarDropDown = ({ item, collapsed }) => {
               key={child.path}
               to={child.path}
               end
+              onClick={onNavigate}
               className={({ isActive }) => cx("sidebar-link", isActive && "active")}
             >
               <span className="icon">{child.icon}</span>

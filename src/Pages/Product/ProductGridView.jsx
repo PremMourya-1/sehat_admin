@@ -47,7 +47,7 @@ const ProductGridCard = ({ product, setData, onView, onEdit, onDelete }) => {
 
   return (
     <div
-      className="flex flex-col overflow-hidden rounded-xl border bg-white shadow-sm"
+      className="flex flex-col overflow-hidden rounded-xl border bg-[var(--surface)] shadow-sm"
       style={{ borderColor: "var(--border)" }}
     >
       <div className="relative aspect-square w-full overflow-hidden" style={{ backgroundColor: "var(--background-light)" }}>

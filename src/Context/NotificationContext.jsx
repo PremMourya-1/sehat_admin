@@ -121,7 +121,7 @@ export const NotificationProvider = ({ children }) => {
                 toast.dismiss(t.id);
                 goToOrder(order.id);
               }}
-              className="flex cursor-pointer items-center gap-3 rounded-lg border bg-white px-4 py-3 shadow-lg"
+              className="flex cursor-pointer items-center gap-3 rounded-lg border bg-[var(--surface)] px-4 py-3 shadow-lg"
               style={{ borderColor: "var(--border)", opacity: t.visible ? 1 : 0 }}
             >
               <span

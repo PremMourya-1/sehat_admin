@@ -13,9 +13,9 @@
   right: 0;
   left: var(--sidebar-width);
   z-index: 30;
-  background-color: #fff;
+  background-color: var(--surface);
   border-bottom: 1px solid var(--border);
-  transition: left 0.25s ease;
+  transition: left 0.25s ease, background-color 0.2s ease, border-color 0.2s ease;
 }
 
 .admin-header.collapsed {
@@ -43,14 +43,22 @@
   }
 }
 
-/* rsuite Modal */
+/* rsuite Modal — rsuite ships its own light-only theme, so surface/text/
+   border colors need overriding by hand for dark mode to reach it too. */
 .rs-modal-content {
   border-radius: 0.9rem;
   font-family: var(--font-sans);
+  background-color: var(--surface);
+  color: var(--text);
+  box-shadow: var(--shadow-lg);
 }
 .rs-modal-header .rs-modal-title {
   font-family: var(--font-heading);
   color: var(--text);
+}
+.rs-modal-header,
+.rs-modal-footer {
+  border-color: var(--border);
 }
 .rs-btn-primary {
   background-color: var(--primary) !important;
@@ -62,6 +70,11 @@
 /* rsuite Drawer */
 .rs-drawer-content {
   font-family: var(--font-sans);
+  background-color: var(--surface);
+  color: var(--text);
+}
+.rs-drawer-header {
+  border-color: var(--border);
 }
 .rs-drawer-header .rs-drawer-title {
   font-family: var(--font-heading);
