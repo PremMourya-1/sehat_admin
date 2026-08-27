@@ -14,6 +14,12 @@ const adminApi = {
   getDashboardStats: () => apiJson.get(adminUrl.dashboard),
   getWalletBalance: () => apiJson.get(adminUrl.walletBalance),
 
+  // ---- analytics ----
+  getAnalyticsOverview: () => apiJson.get(adminUrl.analyticsOverview),
+  getAnalyticsTrends: (days) => apiJson.get(adminUrl.analyticsTrends, { params: { days } }),
+  getAnalyticsBreakdown: (params) => apiJson.get(adminUrl.analyticsBreakdown, { params }),
+  getBestSellers: (params) => apiJson.get(adminUrl.analyticsBestSellers, { params }),
+
   // ---- product ----
   getProducts: () => apiJson.get(adminUrl.product),
   getProductById: (id) => apiJson.get(adminUrl.productById(id)),

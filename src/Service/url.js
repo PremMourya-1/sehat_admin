@@ -11,6 +11,12 @@ const adminUrl = {
   dashboard: "/dashboard",
   walletBalance: "/dashboard/wallet-balance",
 
+  // analytics
+  analyticsOverview: "/analytics/overview",
+  analyticsTrends: "/analytics/trends",
+  analyticsBreakdown: "/analytics/breakdown",
+  analyticsBestSellers: "/analytics/best-sellers",
+
   // product
   product: "/products",
   productById: (id) => `/products/${id}`,

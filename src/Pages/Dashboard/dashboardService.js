@@ -37,3 +37,58 @@ export async function getWalletBalance(setBalance, setIsLoading, setError) {
     setIsLoading(false);
   }
 }
+
+// The always-on today/week/month header stats — not affected by the
+// breakdown section's date-range filter.
+export async function getAnalyticsOverview(setData, setIsLoading) {
+  try {
+    setIsLoading(true);
+    const res = await adminApi.getAnalyticsOverview();
+    if (res.data.action) setData(res.data.data);
+    else toast.error(res.data.message);
+  } catch (e) {
+    toast.error(e?.response?.data?.message || "Failed to load analytics overview");
+  } finally {
+    setIsLoading(false);
+  }
+}
+
+export async function getAnalyticsTrends(days, setData, setIsLoading) {
+  try {
+    setIsLoading(true);
+    const res = await adminApi.getAnalyticsTrends(days);
+    if (res.data.action) setData(res.data.data);
+    else toast.error(res.data.message);
+  } catch (e) {
+    toast.error(e?.response?.data?.message || "Failed to load revenue trend");
+  } finally {
+    setIsLoading(false);
+  }
+}
+
+// range: { range: "today"|"week"|"month"|"custom", from?, to? }
+export async function getAnalyticsBreakdown(range, setData, setIsLoading) {
+  try {
+    setIsLoading(true);
+    const res = await adminApi.getAnalyticsBreakdown(range);
+    if (res.data.action) setData(res.data.data);
+    else toast.error(res.data.message);
+  } catch (e) {
+    toast.error(e?.response?.data?.message || "Failed to load breakdown");
+  } finally {
+    setIsLoading(false);
+  }
+}
+
+export async function getBestSellers(params, setData, setIsLoading) {
+  try {
+    setIsLoading(true);
+    const res = await adminApi.getBestSellers(params);
+    if (res.data.action) setData(res.data.data);
+    else toast.error(res.data.message);
+  } catch (e) {
+    toast.error(e?.response?.data?.message || "Failed to load best sellers");
+  } finally {
+    setIsLoading(false);
+  }
+}

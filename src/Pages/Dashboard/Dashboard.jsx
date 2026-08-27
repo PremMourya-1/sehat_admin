@@ -8,7 +8,18 @@ import PreLoader from "../../Components/Common/Loader/PreLoader";
 import LoaderSpiner from "../../Components/Common/Loader/LoaderSpiner";
 import usePageReload from "../../Hooks/usePageReload";
 import { formatCurrency } from "../../Utils/utils";
-import { getDashboardStats, getWalletBalance } from "./dashboardService";
+import {
+  getDashboardStats,
+  getWalletBalance,
+  getAnalyticsOverview,
+  getAnalyticsTrends,
+  getAnalyticsBreakdown,
+  getBestSellers,
+} from "./dashboardService";
+import OverviewStats from "./OverviewStats";
+import RevenueTrendChart from "./RevenueTrendChart";
+import BreakdownSection from "./BreakdownSection";
+import BestSellers from "./BestSellers";
 
 // Easy to adjust later — below this, the wallet card switches to a warning
 // style so the admin notices before it blocks order fulfillment (Shiprocket
@@ -26,16 +37,49 @@ const Dashboard = () => {
   const [isWalletLoading, setIsWalletLoading] = useState(true);
   const [walletError, setWalletError] = useState(null);
 
+  const [overview, setOverview] = useState(null);
+  const [isOverviewLoading, setIsOverviewLoading] = useState(true);
+
+  const [trendDays, setTrendDays] = useState(30);
+  const [trend, setTrend] = useState([]);
+  const [isTrendLoading, setIsTrendLoading] = useState(true);
+
+  const [breakdownRange, setBreakdownRange] = useState({ range: "month" });
+  const [breakdown, setBreakdown] = useState(null);
+  const [isBreakdownLoading, setIsBreakdownLoading] = useState(true);
+
+  const [bestSellersPeriod, setBestSellersPeriod] = useState("month");
+  const [bestSellersBy, setBestSellersBy] = useState("units");
+  const [bestSellers, setBestSellers] = useState([]);
+  const [isBestSellersLoading, setIsBestSellersLoading] = useState(true);
+
+  // Only this one is registered with usePageReload (the header's manual
+  // "reload" button) — registering more than one would just overwrite the
+  // slot, since it's a single-callback ref (see Hooks/usePageReload.js).
+  // Every other widget below fetches independently on mount/param-change,
+  // which already covers the normal "data changed, refresh it" case.
   const fetchStats = useCallback(() => getDashboardStats(setStats, setIsLoading), []);
   usePageReload(fetchStats);
 
-  const fetchWalletBalance = useCallback(
-    () => getWalletBalance(setWalletBalance, setIsWalletLoading, setWalletError),
-    [],
-  );
   useEffect(() => {
-    fetchWalletBalance();
-  }, [fetchWalletBalance]);
+    getWalletBalance(setWalletBalance, setIsWalletLoading, setWalletError);
+  }, []);
+
+  useEffect(() => {
+    getAnalyticsOverview(setOverview, setIsOverviewLoading);
+  }, []);
+
+  useEffect(() => {
+    getAnalyticsTrends(trendDays, setTrend, setIsTrendLoading);
+  }, [trendDays]);
+
+  useEffect(() => {
+    getAnalyticsBreakdown(breakdownRange, setBreakdown, setIsBreakdownLoading);
+  }, [breakdownRange]);
+
+  useEffect(() => {
+    getBestSellers({ period: bestSellersPeriod, by: bestSellersBy, limit: 10 }, setBestSellers, setIsBestSellersLoading);
+  }, [bestSellersPeriod, bestSellersBy]);
 
   const isLowBalance = walletBalance !== null && walletBalance < LOW_WALLET_BALANCE_THRESHOLD;
 
@@ -82,7 +126,7 @@ const Dashboard = () => {
 
           <div className="mt-4 grid grid-cols-2 gap-4 lg:grid-cols-1">
             <Card
-              title="Total Revenue"
+              title="Total Revenue (all-time)"
               value={formatCurrency(stats?.totalRevenue)}
               icon={<FaRupeeSign />}
               accent="#C89B3C"
@@ -132,6 +176,34 @@ const Dashboard = () => {
                 Add Balance
               </a>
             </Card>
+          </div>
+
+          <div className="mt-6">
+            <OverviewStats overview={overview} isLoading={isOverviewLoading} />
+          </div>
+
+          <div className="mt-4">
+            <RevenueTrendChart trend={trend} isLoading={isTrendLoading} days={trendDays} onDaysChange={setTrendDays} />
+          </div>
+
+          <div className="mt-6">
+            <BreakdownSection
+              range={breakdownRange}
+              onRangeChange={setBreakdownRange}
+              breakdown={breakdown}
+              isLoading={isBreakdownLoading}
+            />
+          </div>
+
+          <div className="mt-6">
+            <BestSellers
+              period={bestSellersPeriod}
+              onPeriodChange={setBestSellersPeriod}
+              by={bestSellersBy}
+              onByChange={setBestSellersBy}
+              products={bestSellers}
+              isLoading={isBestSellersLoading}
+            />
           </div>
         </>
       )}
