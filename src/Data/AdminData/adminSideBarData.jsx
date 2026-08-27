@@ -31,8 +31,15 @@ import { HiOutlineClipboardList } from "react-icons/hi";
 const adminSideBarData = [
   { label: "Dashboard", path: "/", icon: <MdDashboard /> },
 
-  { label: "Products", path: "/products", icon: <FaBoxOpen />, group: "Catalog" },
-  { label: "Manage Pricing", path: "/products/pricing", icon: <MdOutlineSell />, group: "Catalog" },
+  {
+    label: "Products",
+    icon: <FaBoxOpen />,
+    group: "Catalog",
+    children: [
+      { label: "Products", path: "/products", icon: <FaBoxOpen /> },
+      { label: "Pricing", path: "/products/pricing", icon: <MdOutlineSell /> },
+    ],
+  },
   { label: "Categories", path: "/categories", icon: <BiCategory />, group: "Catalog" },
   { label: "Combo Offers", path: "/combo-offers", icon: <MdOutlineLocalOffer />, group: "Catalog" },
   { label: "Cart Rewards", path: "/cart-rewards", icon: <MdCardGiftcard />, group: "Catalog" },
