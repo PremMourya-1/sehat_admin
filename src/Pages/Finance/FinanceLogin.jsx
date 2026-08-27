@@ -82,7 +82,7 @@ const FinanceLogin = () => {
                     onClick={() => setName(user.value)}
                     className={cx(
                       "rounded-lg border py-3 text-sm font-medium transition-colors duration-150",
-                      name === user.value ? "text-white" : "bg-white",
+                      name === user.value ? "text-white" : "bg-[var(--surface)]",
                     )}
                     style={
                       name === user.value

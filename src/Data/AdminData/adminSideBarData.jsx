@@ -8,7 +8,17 @@ import {
   MdCardGiftcard,
 } from "react-icons/md";
 import { BiCategory } from "react-icons/bi";
-import { FaBoxOpen, FaUsers, FaTags, FaRegImages, FaRegCommentDots, FaFileAlt, FaBlog, FaRegStar } from "react-icons/fa";
+import {
+  FaBoxOpen,
+  FaUsers,
+  FaTags,
+  FaRegImages,
+  FaRegCommentDots,
+  FaFileAlt,
+  FaBlog,
+  FaRegStar,
+  FaMoneyBillWave,
+} from "react-icons/fa";
 import { HiOutlineClipboardList } from "react-icons/hi";
 
 // Sidebar navigation data consumed by Components/Common/SideBar/SideBar.jsx.
@@ -44,6 +54,14 @@ const adminSideBarData = [
   { label: "FAQs", path: "/faqs", icon: <MdOutlineQuestionAnswer />, group: "Content" },
   { label: "CMS Pages", path: "/cms", icon: <FaFileAlt />, group: "Content" },
   { label: "Newsletter", path: "/newsletter-subscribers", icon: <MdOutlineMailOutline />, group: "Content" },
+
+  // Finance (Expenses + Sales tracking) is a completely separate mini-app
+  // with its own login (see Pages/Finance/ and Routes/Route.jsx) — this
+  // link just makes it reachable from here instead of only via a direct
+  // URL. Clicking it navigates away from AdminLayout entirely (Finance
+  // pages render their own FinanceHeader, not this sidebar) — /finance
+  // itself redirects to /finance/expenses.
+  { label: "Finance", path: "/finance", icon: <FaMoneyBillWave />, group: "Finance" },
 
   { label: "Settings", path: "/settings", icon: <MdOutlineSettings />, group: "System" },
 ];

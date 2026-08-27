@@ -1,7 +1,7 @@
 import { useState } from "react";
 import { useForm } from "react-hook-form";
 import { useDispatch } from "react-redux";
-import { useNavigate } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import { FaEye, FaEyeSlash } from "react-icons/fa";
 import InputBox from "../../Components/Form/InputBox/InputBox";
 import LoaderSpiner from "../../Components/Common/Loader/LoaderSpiner";
@@ -80,6 +80,18 @@ const Login = () => {
             </button>
           </form>
         </div>
+
+        {/* Finance is a separate mini-app with its own login/credentials
+            (see Pages/Finance/) — not an admin account. This just makes it
+            discoverable from here instead of requiring the exact URL. */}
+        <div className="mt-5 flex items-center gap-3">
+          <span className="h-px flex-1" style={{ backgroundColor: "var(--border)" }} />
+          <span className="text-xs text-muted">or</span>
+          <span className="h-px flex-1" style={{ backgroundColor: "var(--border)" }} />
+        </div>
+        <Link to="/finance/login" className="btn-outline mt-5 w-full">
+          Finance Login
+        </Link>
       </div>
     </div>
   );

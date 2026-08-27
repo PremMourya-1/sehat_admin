@@ -47,7 +47,7 @@ const FinanceHeader = ({ title }) => {
             className={({ isActive }) =>
               cx(
                 "rounded-lg px-4 py-2 text-sm font-medium transition-colors duration-150",
-                isActive ? "text-white" : "bg-white",
+                isActive ? "text-white" : "bg-[var(--surface)]",
               )
             }
             style={({ isActive }) =>

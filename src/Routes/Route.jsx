@@ -1,4 +1,4 @@
-import { Route, Routes } from "react-router-dom";
+import { Navigate, Route, Routes } from "react-router-dom";
 import adminRoutes from "../Data/AdminData/adminRoutesData";
 import AdminLayout from "../Layout/AdminLayout/AdminLayout";
 import Login from "../Pages/Auth/Login";
@@ -29,9 +29,15 @@ function RouteData() {
 
       {/* Finance mini-app (Expenses + Sales) — a completely separate
           mini-app with its own auth (see FINANCE.md), sibling to the admin
-          routes above, not nested under ProtectedRoute/AdminLayout and not
-          listed in the admin sidebar. */}
+          routes above, not nested under ProtectedRoute/AdminLayout. Linked
+          from both the admin Login page and the admin sidebar (see
+          Data/AdminData/adminSideBarData.jsx) even though it isn't part of
+          AdminLayout — clicking through just navigates to this separate
+          route tree, no full page reload. */}
       <Route path="/finance/login" element={<FinanceLogin />} />
+      {/* Bare /finance defaults to Expenses so a user doesn't need to know
+          the exact sub-path. */}
+      <Route path="/finance" element={<Navigate to="/finance/expenses" replace />} />
       <Route
         path="/finance/expenses"
         element={
