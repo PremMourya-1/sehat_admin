@@ -134,6 +134,9 @@ const adminApi = {
 
   // ---- cart housekeeping ----
   cleanupAbandonedCarts: () => apiJson.post(adminUrl.cartsCleanupAbandoned),
+
+  // ---- abandoned checkouts (read-only) ----
+  getAbandonedCheckouts: () => apiJson.get(adminUrl.abandonedCheckout),
 };
 
 export default adminApi;

@@ -7,6 +7,7 @@ import {
   MdToday,
   MdCardGiftcard,
   MdOutlineSell,
+  MdOutlineRemoveShoppingCart,
 } from "react-icons/md";
 import { BiCategory } from "react-icons/bi";
 import {
@@ -52,6 +53,12 @@ const adminSideBarData = [
       { label: "All Orders", path: "/orders", icon: <HiOutlineClipboardList /> },
       { label: "Today's Orders", path: "/orders/today", icon: <MdToday /> },
     ],
+  },
+  {
+    label: "Abandoned Checkouts",
+    path: "/abandoned-checkouts",
+    icon: <MdOutlineRemoveShoppingCart />,
+    group: "Sales",
   },
   { label: "Coupons", path: "/coupons", icon: <FaTags />, group: "Sales" },
   { label: "Customers", path: "/customers", icon: <FaUsers />, group: "Sales" },

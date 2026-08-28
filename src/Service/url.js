@@ -100,6 +100,9 @@ const adminUrl = {
 
   // cart housekeeping
   cartsCleanupAbandoned: "/carts/cleanup-abandoned",
+
+  // abandoned checkouts (prepaid checkout attempts before payment succeeds)
+  abandonedCheckout: "/abandoned-checkouts",
 };
 
 export default adminUrl;
