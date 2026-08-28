@@ -35,6 +35,8 @@ export const ORDER_STATUS_OPTIONS = [
 // out_for_delivery/delivered/rto are driven by Shiprocket's status webhook
 // (see utils/shiprocket.js handleShiprocketStatusWebhook).
 export const CUSTOMER_STATUS_LABELS = {
+  payment_pending: "Payment Pending",
+  payment_failed: "Payment Failed",
   confirmed: "Order Confirmed",
   dispatched: "Dispatched",
   picked_up: "Picked Up",
@@ -44,6 +46,13 @@ export const CUSTOMER_STATUS_LABELS = {
   rto: "Returned to Origin",
   cancelled: "Cancelled",
 };
+
+// Orders in any of these customerStatus values are never eligible for the
+// bulk/single "Generate Label" action — see Pages/Orders/OrdersTable.jsx
+// (checkbox disable), OrdersList.jsx (select-all + bulk eligibility) and
+// OrderView.jsx (Shipping Label card). Kept in one place so those three
+// can't quietly drift out of sync with each other.
+export const NON_ACTIONABLE_CUSTOMER_STATUSES = ["payment_pending", "payment_failed", "cancelled"];
 
 // All Indian states + UTs — used for the shipping-zone state assignment
 // checkboxes (see Pages/Settings/ShippingZones.jsx). Names must match what

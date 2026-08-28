@@ -5,7 +5,7 @@ import BreadCrumb from "../../Components/Common/BreadCrumb/BreadCrumb";
 import PreLoader from "../../Components/Common/Loader/PreLoader";
 import LoaderSpiner from "../../Components/Common/Loader/LoaderSpiner";
 import usePageReload from "../../Hooks/usePageReload";
-import { CUSTOMER_STATUS_LABELS } from "../../Constant/Constant";
+import { CUSTOMER_STATUS_LABELS, NON_ACTIONABLE_CUSTOMER_STATUSES } from "../../Constant/Constant";
 import { formatCurrency, formatDate } from "../../Utils/utils";
 import { getOrderById, generateOrderLabel, simulateOrderStatus, cancelOrder } from "./orderService";
 
@@ -19,12 +19,23 @@ const SIMULATABLE_STATUSES = ["picked_up", "in_transit", "out_for_delivery", "de
 // STATUS_PROGRESSION in utils/shiprocket.js) — "rto" isn't part of it there
 // either, but is included here since it's still a real key statusHistory
 // can carry (processStatusUpdate stamps whatever nextStatus it applies).
-const STATUS_HISTORY_ORDER = ["confirmed", "dispatched", "picked_up", "in_transit", "out_for_delivery", "delivered", "rto"];
+const STATUS_HISTORY_ORDER = [
+  "payment_pending",
+  "confirmed",
+  "dispatched",
+  "picked_up",
+  "in_transit",
+  "out_for_delivery",
+  "delivered",
+  "rto",
+];
 
 // Same map as OrdersTable.jsx's CUSTOMER_STATUS_BADGE (kept local to each
 // file, same convention as that file already uses rather than a shared
 // export for a 7-entry lookup).
 const CUSTOMER_STATUS_BADGE = {
+  payment_pending: "badge-warning",
+  payment_failed: "badge-danger",
   confirmed: "badge-info",
   dispatched: "badge-primary",
   picked_up: "badge-primary",
@@ -165,8 +176,10 @@ const OrderView = () => {
                 <a href={order.labelUrl} target="_blank" rel="noreferrer" className="btn-primary !px-4 !py-1.5 !text-sm">
                   Download Label
                 </a>
-              ) : order.customerStatus === "cancelled" ? (
-                <span className="text-xs text-muted">Not available — order is cancelled</span>
+              ) : NON_ACTIONABLE_CUSTOMER_STATUSES.includes(order.customerStatus) ? (
+                <span className="text-xs text-muted">
+                  Not available — {(CUSTOMER_STATUS_LABELS[order.customerStatus] || order.customerStatus).toLowerCase()}
+                </span>
               ) : (
                 <button
                   type="button"
@@ -204,7 +217,23 @@ const OrderView = () => {
               <span className="text-xs text-muted">Operational: {order.status}</span>
             </div>
 
-            {order.customerStatus === "cancelled" ? (
+            {order.customerStatus === "payment_pending" || order.customerStatus === "payment_failed" ? (
+              // No "Cancel Order" here on purpose: cancelling routes through
+              // finalizeCancellation(), which restocks every item — but
+              // nothing was ever decremented for one of these (stock only
+              // decrements once payment succeeds, see markOrderPaid.js), so
+              // that restock would incorrectly ADD stock. These resolve on
+              // their own: payment succeeding moves it to "confirmed", or
+              // the 24h housekeeping job (utils/abandonedOrderCleanup.js)
+              // marks it "payment_failed" if it's never completed.
+              <div className="mt-3 border-t pt-3" style={{ borderColor: "var(--border)" }}>
+                <p className="text-xs text-muted">
+                  {order.customerStatus === "payment_pending"
+                    ? "Waiting on the customer to complete payment — no action needed here."
+                    : "Payment was never completed within 24h. This order was never charged or stocked out, so there's nothing to refund or restock."}
+                </p>
+              </div>
+            ) : order.customerStatus === "cancelled" ? (
               <div className="mt-3 border-t pt-3" style={{ borderColor: "var(--border)" }}>
                 <p className="text-xs text-muted">
                   Cancelled by {order.cancelledBy} on {formatDate(order.cancelledAt, "DD MMM YYYY, hh:mm A")}

@@ -1,7 +1,7 @@
 import { useNavigate } from "react-router-dom";
 import ActionButtons from "../../Components/Common/ActionButtons/ActionButtons";
 import HoverCard from "../../Components/HoverCard/HoverCard";
-import { CUSTOMER_STATUS_LABELS } from "../../Constant/Constant";
+import { CUSTOMER_STATUS_LABELS, NON_ACTIONABLE_CUSTOMER_STATUSES } from "../../Constant/Constant";
 import { formatCurrency, formatDate, getImageUrl } from "../../Utils/utils";
 
 const STATUS_BADGE = {
@@ -13,6 +13,8 @@ const STATUS_BADGE = {
 };
 
 const CUSTOMER_STATUS_BADGE = {
+  payment_pending: "badge-warning",
+  payment_failed: "badge-danger",
   confirmed: "badge-info",
   dispatched: "badge-primary",
   picked_up: "badge-primary",
@@ -43,20 +45,21 @@ const useOrdersColumns = ({ selectedIds, onToggleSelect }) => {
       label: "",
       width: "36px",
       render: (row) => {
-        // Cancelled orders are never eligible for the bulk "Generate
-        // Label" action (see OrdersList.jsx's isEligible) — the checkbox
-        // is disabled rather than silently skipping the order later, so
-        // it's never selectable in the first place.
-        const isCancelled = row.customerStatus === "cancelled";
+        // Cancelled/payment-pending/payment-failed orders are never
+        // eligible for the bulk "Generate Label" action (see
+        // OrdersList.jsx's isEligible) — the checkbox is disabled rather
+        // than silently skipping the order later, so it's never selectable
+        // in the first place.
+        const isNonActionable = NON_ACTIONABLE_CUSTOMER_STATUSES.includes(row.customerStatus);
         return (
           <input
             type="checkbox"
             checked={selectedIds.has(row.id)}
             onChange={() => onToggleSelect(row.id)}
-            disabled={isCancelled}
+            disabled={isNonActionable}
             className="h-4 w-4 disabled:cursor-not-allowed disabled:opacity-40"
             aria-label={`Select order ${row.orderNumber}`}
-            title={isCancelled ? "Order is cancelled — not eligible for label generation" : undefined}
+            title={isNonActionable ? `${CUSTOMER_STATUS_LABELS[row.customerStatus] || row.customerStatus} — not eligible for label generation` : undefined}
           />
         );
       },

@@ -10,6 +10,7 @@ import usePageReload from "../../Hooks/usePageReload";
 import {
   ORDER_STATUS_OPTIONS,
   CUSTOMER_STATUS_LABELS,
+  NON_ACTIONABLE_CUSTOMER_STATUSES,
 } from "../../Constant/Constant";
 import useOrdersColumns from "./OrdersTable";
 import {
@@ -129,12 +130,12 @@ const OrdersList = ({
     });
   };
 
-  // Cancelled orders' checkboxes are disabled (see OrdersTable.jsx) — kept
-  // out of both the "are they all selected" check and what "select all"
-  // actually selects, so it can never look/behave as if a cancelled order
+  // Non-actionable orders' checkboxes are disabled (see OrdersTable.jsx) —
+  // kept out of both the "are they all selected" check and what "select
+  // all" actually selects, so it can never look/behave as if one of them
   // got selected.
   const selectableVisible = useMemo(
-    () => pageData.filter((order) => order.customerStatus !== "cancelled"),
+    () => pageData.filter((order) => !NON_ACTIONABLE_CUSTOMER_STATUSES.includes(order.customerStatus)),
     [pageData],
   );
   const allVisibleSelected =
@@ -149,8 +150,11 @@ const OrdersList = ({
     });
   };
 
-  // Orders that already have a label, or are cancelled, are skipped rather
-  // than re-processed — same skip-already-done behavior
+  // Orders that already have a label, or are non-actionable (cancelled /
+  // payment_pending / payment_failed — see NON_ACTIONABLE_CUSTOMER_STATUSES;
+  // their checkboxes are disabled so this shouldn't normally be reachable,
+  // but it's kept as defense in depth), are skipped rather than
+  // re-processed — same skip-already-done behavior
   // generateLabelAndFulfill/validateOrderForShipment already enforce
   // per-step server-side (a cancelled order fails there with "Order is
   // cancelled" — see utils/shiprocket.js), just decided up front here so
@@ -158,7 +162,8 @@ const OrdersList = ({
   // doesn't burn a request on something the backend would've rejected anyway.
   const handleBulkGenerateLabel = async () => {
     const selectedOrders = data.filter((order) => selectedIds.has(order.id));
-    const isEligible = (order) => order.labelStatus !== "generated" && order.customerStatus !== "cancelled";
+    const isEligible = (order) =>
+      order.labelStatus !== "generated" && !NON_ACTIONABLE_CUSTOMER_STATUSES.includes(order.customerStatus);
     const toProcess = selectedOrders.filter(isEligible);
     const skipped = selectedOrders.filter((order) => !isEligible(order));
 
@@ -195,7 +200,9 @@ const OrdersList = ({
       skipped: skipped.map((order) => ({
         id: order.id,
         orderNumber: order.orderNumber,
-        reason: order.customerStatus === "cancelled" ? "cancelled" : "already labeled",
+        reason: NON_ACTIONABLE_CUSTOMER_STATUSES.includes(order.customerStatus)
+          ? CUSTOMER_STATUS_LABELS[order.customerStatus] || order.customerStatus
+          : "already labeled",
       })),
     });
     setIsBulkRunning(false);
