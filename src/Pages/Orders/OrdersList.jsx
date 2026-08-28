@@ -129,14 +129,22 @@ const OrdersList = ({
     });
   };
 
+  // Cancelled orders' checkboxes are disabled (see OrdersTable.jsx) — kept
+  // out of both the "are they all selected" check and what "select all"
+  // actually selects, so it can never look/behave as if a cancelled order
+  // got selected.
+  const selectableVisible = useMemo(
+    () => pageData.filter((order) => order.customerStatus !== "cancelled"),
+    [pageData],
+  );
   const allVisibleSelected =
-    pageData.length > 0 && pageData.every((order) => selectedIds.has(order.id));
+    selectableVisible.length > 0 && selectableVisible.every((order) => selectedIds.has(order.id));
   const toggleSelectAllVisible = () => {
     setSelectedIds((prev) => {
       const next = new Set(prev);
       if (allVisibleSelected)
-        pageData.forEach((order) => next.delete(order.id));
-      else pageData.forEach((order) => next.add(order.id));
+        selectableVisible.forEach((order) => next.delete(order.id));
+      else selectableVisible.forEach((order) => next.add(order.id));
       return next;
     });
   };

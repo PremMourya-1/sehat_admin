@@ -42,15 +42,24 @@ const useOrdersColumns = ({ selectedIds, onToggleSelect }) => {
       key: "select",
       label: "",
       width: "36px",
-      render: (row) => (
-        <input
-          type="checkbox"
-          checked={selectedIds.has(row.id)}
-          onChange={() => onToggleSelect(row.id)}
-          className="h-4 w-4"
-          aria-label={`Select order ${row.orderNumber}`}
-        />
-      ),
+      render: (row) => {
+        // Cancelled orders are never eligible for the bulk "Generate
+        // Label" action (see OrdersList.jsx's isEligible) — the checkbox
+        // is disabled rather than silently skipping the order later, so
+        // it's never selectable in the first place.
+        const isCancelled = row.customerStatus === "cancelled";
+        return (
+          <input
+            type="checkbox"
+            checked={selectedIds.has(row.id)}
+            onChange={() => onToggleSelect(row.id)}
+            disabled={isCancelled}
+            className="h-4 w-4 disabled:cursor-not-allowed disabled:opacity-40"
+            aria-label={`Select order ${row.orderNumber}`}
+            title={isCancelled ? "Order is cancelled — not eligible for label generation" : undefined}
+          />
+        );
+      },
     },
     {
       key: "product",

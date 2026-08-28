@@ -159,9 +159,14 @@ const OrderView = () => {
             <div className="mb-3 flex items-center justify-between">
               <h3 className="section-title">Shipping Label</h3>
               {order.labelStatus === "generated" ? (
+                // A label generated before cancellation stays downloadable
+                // as a historical record — this doesn't create a new
+                // shipment, so it's fine to leave visible either way.
                 <a href={order.labelUrl} target="_blank" rel="noreferrer" className="btn-primary !px-4 !py-1.5 !text-sm">
                   Download Label
                 </a>
+              ) : order.customerStatus === "cancelled" ? (
+                <span className="text-xs text-muted">Not available — order is cancelled</span>
               ) : (
                 <button
                   type="button"
