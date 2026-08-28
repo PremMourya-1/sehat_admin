@@ -1,7 +1,8 @@
 import { useNavigate } from "react-router-dom";
 import ActionButtons from "../../Components/Common/ActionButtons/ActionButtons";
+import HoverCard from "../../Components/HoverCard/HoverCard";
 import { CUSTOMER_STATUS_LABELS } from "../../Constant/Constant";
-import { formatCurrency, formatDate } from "../../Utils/utils";
+import { formatCurrency, formatDate, getImageUrl } from "../../Utils/utils";
 
 const STATUS_BADGE = {
   pending: "badge-warning",
@@ -51,8 +52,79 @@ const useOrdersColumns = ({ selectedIds, onToggleSelect }) => {
         />
       ),
     },
-    { key: "orderNumber", label: "Order #" },
-    { key: "customer", label: "Customer", render: (row) => row.customer?.name || row.customer?.email || "-" },
+    {
+      key: "product",
+      label: "Product",
+      render: (row) => {
+        const items = row.OrderItems || [];
+        if (items.length === 0) return <span className="text-muted">-</span>;
+        return (
+          <div className="flex flex-col gap-2">
+            {items.map((item) => (
+              <div key={item.id} className="flex items-center gap-2">
+                <span
+                  className="relative block h-10 w-10 flex-none overflow-hidden rounded-md border"
+                  style={{ borderColor: "var(--border)" }}
+                >
+                  {item.Product?.image ? (
+                    <img
+                      src={getImageUrl(item.Product.image)}
+                      alt={item.Product?.name || ""}
+                      className="h-full w-full object-cover"
+                    />
+                  ) : (
+                    <div className="h-full w-full" style={{ backgroundColor: "var(--background-light)" }} />
+                  )}
+                </span>
+                <div className="flex flex-col leading-tight">
+                  <span className="text-sm font-medium" style={{ color: "var(--text)" }}>
+                    {item.Product?.name || item.customMixName || item.ComboOffer?.title || "Product"}
+                  </span>
+                  <span className="flex items-center gap-1.5 text-xs text-muted">
+                    {item.weight && <span className="badge-muted !px-1.5 !py-0">{item.weight}</span>}
+                    <span>× {item.quantity}</span>
+                  </span>
+                </div>
+              </div>
+            ))}
+          </div>
+        );
+      },
+    },
+    {
+      key: "customer",
+      label: "Customer",
+      render: (row) => {
+        const name = row.Customer?.name || row.shippingName || "-";
+        if (name === "-") return <span className="text-muted">-</span>;
+
+        const address = [row.shippingAddress, row.shippingCity, row.shippingState, row.shippingPincode]
+          .filter(Boolean)
+          .join(", ");
+
+        return (
+          <HoverCard
+            trigger={
+              <span
+                className="cursor-default border-b border-dashed"
+                style={{ borderColor: "var(--border)", color: "var(--text)" }}
+              >
+                {name}
+              </span>
+            }
+          >
+            <div className="flex flex-col gap-1 text-sm">
+              <p className="font-semibold" style={{ color: "var(--text)" }}>
+                {name}
+              </p>
+              {row.Customer?.email && <p className="text-xs text-muted">{row.Customer.email}</p>}
+              <p style={{ color: "var(--text)" }}>{row.shippingPhone || row.Customer?.mobileNumber || "-"}</p>
+              <p className="text-xs text-muted">{address || "No address on file"}</p>
+            </div>
+          </HoverCard>
+        );
+      },
+    },
     {
       key: "amount",
       label: "Amount",
