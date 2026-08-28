@@ -92,7 +92,14 @@ export async function simulateOrderStatus(id, status, setData, setIsSimulating) 
 // adminOrderController.cancelOrder) and refuses to touch the order at all
 // if that fails, so a caught error here means the order is genuinely still
 // active, not cancelled.
-export async function cancelOrder(id, reason, setData, setIsCancelling) {
+//
+// `onErrorMessage`, if passed, gets the exact failure text in addition to
+// the toast already fired below — used by Pages/Orders/CancelOrderModal.jsx
+// (the Orders list's cancel entry point) to show the error inline in the
+// modal too, since a toast alone can fade/scroll out of view before it's
+// read. Optional and additive — existing callers (OrderView.jsx's own
+// cancel flow) that don't pass it are unaffected.
+export async function cancelOrder(id, reason, setData, setIsCancelling, onErrorMessage) {
   try {
     setIsCancelling(true);
     const res = await adminApi.cancelOrder(id, reason);
@@ -102,9 +109,12 @@ export async function cancelOrder(id, reason, setData, setIsCancelling) {
       return true;
     }
     toast.error(res.data.message);
+    onErrorMessage?.(res.data.message || "Could not cancel this order");
     return false;
   } catch (e) {
-    toast.error(e?.response?.data?.message || "Failed to cancel order");
+    const message = e?.response?.data?.message || "Failed to cancel order";
+    toast.error(message);
+    onErrorMessage?.(message);
     return false;
   } finally {
     setIsCancelling(false);

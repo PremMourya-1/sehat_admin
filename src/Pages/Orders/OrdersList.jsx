@@ -13,6 +13,7 @@ import {
   NON_ACTIONABLE_CUSTOMER_STATUSES,
 } from "../../Constant/Constant";
 import useOrdersColumns from "./OrdersTable";
+import CancelOrderModal from "./CancelOrderModal";
 import {
   getOrderData,
   generateOrderLabelResult,
@@ -67,6 +68,7 @@ const OrdersList = ({
   const [bulkProgress, setBulkProgress] = useState({ done: 0, total: 0 });
   const [bulkResults, setBulkResults] = useState(null);
   const [isDownloadingLabels, setIsDownloadingLabels] = useState(false);
+  const [toCancel, setToCancel] = useState(null);
 
   const {
     search,
@@ -230,7 +232,15 @@ const OrdersList = ({
   const columns = useOrdersColumns({
     selectedIds,
     onToggleSelect: toggleSelect,
+    onCancelClick: setToCancel,
   });
+
+  // Updates the row in place with the now-cancelled order returned by the
+  // API, rather than a full refetch — same pattern the bulk Generate Label
+  // run already uses below.
+  const handleOrderCancelled = (updatedOrder) => {
+    setData((prev) => prev.map((item) => (item.id === updatedOrder.id ? updatedOrder : item)));
+  };
 
   return (
     <div>
@@ -427,6 +437,8 @@ const OrdersList = ({
           />
         </div>
       )}
+
+      <CancelOrderModal order={toCancel} onClose={() => setToCancel(null)} onCancelled={handleOrderCancelled} />
     </div>
   );
 };

@@ -1,7 +1,9 @@
 import { useNavigate } from "react-router-dom";
+import Tippy from "@tippyjs/react";
+import { FiXCircle } from "react-icons/fi";
 import ActionButtons from "../../Components/Common/ActionButtons/ActionButtons";
 import HoverCard from "../../Components/HoverCard/HoverCard";
-import { CUSTOMER_STATUS_LABELS, NON_ACTIONABLE_CUSTOMER_STATUSES } from "../../Constant/Constant";
+import { CUSTOMER_STATUS_BADGE, CUSTOMER_STATUS_LABELS, NON_ACTIONABLE_CUSTOMER_STATUSES } from "../../Constant/Constant";
 import { formatCurrency, formatDate, getImageUrl } from "../../Utils/utils";
 
 const STATUS_BADGE = {
@@ -9,19 +11,6 @@ const STATUS_BADGE = {
   processing: "badge-info",
   shipped: "badge-primary",
   delivered: "badge-success",
-  cancelled: "badge-danger",
-};
-
-const CUSTOMER_STATUS_BADGE = {
-  payment_pending: "badge-warning",
-  payment_failed: "badge-danger",
-  confirmed: "badge-info",
-  dispatched: "badge-primary",
-  picked_up: "badge-primary",
-  in_transit: "badge-primary",
-  out_for_delivery: "badge-primary",
-  delivered: "badge-success",
-  rto: "badge-danger",
   cancelled: "badge-danger",
 };
 
@@ -36,7 +25,7 @@ const LABEL_STATUS_BADGE = {
 // read-only for status; the only action left is viewing the order detail
 // page (where "Generate Label" lives) or selecting rows for the bulk
 // Generate Label action (see OrdersList.jsx).
-const useOrdersColumns = ({ selectedIds, onToggleSelect }) => {
+const useOrdersColumns = ({ selectedIds, onToggleSelect, onCancelClick }) => {
   const navigate = useNavigate();
 
   return [
@@ -194,7 +183,34 @@ const useOrdersColumns = ({ selectedIds, onToggleSelect }) => {
     {
       key: "actions",
       label: "Actions",
-      render: (row) => <ActionButtons onView={() => navigate(`/orders/${row.id}`)} />,
+      render: (row) => {
+        // Matches OrderView.jsx's own existing cancel-button gate exactly
+        // (and adminOrderController.cancelOrder's real behavior — it only
+        // ever blocks "cancelled" itself; "delivered" isn't special-cased
+        // there beyond skipping the now-pointless Shiprocket pickup-cancel
+        // step). NON_ACTIONABLE_CUSTOMER_STATUSES already covers "cancelled"
+        // plus the two legacy payment_pending/payment_failed values, which
+        // the backend's required-reason + not-already-cancelled checks
+        // would otherwise 400 on anyway.
+        const canCancel = !NON_ACTIONABLE_CUSTOMER_STATUSES.includes(row.customerStatus);
+        return (
+          <div className="flex items-center gap-2">
+            <ActionButtons onView={() => navigate(`/orders/${row.id}`)} />
+            {canCancel && (
+              <Tippy content="Cancel Order">
+                <button
+                  type="button"
+                  onClick={() => onCancelClick(row)}
+                  className="action-icon-delete"
+                  aria-label={`Cancel order ${row.orderNumber}`}
+                >
+                  <FiXCircle />
+                </button>
+              </Tippy>
+            )}
+          </div>
+        );
+      },
     },
   ];
 };

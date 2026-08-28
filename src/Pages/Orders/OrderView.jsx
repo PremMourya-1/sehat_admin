@@ -5,7 +5,7 @@ import BreadCrumb from "../../Components/Common/BreadCrumb/BreadCrumb";
 import PreLoader from "../../Components/Common/Loader/PreLoader";
 import LoaderSpiner from "../../Components/Common/Loader/LoaderSpiner";
 import usePageReload from "../../Hooks/usePageReload";
-import { CUSTOMER_STATUS_LABELS, NON_ACTIONABLE_CUSTOMER_STATUSES } from "../../Constant/Constant";
+import { CUSTOMER_STATUS_BADGE, CUSTOMER_STATUS_LABELS, NON_ACTIONABLE_CUSTOMER_STATUSES } from "../../Constant/Constant";
 import { formatCurrency, formatDate } from "../../Utils/utils";
 import { getOrderById, generateOrderLabel, simulateOrderStatus, cancelOrder } from "./orderService";
 
@@ -29,22 +29,6 @@ const STATUS_HISTORY_ORDER = [
   "delivered",
   "rto",
 ];
-
-// Same map as OrdersTable.jsx's CUSTOMER_STATUS_BADGE (kept local to each
-// file, same convention as that file already uses rather than a shared
-// export for a 7-entry lookup).
-const CUSTOMER_STATUS_BADGE = {
-  payment_pending: "badge-warning",
-  payment_failed: "badge-danger",
-  confirmed: "badge-info",
-  dispatched: "badge-primary",
-  picked_up: "badge-primary",
-  in_transit: "badge-primary",
-  out_for_delivery: "badge-primary",
-  delivered: "badge-success",
-  rto: "badge-danger",
-  cancelled: "badge-danger",
-};
 
 // Which shipment-pipeline step's error to surface when "Generate Label"
 // fails — checked in pipeline order, since a later step's error is only

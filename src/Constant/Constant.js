@@ -47,6 +47,23 @@ export const CUSTOMER_STATUS_LABELS = {
   cancelled: "Cancelled",
 };
 
+// Badge color per customerStatus — used everywhere that status gets shown
+// as a colored pill (Pages/Orders/OrdersTable.jsx, OrderView.jsx,
+// CancelOrderModal.jsx). Previously duplicated locally in each of those
+// files; pulled out here once it was needed a third time.
+export const CUSTOMER_STATUS_BADGE = {
+  payment_pending: "badge-warning",
+  payment_failed: "badge-danger",
+  confirmed: "badge-info",
+  dispatched: "badge-primary",
+  picked_up: "badge-primary",
+  in_transit: "badge-primary",
+  out_for_delivery: "badge-primary",
+  delivered: "badge-success",
+  rto: "badge-danger",
+  cancelled: "badge-danger",
+};
+
 // Orders in any of these customerStatus values are never eligible for the
 // bulk/single "Generate Label" action — see Pages/Orders/OrdersTable.jsx
 // (checkbox disable), OrdersList.jsx (select-all + bulk eligibility) and
