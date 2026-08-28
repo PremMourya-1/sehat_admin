@@ -15,6 +15,19 @@ const emptyVariant = () => ({ weight: "250g", mrp: "", price: "", stock: "" });
 const emptyCompositionRow = () => ({ ingredient: "", percentage: "" });
 const emptyNutrition = () => ({ calories: "", protein: "", fat: "", carbs: "", fiber: "" });
 
+// Lightweight preview only — mirrors backend utils/generateSlug.js's
+// slugify() closely enough for a live "here's what it'll look like" hint
+// as the admin types, but the REAL value (normalized + made unique against
+// every other product) is always computed server-side on save. Never
+// blocks/validates against this preview.
+const slugifyPreview = (text) =>
+  String(text || "")
+    .toLowerCase()
+    .trim()
+    .replace(/[^a-z0-9\s-]/g, "")
+    .replace(/[\s-]+/g, "-")
+    .replace(/^-+|-+$/g, "");
+
 /**
  * Shared add/edit form for products. Sehat Potli's key domain difference vs
  * the reference architecture: price/mrp/stock live on a dynamic list of
@@ -42,6 +55,7 @@ const ProductForm = ({ initialData, onSubmit, isSubmitting, submitLabel = "Save 
   } = useForm({
     defaultValues: {
       name: "",
+      slug: "",
       categoryId: "",
       shortDescription: "",
       longDescription: "",
@@ -59,6 +73,21 @@ const ProductForm = ({ initialData, onSubmit, isSubmitting, submitLabel = "Save 
   });
 
   const isMixIngredient = watch("isMixIngredient");
+  const nameValue = watch("name");
+
+  // Slug auto-syncs with the name field live (WordPress/Shopify-style)
+  // until the admin edits the slug directly, at which point it "detaches"
+  // and stops following name changes — so fixing a typo in the name later
+  // never silently rewrites a slug that's already live somewhere. A brand-
+  // new product (initialData undefined) starts attached, since there's
+  // nothing to protect yet; the reset() effect below re-syncs this to
+  // "detached" the moment an existing product's real initialData.slug
+  // arrives (async — not yet known on this component's first render).
+  const [slugTouched, setSlugTouched] = useState(Boolean(initialData?.slug));
+
+  useEffect(() => {
+    if (!slugTouched) setValue("slug", slugifyPreview(nameValue));
+  }, [nameValue, slugTouched, setValue]);
 
   const { fields, append, remove } = useFieldArray({ control, name: "variants" });
   const {
@@ -86,8 +115,15 @@ const ProductForm = ({ initialData, onSubmit, isSubmitting, submitLabel = "Save 
     // form state the whole time. Once both are ready, the <option> list is
     // already committed before this effect runs, so the value takes.
     if (initialData && categories.length > 0) {
+      // initialData itself only arrives after this component's first
+      // render (fetched async by the caller — see ProductEdit.jsx), so the
+      // slugTouched state's own initial value (set from `Boolean(initial
+      // Data?.slug)` at mount, when initialData was still undefined) needs
+      // re-syncing here once the real value is actually known.
+      setSlugTouched(Boolean(initialData.slug));
       reset({
         name: initialData.name || "",
+        slug: initialData.slug || slugifyPreview(initialData.name),
         categoryId: initialData.categoryId || "",
         shortDescription: initialData.shortDescription || "",
         longDescription: initialData.longDescription || "",
@@ -136,6 +172,7 @@ const ProductForm = ({ initialData, onSubmit, isSubmitting, submitLabel = "Save 
 
     const formData = new FormData();
     formData.append("name", data.name);
+    formData.append("slug", data.slug || "");
     formData.append("categoryId", data.categoryId);
     formData.append("shortDescription", data.shortDescription || "");
     formData.append("longDescription", data.longDescription || "");
@@ -221,6 +258,19 @@ const ProductForm = ({ initialData, onSubmit, isSubmitting, submitLabel = "Save 
               placeholder="e.g. Premium California Almonds"
               required
             />
+
+            <InputBox
+              label="URL Slug"
+              name="slug"
+              register={register}
+              rules={{ onChange: () => setSlugTouched(true) }}
+              error={errors.slug}
+              placeholder="Auto-generated from the product name — edit to customize"
+            />
+            <p className="-mt-3 mb-4 text-xs text-muted">
+              The product&apos;s URL will be sehatpotli.in/products/<strong>{watch("slug") || "..."}</strong>. Auto-fills from the
+              name until you edit it directly.
+            </p>
 
             <InputBox
               label="Category"
