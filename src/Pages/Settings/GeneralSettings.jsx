@@ -169,7 +169,17 @@ const GeneralSettings = () => {
 
   return (
     <>
-      <Card className="max-w-xl">
+      {/* 2-col desktop / 1-col mobile-tablet (see tailwind.config.js — this
+          project's breakpoints are max-width/desktop-first, so `md:` here
+          means "collapse at tablet-and-below", not "expand at tablet-and-
+          up"). Naturally-compact cards (a toggle pair, two radio options)
+          sit two-up; longer ones (a chip list, a full form) declare
+          col-span-2 to take the full row instead of being squeezed. Plain
+          CSS grid auto-flow (no `dense`) — a short card added later just
+          slots in next to Cart Housekeeping below without any of this
+          needing to change. */}
+      <div className="grid grid-cols-2 gap-5 md:grid-cols-1">
+      <Card>
         <h3 className="section-title mb-4">Payments &amp; Fulfillment</h3>
 
         <label
@@ -225,65 +235,7 @@ const GeneralSettings = () => {
         </label>
       </Card>
 
-      <Card className="mt-5 max-w-xl">
-        <h3 className="section-title mb-1">Build Your Own Mix</h3>
-        <p className="mb-4 text-sm text-muted">
-          Weight increments customers can add per ingredient on the mix builder
-          — a customer never free-types a gram amount, only picks from this
-          list.
-        </p>
-
-        <div className="mb-3 flex flex-wrap gap-2">
-          {increments.map((grams) => (
-            <span
-              key={grams}
-              className="flex items-center gap-1.5 rounded-full py-1.5 pl-3 pr-2 text-sm font-medium"
-              style={{
-                backgroundColor: "var(--primary-tp)",
-                color: "var(--primary)",
-              }}
-            >
-              {grams}g
-              <button
-                type="button"
-                onClick={() => removeIncrement(grams)}
-                disabled={isSavingIncrements}
-                aria-label={`Remove ${grams}g`}
-                className="flex h-4 w-4 items-center justify-center rounded-full hover:bg-black/10"
-              >
-                <MdClose size={12} />
-              </button>
-            </span>
-          ))}
-          {isSavingIncrements && <LoaderSpiner size={16} />}
-        </div>
-
-        <div className="flex items-center gap-2">
-          <input
-            type="number"
-            min="1"
-            value={newIncrement}
-            onChange={(e) => setNewIncrement(e.target.value)}
-            onKeyDown={(e) =>
-              e.key === "Enter" && (e.preventDefault(), addIncrement())
-            }
-            placeholder="e.g. 200"
-            className="inputBox w-32"
-            disabled={isSavingIncrements}
-          />
-          <button
-            type="button"
-            onClick={addIncrement}
-            disabled={isSavingIncrements || !newIncrement}
-            className="btn-outline"
-          >
-            <MdAdd size={16} />
-            Add
-          </button>
-        </div>
-      </Card>
-
-      <Card className="mt-5 max-w-xl">
+      <Card>
         <h3 className="section-title mb-1">Cart Reward Tiers</h3>
         <p className="mb-4 text-sm text-muted">
           When a cart clears several reward thresholds at once (see the Cart
@@ -345,7 +297,65 @@ const GeneralSettings = () => {
         </div>
       </Card>
 
-      <Card className="mt-5 max-w-xl">
+      <Card className="col-span-2">
+        <h3 className="section-title mb-1">Build Your Own Mix</h3>
+        <p className="mb-4 text-sm text-muted">
+          Weight increments customers can add per ingredient on the mix builder
+          — a customer never free-types a gram amount, only picks from this
+          list.
+        </p>
+
+        <div className="mb-3 flex flex-wrap gap-2">
+          {increments.map((grams) => (
+            <span
+              key={grams}
+              className="flex items-center gap-1.5 rounded-full py-1.5 pl-3 pr-2 text-sm font-medium"
+              style={{
+                backgroundColor: "var(--primary-tp)",
+                color: "var(--primary)",
+              }}
+            >
+              {grams}g
+              <button
+                type="button"
+                onClick={() => removeIncrement(grams)}
+                disabled={isSavingIncrements}
+                aria-label={`Remove ${grams}g`}
+                className="flex h-4 w-4 items-center justify-center rounded-full hover:bg-black/10"
+              >
+                <MdClose size={12} />
+              </button>
+            </span>
+          ))}
+          {isSavingIncrements && <LoaderSpiner size={16} />}
+        </div>
+
+        <div className="flex items-center gap-2">
+          <input
+            type="number"
+            min="1"
+            value={newIncrement}
+            onChange={(e) => setNewIncrement(e.target.value)}
+            onKeyDown={(e) =>
+              e.key === "Enter" && (e.preventDefault(), addIncrement())
+            }
+            placeholder="e.g. 200"
+            className="inputBox w-32"
+            disabled={isSavingIncrements}
+          />
+          <button
+            type="button"
+            onClick={addIncrement}
+            disabled={isSavingIncrements || !newIncrement}
+            className="btn-outline"
+          >
+            <MdAdd size={16} />
+            Add
+          </button>
+        </div>
+      </Card>
+
+      <Card className="col-span-2">
         <h3 className="section-title mb-1">Launch / Sale Countdown</h3>
         <p className="mb-4 text-sm text-muted">
           A dismissible countdown banner shown on the storefront, ticking down
@@ -480,7 +490,7 @@ const GeneralSettings = () => {
         </div>
       </Card>
 
-      <Card className="mt-5 max-w-xl">
+      <Card>
         <h3 className="section-title mb-1">Cart Housekeeping</h3>
         <p className="mb-4 text-sm text-muted">
           Removes customer Cart rows (and their items) that haven&apos;t been
@@ -497,6 +507,7 @@ const GeneralSettings = () => {
           Clean up abandoned carts
         </button>
       </Card>
+      </div>
 
       <ConfirmModal
         open={confirmCleanupOpen}
