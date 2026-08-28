@@ -8,15 +8,30 @@ import usePageReload from "../../Hooks/usePageReload";
 import { formatDate } from "../../Utils/utils";
 import { getWhatsappSettings, updateWhatsappSettings } from "./whatsappSettingsService";
 
+// Mirrors backend utils/whatsapp.js's DEFAULT_TEMPLATE_NAMES exactly — only
+// used here to pre-fill the form the very first time (before the admin has
+// ever explicitly saved a `templates` config), so these fields always show
+// the name that's REALLY active rather than starting blank. If the backend
+// constant ever changes, update this to match.
+const DEFAULT_TEMPLATE_NAMES = {
+  orderConfirmed: "order_confirmed_v2",
+  orderDispatched: "order_dispatched_v2",
+  orderOutForDelivery: "order_out_for_delivery_v2",
+  orderDelivered: "order_delivered",
+};
+
 // Credentials live in the DB (IntegrationSettings, integrationKey
 // "whatsapp"), same reason as every other integration here. accessToken and
 // webhookVerifyToken are write-only — the API only ever sends back
 // `hasAccessToken`/`hasWebhookVerifyToken`, never the real value — so both
 // are left blank here unless the admin wants to replace them.
-// phoneNumberId/businessAccountId aren't secrets, so they come back as plain
-// text and are pre-filled. Message-sending itself isn't wired up yet — this
-// page only stores the credentials the webhook endpoint (and later,
-// sending) needs; see backend controllers/webhookController.js.
+// phoneNumberId/businessAccountId/the 4 template names aren't secrets, so
+// they come back as plain text and are pre-filled.
+//
+// Template names (config.templates.*) decide which Meta-approved template
+// each order-status event actually sends — see backend utils/whatsapp.js
+// getTemplateName(). Changing one here takes effect on the very next send
+// for that event, no deploy needed.
 const WhatsAppSettings = () => {
   const [settings, setSettings] = useState(null);
   const [isLoading, setIsLoading] = useState(true);
@@ -28,7 +43,16 @@ const WhatsAppSettings = () => {
     reset,
     formState: { errors },
   } = useForm({
-    defaultValues: { accessToken: "", phoneNumberId: "", businessAccountId: "", webhookVerifyToken: "" },
+    defaultValues: {
+      accessToken: "",
+      phoneNumberId: "",
+      businessAccountId: "",
+      webhookVerifyToken: "",
+      orderConfirmedTemplate: "",
+      orderDispatchedTemplate: "",
+      orderOutForDeliveryTemplate: "",
+      orderDeliveredTemplate: "",
+    },
   });
 
   const fetchWhatsappSettings = useCallback(() => getWhatsappSettings(setSettings, setIsLoading), []);
@@ -36,11 +60,16 @@ const WhatsAppSettings = () => {
 
   useEffect(() => {
     if (settings) {
+      const templates = settings.config?.templates || {};
       reset({
         accessToken: "",
         phoneNumberId: settings.config?.phoneNumberId || "",
         businessAccountId: settings.config?.businessAccountId || "",
         webhookVerifyToken: "",
+        orderConfirmedTemplate: templates.orderConfirmed || DEFAULT_TEMPLATE_NAMES.orderConfirmed,
+        orderDispatchedTemplate: templates.orderDispatched || DEFAULT_TEMPLATE_NAMES.orderDispatched,
+        orderOutForDeliveryTemplate: templates.orderOutForDelivery || DEFAULT_TEMPLATE_NAMES.orderOutForDelivery,
+        orderDeliveredTemplate: templates.orderDelivered || DEFAULT_TEMPLATE_NAMES.orderDelivered,
       });
     }
   }, [settings, reset]);
@@ -49,7 +78,16 @@ const WhatsAppSettings = () => {
   const hasWebhookVerifyToken = Boolean(settings?.config?.hasWebhookVerifyToken);
 
   const onSubmit = async (values) => {
-    const config = { phoneNumberId: values.phoneNumberId, businessAccountId: values.businessAccountId };
+    const config = {
+      phoneNumberId: values.phoneNumberId,
+      businessAccountId: values.businessAccountId,
+      templates: {
+        orderConfirmed: values.orderConfirmedTemplate.trim() || DEFAULT_TEMPLATE_NAMES.orderConfirmed,
+        orderDispatched: values.orderDispatchedTemplate.trim() || DEFAULT_TEMPLATE_NAMES.orderDispatched,
+        orderOutForDelivery: values.orderOutForDeliveryTemplate.trim() || DEFAULT_TEMPLATE_NAMES.orderOutForDelivery,
+        orderDelivered: values.orderDeliveredTemplate.trim() || DEFAULT_TEMPLATE_NAMES.orderDelivered,
+      },
+    };
     if (values.accessToken) config.accessToken = values.accessToken;
     if (values.webhookVerifyToken) config.webhookVerifyToken = values.webhookVerifyToken;
     await updateWhatsappSettings(config, setSettings, setIsSubmitting);
@@ -117,6 +155,53 @@ const WhatsAppSettings = () => {
               Used to verify Meta&apos;s webhook setup request. Register <code>/api/webhooks/whatsapp</code> as the Callback URL
               in Meta App Dashboard &gt; WhatsApp &gt; Configuration, with this same token as the Verify Token.
             </p>
+
+            <div className="my-5 border-t" style={{ borderColor: "var(--border)" }} />
+
+            <h4 className="mb-1 text-sm font-semibold" style={{ color: "var(--text)" }}>
+              Order-Status Templates
+            </h4>
+            <p className="mb-4 text-xs text-muted">
+              The exact Meta-approved template name each event sends. Switching to a different already-approved variant is just
+              editing the name here and saving — no deploy needed.
+            </p>
+            <InputBox
+              label="Order Confirmed Template"
+              name="orderConfirmedTemplate"
+              type="text"
+              register={register}
+              rules={{ required: "Template name is required" }}
+              error={errors.orderConfirmedTemplate}
+              required
+            />
+            <InputBox
+              label="Order Dispatched Template"
+              name="orderDispatchedTemplate"
+              type="text"
+              register={register}
+              rules={{ required: "Template name is required" }}
+              error={errors.orderDispatchedTemplate}
+              required
+            />
+            <InputBox
+              label="Order Out for Delivery Template"
+              name="orderOutForDeliveryTemplate"
+              type="text"
+              register={register}
+              rules={{ required: "Template name is required" }}
+              error={errors.orderOutForDeliveryTemplate}
+              required
+            />
+            <InputBox
+              label="Order Delivered Template"
+              name="orderDeliveredTemplate"
+              type="text"
+              register={register}
+              rules={{ required: "Template name is required" }}
+              error={errors.orderDeliveredTemplate}
+              required
+            />
+
             <button type="submit" className="btn-primary w-full" disabled={isSubmitting}>
               {isSubmitting ? <LoaderSpiner size={18} /> : "Save Settings"}
             </button>
