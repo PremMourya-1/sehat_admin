@@ -201,23 +201,7 @@ const OrderView = () => {
               <span className="text-xs text-muted">Operational: {order.status}</span>
             </div>
 
-            {order.customerStatus === "payment_pending" || order.customerStatus === "payment_failed" ? (
-              // No "Cancel Order" here on purpose: cancelling routes through
-              // finalizeCancellation(), which restocks every item — but
-              // nothing was ever decremented for one of these (stock only
-              // decrements once payment succeeds, see markOrderPaid.js), so
-              // that restock would incorrectly ADD stock. These resolve on
-              // their own: payment succeeding moves it to "confirmed", or
-              // the 24h housekeeping job (utils/abandonedOrderCleanup.js)
-              // marks it "payment_failed" if it's never completed.
-              <div className="mt-3 border-t pt-3" style={{ borderColor: "var(--border)" }}>
-                <p className="text-xs text-muted">
-                  {order.customerStatus === "payment_pending"
-                    ? "Waiting on the customer to complete payment — no action needed here."
-                    : "Payment was never completed within 24h. This order was never charged or stocked out, so there's nothing to refund or restock."}
-                </p>
-              </div>
-            ) : order.customerStatus === "cancelled" ? (
+            {order.customerStatus === "cancelled" ? (
               <div className="mt-3 border-t pt-3" style={{ borderColor: "var(--border)" }}>
                 <p className="text-xs text-muted">
                   Cancelled by {order.cancelledBy} on {formatDate(order.cancelledAt, "DD MMM YYYY, hh:mm A")}
@@ -250,8 +234,9 @@ const OrderView = () => {
                 ) : (
                   <div>
                     <p className="text-xs" style={{ color: "var(--danger, #dc2626)" }}>
-                      Cancelling will restock items{order.paymentMethod === "prepaid" && order.paymentStatus === "paid" ? ", refund the payment," : ""} and
-                      {order.shiprocketShipmentId ? " attempt to cancel the Shiprocket shipment." : " is final."}
+                      {order.paymentMethod === "prepaid" && order.paymentStatus !== "paid"
+                        ? "This order was never actually paid for, so there's nothing to restock or refund — cancelling just marks it cancelled."
+                        : `Cancelling will restock items${order.paymentMethod === "prepaid" && order.paymentStatus === "paid" ? ", refund the payment," : ""} and${order.shiprocketShipmentId ? " attempt to cancel the Shiprocket shipment." : " is final."}`}
                     </p>
                     <textarea
                       value={cancelReason}

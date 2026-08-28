@@ -62,9 +62,15 @@ const CancelOrderModal = ({ order, onClose, onCancelled }) => {
           </div>
 
           <p className="text-xs text-muted">
-            This will restock the items
-            {order.paymentMethod === "prepaid" && order.paymentStatus === "paid" ? ", refund the payment," : ""}
-            {order.shiprocketShipmentId ? " and attempt to cancel the Shiprocket shipment." : "."}
+            {order.paymentMethod === "prepaid" && order.paymentStatus !== "paid" ? (
+              "This order was never actually paid for, so there's nothing to restock or refund — cancelling just marks it cancelled."
+            ) : (
+              <>
+                This will restock the items
+                {order.paymentMethod === "prepaid" && order.paymentStatus === "paid" ? ", refund the payment," : ""}
+                {order.shiprocketShipmentId ? " and attempt to cancel the Shiprocket shipment." : "."}
+              </>
+            )}
           </p>
 
           <div className="formGroup !mb-0">

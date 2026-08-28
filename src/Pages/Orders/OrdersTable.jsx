@@ -184,15 +184,21 @@ const useOrdersColumns = ({ selectedIds, onToggleSelect, onCancelClick }) => {
       key: "actions",
       label: "Actions",
       render: (row) => {
-        // Matches OrderView.jsx's own existing cancel-button gate exactly
-        // (and adminOrderController.cancelOrder's real behavior — it only
-        // ever blocks "cancelled" itself; "delivered" isn't special-cased
+        // Matches adminOrderController.cancelOrder's real behavior exactly
+        // (re-confirmed by re-reading it, not assumed): it only ever blocks
+        // an already-"cancelled" order. "delivered" is NOT special-cased
         // there beyond skipping the now-pointless Shiprocket pickup-cancel
-        // step). NON_ACTIONABLE_CUSTOMER_STATUSES already covers "cancelled"
-        // plus the two legacy payment_pending/payment_failed values, which
-        // the backend's required-reason + not-already-cancelled checks
-        // would otherwise 400 on anyway.
-        const canCancel = !NON_ACTIONABLE_CUSTOMER_STATUSES.includes(row.customerStatus);
+        // step, so it stays cancellable here too — every other status,
+        // including the legacy payment_pending/payment_failed values some
+        // old pre-AbandonedCheckout orders are still stuck at, is
+        // cancellable as well. Deliberately NOT reusing
+        // NON_ACTIONABLE_CUSTOMER_STATUSES here — that one's specifically
+        // about bulk Generate Label eligibility (which genuinely does need
+        // paymentStatus "paid" to succeed), a different question from "can
+        // this be cancelled". Restocking a never-paid prepaid order used to
+        // incorrectly add stock nothing ever took — fixed in utils/
+        // orderCancellation.js, so cancelling one of these is now safe.
+        const canCancel = row.customerStatus !== "cancelled";
         return (
           <div className="flex items-center gap-2">
             <ActionButtons onView={() => navigate(`/orders/${row.id}`)} />
