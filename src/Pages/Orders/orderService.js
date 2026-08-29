@@ -57,24 +57,39 @@ export async function generateOrderLabel(id, setData, setIsGenerating, onError) 
 // Internal testing tool only (see shiprocket-configuration.md "Admin Test
 // Status Simulator") — drives an order through the real
 // processStatusUpdate() logic the Shiprocket webhook itself uses, so
-// customerStatus/emails can be tested without a real courier. Returns the
-// full result object (not just a boolean) so the caller can show whether
-// the update was skipped (forward-only guard) and which email fired.
+// customerStatus/notifications can be tested without a real courier.
+// Returns the full result object (not just a boolean) so the caller can
+// show whether the update was skipped (forward-only guard), which
+// notification event fired, and — via notificationOutcome — which CHANNEL
+// actually got used and whether it really succeeded. Backend awaits the
+// real send for this specific caller (see adminOrderController.js
+// simulateStatusUpdate's awaitNotification: true) specifically so this can
+// report the truth instead of a fixed event-name label that used to read
+// like "email was sent" regardless of channel or outcome (the exact
+// confusion behind the 2026-08-29 phoneNumberId incident — a failed
+// WhatsApp send looked identical to a successful email one).
 export async function simulateOrderStatus(id, status, setData, setIsSimulating) {
   try {
     setIsSimulating(true);
     const res = await adminApi.simulateOrderStatus(id, status);
     if (res.data.action) {
-      const { order, skipped, reason, emailTriggered } = res.data.data;
+      const { order, skipped, reason, notificationEvent, notificationOutcome } = res.data.data;
       setData(order);
       if (skipped) {
         toast(`No change — ${reason}`);
+      } else if (notificationEvent && notificationOutcome) {
+        const channelLabel = notificationOutcome.channel === "whatsapp" ? "WhatsApp" : "Email";
+        if (notificationOutcome.success) {
+          toast.success(`Status simulated — "${notificationEvent}" ${channelLabel} sent`);
+        } else if (notificationOutcome.skipped) {
+          toast.success(`Status simulated — "${notificationEvent}" ${channelLabel} already sent earlier (skipped)`);
+        } else {
+          toast.error(`Status simulated, but "${notificationEvent}" ${channelLabel} FAILED: ${notificationOutcome.error}`);
+        }
       } else {
-        toast.success(
-          emailTriggered ? `Status simulated — "${emailTriggered}" email sent` : "Status simulated successfully",
-        );
+        toast.success("Status simulated successfully");
       }
-      return { success: true, skipped, emailTriggered };
+      return { success: true, skipped, notificationEvent, notificationOutcome };
     }
     toast.error(res.data.message);
     return { success: false };

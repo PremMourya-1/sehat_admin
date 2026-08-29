@@ -75,13 +75,28 @@ const OrderView = () => {
   const handleSimulateStatus = async () => {
     const result = await simulateOrderStatus(id, simulateTarget, setOrder, setIsSimulating);
     if (result.success) {
-      setLastSimulation(
-        result.skipped
-          ? "No change — order is already at or past this status."
-          : result.emailTriggered
-            ? `customerStatus updated. "${result.emailTriggered}" email triggered.`
-            : "customerStatus updated. No email is wired up for this status yet.",
-      );
+      let message;
+      let isError = false;
+      if (result.skipped) {
+        message = "No change — order is already at or past this status.";
+      } else if (result.notificationEvent && result.notificationOutcome) {
+        // notificationOutcome reports the CHANNEL actually used and whether
+        // it really succeeded — see orderService.js simulateOrderStatus for
+        // why this matters (a failed WhatsApp send used to be
+        // indistinguishable from a successful email one here).
+        const channelLabel = result.notificationOutcome.channel === "whatsapp" ? "WhatsApp" : "Email";
+        if (result.notificationOutcome.success) {
+          message = `customerStatus updated. "${result.notificationEvent}" ${channelLabel} sent.`;
+        } else if (result.notificationOutcome.skipped) {
+          message = `customerStatus updated. "${result.notificationEvent}" ${channelLabel} already sent earlier (skipped).`;
+        } else {
+          message = `customerStatus updated, but "${result.notificationEvent}" ${channelLabel} FAILED: ${result.notificationOutcome.error}`;
+          isError = true;
+        }
+      } else {
+        message = "customerStatus updated. No notification is wired up for this status yet.";
+      }
+      setLastSimulation({ message, isError });
     }
   };
 
@@ -361,7 +376,14 @@ const OrderView = () => {
               </button>
             </div>
 
-            {lastSimulation && <p className="mt-3 text-xs text-muted">{lastSimulation}</p>}
+            {lastSimulation && (
+              <p
+                className="mt-3 text-xs"
+                style={lastSimulation.isError ? { color: "var(--danger, #dc2626)" } : { color: "var(--muted)" }}
+              >
+                {lastSimulation.message}
+              </p>
+            )}
           </div>
         </div>
       </div>
