@@ -47,13 +47,25 @@ function matchesDateFilter(order, dateFilter) {
   return true;
 }
 
-// Shared by both the main Orders page and the Today's Orders page (see
-// Orders.jsx / TodayOrders.jsx) — `defaultDateFilter` just seeds the initial
-// date-filter value, it's still changeable from either entry point.
+// Shared by the main Orders page, Today's Orders, and Dispatched Orders
+// (see Orders.jsx / TodayOrders.jsx / DispatchedOrders.jsx) —
+// `defaultDateFilter` just seeds the initial date-filter value, it's still
+// changeable from any entry point. `restrictToStatuses`, if given, scopes
+// the page to only those customerStatus values — both the underlying data
+// (an order outside this set never appears, full stop, not just filtered
+// out of a dropdown) and the Customer Status dropdown's own options (no
+// point offering "Confirmed" as a filter choice on a page that can only
+// ever show dispatched-onward orders). `showStatusFilter`/
+// `showLabelStatusFilter` independently hide the other two filter
+// dropdowns for a page that only wants date + customer status (Dispatched
+// Orders) — search and bulk actions are untouched either way.
 const OrdersList = ({
   defaultDateFilter = "all",
   title = "Orders",
   breadcrumbItems = [{ label: "Orders" }],
+  restrictToStatuses = null,
+  showStatusFilter = true,
+  showLabelStatusFilter = true,
 }) => {
   const [data, setData] = useState([]);
   const [isLoading, setIsLoading] = useState(true);
@@ -70,11 +82,16 @@ const OrdersList = ({
   const [isDownloadingLabels, setIsDownloadingLabels] = useState(false);
   const [toCancel, setToCancel] = useState(null);
 
+  const scopedData = useMemo(
+    () => (restrictToStatuses ? data.filter((order) => restrictToStatuses.includes(order.customerStatus)) : data),
+    [data, restrictToStatuses],
+  );
+
   const {
     search,
     setSearch,
     filteredData: searchFiltered,
-  } = UseFilter(data, ["orderNumber", "couponCode", "awbCode"]);
+  } = UseFilter(scopedData, ["orderNumber", "couponCode", "awbCode"]);
 
   const fetchOrders = useCallback(
     () => getOrderData(setData, setIsLoading),
@@ -266,18 +283,20 @@ const OrdersList = ({
           ))}
         </select>
 
-        <select
-          value={statusFilter}
-          onChange={(e) => setStatusFilter(e.target.value)}
-          className="inputBox !w-auto"
-        >
-          <option value="all">All Statuses</option>
-          {ORDER_STATUS_OPTIONS.map((status) => (
-            <option key={status} value={status}>
-              {status}
-            </option>
-          ))}
-        </select>
+        {showStatusFilter && (
+          <select
+            value={statusFilter}
+            onChange={(e) => setStatusFilter(e.target.value)}
+            className="inputBox !w-auto"
+          >
+            <option value="all">All Statuses</option>
+            {ORDER_STATUS_OPTIONS.map((status) => (
+              <option key={status} value={status}>
+                {status}
+              </option>
+            ))}
+          </select>
+        )}
 
         <select
           value={customerStatusFilter}
@@ -285,25 +304,27 @@ const OrdersList = ({
           className="inputBox !w-auto"
         >
           <option value="all">All Customer Statuses</option>
-          {CUSTOMER_STATUS_OPTIONS.map((status) => (
+          {(restrictToStatuses || CUSTOMER_STATUS_OPTIONS).map((status) => (
             <option key={status} value={status}>
               {CUSTOMER_STATUS_LABELS[status]}
             </option>
           ))}
         </select>
 
-        <select
-          value={labelStatusFilter}
-          onChange={(e) => setLabelStatusFilter(e.target.value)}
-          className="inputBox !w-auto"
-        >
-          <option value="all">All Label Statuses</option>
-          {LABEL_STATUS_OPTIONS.map((status) => (
-            <option key={status} value={status}>
-              {status.replace(/_/g, " ")}
-            </option>
-          ))}
-        </select>
+        {showLabelStatusFilter && (
+          <select
+            value={labelStatusFilter}
+            onChange={(e) => setLabelStatusFilter(e.target.value)}
+            className="inputBox !w-auto"
+          >
+            <option value="all">All Label Statuses</option>
+            {LABEL_STATUS_OPTIONS.map((status) => (
+              <option key={status} value={status}>
+                {status.replace(/_/g, " ")}
+              </option>
+            ))}
+          </select>
+        )}
 
         <label className="flex cursor-pointer items-center gap-1.5 text-sm text-muted">
           <input

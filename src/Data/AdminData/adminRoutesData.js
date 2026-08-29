@@ -6,6 +6,7 @@ import Dashboard from "../../Pages/Dashboard/Dashboard";
 import HeroBanner from "../../Pages/HeroBanner/HeroBanner";
 import Orders from "../../Pages/Orders/Orders";
 import TodayOrders from "../../Pages/Orders/TodayOrders";
+import DispatchedOrders from "../../Pages/Orders/DispatchedOrders";
 import OrderView from "../../Pages/Orders/OrderView";
 import AbandonedCheckouts from "../../Pages/AbandonedCheckouts/AbandonedCheckouts";
 import ProductAdd from "../../Pages/Product/ProductAdd";
@@ -34,6 +35,7 @@ const adminRoutes = [
   { path: "categories", element: Category },
   { path: "orders", element: Orders },
   { path: "orders/today", element: TodayOrders },
+  { path: "orders/dispatched", element: DispatchedOrders },
   { path: "orders/:id", element: OrderView },
   { path: "abandoned-checkouts", element: AbandonedCheckouts },
   { path: "customers", element: Customers },
