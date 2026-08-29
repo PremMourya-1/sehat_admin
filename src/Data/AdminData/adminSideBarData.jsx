@@ -9,6 +9,7 @@ import {
   MdOutlineSell,
   MdOutlineRemoveShoppingCart,
   MdOutlineLocalShipping,
+  MdOutlinePendingActions,
 } from "react-icons/md";
 import { BiCategory } from "react-icons/bi";
 import {
@@ -53,6 +54,7 @@ const adminSideBarData = [
     children: [
       { label: "All Orders", path: "/orders", icon: <HiOutlineClipboardList /> },
       { label: "Today's Orders", path: "/orders/today", icon: <MdToday /> },
+      { label: "Needs to Dispatch", path: "/orders/needs-dispatch", icon: <MdOutlinePendingActions /> },
       { label: "Dispatched Orders", path: "/orders/dispatched", icon: <MdOutlineLocalShipping /> },
     ],
   },

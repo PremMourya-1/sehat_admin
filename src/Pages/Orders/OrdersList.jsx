@@ -259,11 +259,87 @@ const OrdersList = ({
     setData((prev) => prev.map((item) => (item.id === updatedOrder.id ? updatedOrder : item)));
   };
 
+  // Resets every filter back to this page's own baseline (not hardcoded to
+  // "all" — Today's Orders clearing its filters should still land back on
+  // "today", not suddenly show every order ever placed) — search is the one
+  // exception, always cleared to empty regardless of entry point.
+  const hasActiveFilters =
+    search.trim() !== "" ||
+    dateFilter !== defaultDateFilter ||
+    statusFilter !== "all" ||
+    customerStatusFilter !== "all" ||
+    labelStatusFilter !== "all";
+  const clearFilters = () => {
+    setSearch("");
+    setDateFilter(defaultDateFilter);
+    setStatusFilter("all");
+    setCustomerStatusFilter("all");
+    setLabelStatusFilter("all");
+  };
+
   return (
     <div>
-      <BreadCrumb title={title} items={breadcrumbItems} />
+      {/* Generate Label / Download Labels live here — top-right, next to the
+          breadcrumb — always rendered (just disabled until a selection
+          makes them useful) instead of the old behavior of only mounting
+          this whole bar once selectedIds.size > 0. That conditional mount
+          was pushing the table down every time the first checkbox got
+          ticked (and back up when cleared) — a real layout shift on every
+          single selection, not just an occasional one. */}
+      <div className="flex flex-wrap items-start justify-between gap-3">
+        <BreadCrumb title={title} items={breadcrumbItems} />
+        <div className="flex flex-wrap items-center gap-2">
+          <span className="text-sm text-muted">
+            {selectedIds.size}/{selectableVisible.length} selected
+          </span>
+          <button
+            type="button"
+            className="btn-primary !px-4 !py-1.5 !text-sm"
+            disabled={isBulkRunning || selectedIds.size === 0}
+            onClick={handleBulkGenerateLabel}
+          >
+            {isBulkRunning ? (
+              <span className="flex items-center gap-2">
+                <LoaderSpiner size={16} /> {bulkProgress.done} of{" "}
+                {bulkProgress.total} processed
+              </span>
+            ) : (
+              "Generate Label"
+            )}
+          </button>
+          <button
+            type="button"
+            className="btn-outline !px-4 !py-1.5 !text-sm"
+            disabled={
+              isBulkRunning ||
+              isDownloadingLabels ||
+              downloadableSelectedIds.length === 0
+            }
+            onClick={handleDownloadLabels}
+            title={
+              selectedIds.size > 0 && downloadableSelectedIds.length === 0
+                ? "None of the selected orders have a generated label yet"
+                : undefined
+            }
+          >
+            {isDownloadingLabels ? (
+              <LoaderSpiner size={16} />
+            ) : (
+              "Download Labels"
+            )}
+          </button>
+          <button
+            type="button"
+            className="btn-outline !px-4 !py-1.5 !text-sm"
+            onClick={() => setSelectedIds(new Set())}
+            disabled={isBulkRunning || selectedIds.size === 0}
+          >
+            Clear Selection
+          </button>
+        </div>
+      </div>
 
-      <div className="mb-4 flex flex-wrap items-center gap-3">
+      <div className="mb-4 mt-4 flex flex-wrap items-center gap-3">
         <input
           value={search}
           onChange={(e) => setSearch(e.target.value)}
@@ -335,65 +411,16 @@ const OrdersList = ({
           />
           Select all on this page
         </label>
-      </div>
 
-      {selectedIds.size > 0 && (
-        <div
-          className="mb-4 flex flex-wrap items-center gap-3 rounded-lg border p-3"
-          style={{ borderColor: "var(--border)" }}
+        <button
+          type="button"
+          className="btn-outline !ml-auto !px-4 !py-1.5 !text-sm"
+          onClick={clearFilters}
+          disabled={!hasActiveFilters}
         >
-          <span
-            className="text-sm font-medium"
-            style={{ color: "var(--text)" }}
-          >
-            {selectedIds.size} order(s) selected
-          </span>
-          <button
-            type="button"
-            className="btn-primary !px-4 !py-1.5 !text-sm"
-            disabled={isBulkRunning}
-            onClick={handleBulkGenerateLabel}
-          >
-            {isBulkRunning ? (
-              <span className="flex items-center gap-2">
-                <LoaderSpiner size={16} /> {bulkProgress.done} of{" "}
-                {bulkProgress.total} processed
-              </span>
-            ) : (
-              "Generate Label"
-            )}
-          </button>
-          <button
-            type="button"
-            className="btn-outline !px-4 !py-1.5 !text-sm"
-            disabled={
-              isBulkRunning ||
-              isDownloadingLabels ||
-              downloadableSelectedIds.length === 0
-            }
-            onClick={handleDownloadLabels}
-            title={
-              downloadableSelectedIds.length === 0
-                ? "None of the selected orders have a generated label yet"
-                : undefined
-            }
-          >
-            {isDownloadingLabels ? (
-              <LoaderSpiner size={16} />
-            ) : (
-              "Download Labels"
-            )}
-          </button>
-          <button
-            type="button"
-            className="btn-outline !px-4 !py-1.5 !text-sm"
-            onClick={() => setSelectedIds(new Set())}
-            disabled={isBulkRunning}
-          >
-            Clear Selection
-          </button>
-        </div>
-      )}
+          Clear Filters
+        </button>
+      </div>
 
       {bulkResults && (
         <div

@@ -1,10 +1,23 @@
 import { useNavigate } from "react-router-dom";
 import Tippy from "@tippyjs/react";
-import { FiXCircle } from "react-icons/fi";
+import toast from "react-hot-toast";
+import { FiCopy, FiXCircle } from "react-icons/fi";
 import ActionButtons from "../../Components/Common/ActionButtons/ActionButtons";
 import HoverCard from "../../Components/HoverCard/HoverCard";
 import { CUSTOMER_STATUS_BADGE, CUSTOMER_STATUS_LABELS, NON_ACTIONABLE_CUSTOMER_STATUSES } from "../../Constant/Constant";
 import { formatCurrency, formatDate, getImageUrl } from "../../Utils/utils";
+
+// Shared by the AWB cell below — copies the AWB number to the clipboard so
+// an admin pasting it into Shiprocket's own tracking search (or a customer
+// WhatsApp message) never has to select-and-copy the text by hand.
+const copyToClipboard = async (text) => {
+  try {
+    await navigator.clipboard.writeText(text);
+    toast.success(`Copied ${text}`);
+  } catch {
+    toast.error("Could not copy — your browser may be blocking clipboard access");
+  }
+};
 
 const STATUS_BADGE = {
   pending: "badge-warning",
@@ -170,7 +183,22 @@ const useOrdersColumns = ({ selectedIds, onToggleSelect, onCancelClick }) => {
     {
       key: "awbCode",
       label: "AWB No.",
-      render: (row) => (row.awbCode ? <span style={{ color: "var(--text)" }}>{row.awbCode}</span> : <span className="text-muted">-</span>),
+      render: (row) =>
+        row.awbCode ? (
+          <Tippy content="Click to copy">
+            <button
+              type="button"
+              onClick={() => copyToClipboard(row.awbCode)}
+              className="flex items-center gap-1.5 hover:underline"
+              style={{ color: "var(--text)" }}
+            >
+              {row.awbCode}
+              <FiCopy size={12} className="text-muted" />
+            </button>
+          </Tippy>
+        ) : (
+          <span className="text-muted">-</span>
+        ),
     },
     {
       key: "estimatedDeliveryDate",
