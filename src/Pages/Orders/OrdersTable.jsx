@@ -168,6 +168,11 @@ const useOrdersColumns = ({ selectedIds, onToggleSelect, onCancelClick }) => {
       ),
     },
     {
+      key: "awbCode",
+      label: "AWB No.",
+      render: (row) => (row.awbCode ? <span style={{ color: "var(--text)" }}>{row.awbCode}</span> : <span className="text-muted">-</span>),
+    },
+    {
       key: "estimatedDeliveryDate",
       label: "Est. Delivery",
       render: (row) => formatDate(row.estimatedDeliveryDate),

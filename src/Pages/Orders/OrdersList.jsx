@@ -74,7 +74,7 @@ const OrdersList = ({
     search,
     setSearch,
     filteredData: searchFiltered,
-  } = UseFilter(data, ["orderNumber", "couponCode"]);
+  } = UseFilter(data, ["orderNumber", "couponCode", "awbCode"]);
 
   const fetchOrders = useCallback(
     () => getOrderData(setData, setIsLoading),
@@ -250,7 +250,7 @@ const OrdersList = ({
         <input
           value={search}
           onChange={(e) => setSearch(e.target.value)}
-          placeholder="Search by order number or coupon..."
+          placeholder="Search by order number, coupon, or AWB no..."
           className="inputBox max-w-xs"
         />
 
