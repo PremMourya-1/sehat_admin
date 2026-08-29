@@ -8,7 +8,6 @@ import LoaderSpiner from "../../Components/Common/Loader/LoaderSpiner";
 import UseFilter from "../../Hooks/UseFilter";
 import usePageReload from "../../Hooks/usePageReload";
 import {
-  ORDER_STATUS_OPTIONS,
   CUSTOMER_STATUS_LABELS,
   NON_ACTIONABLE_CUSTOMER_STATUSES,
 } from "../../Constant/Constant";
@@ -33,7 +32,20 @@ const DATE_FILTERS = [
 ];
 
 const LABEL_STATUS_OPTIONS = ["not_generated", "generated", "failed"];
-const CUSTOMER_STATUS_OPTIONS = Object.keys(CUSTOMER_STATUS_LABELS);
+
+// payment_pending/payment_failed are legacy values from a superseded
+// checkout design — no new order under the current AbandonedCheckout
+// architecture ever reaches them, only a couple of historical rows still
+// do (see memory/abandoned_checkout_architecture). Excluded from this
+// dropdown's own option list to declutter it down to the values that
+// actually apply to any order placed today — CUSTOMER_STATUS_LABELS
+// itself is untouched, so those historical orders still render with
+// their correct badge/label everywhere (including this same table), they
+// just aren't one of the choices you can filter TO here.
+const LEGACY_CUSTOMER_STATUSES = ["payment_pending", "payment_failed"];
+const CUSTOMER_STATUS_OPTIONS = Object.keys(CUSTOMER_STATUS_LABELS).filter(
+  (status) => !LEGACY_CUSTOMER_STATUSES.includes(status),
+);
 
 function matchesDateFilter(order, dateFilter) {
   if (dateFilter === "all") return true;
@@ -55,22 +67,29 @@ function matchesDateFilter(order, dateFilter) {
 // (an order outside this set never appears, full stop, not just filtered
 // out of a dropdown) and the Customer Status dropdown's own options (no
 // point offering "Confirmed" as a filter choice on a page that can only
-// ever show dispatched-onward orders). `showStatusFilter`/
-// `showLabelStatusFilter` independently hide the other two filter
-// dropdowns for a page that only wants date + customer status (Dispatched
-// Orders) — search and bulk actions are untouched either way.
+// ever show dispatched-onward orders). `showLabelStatusFilter` hides the
+// label-status dropdown for a page that only wants date + customer status
+// (Dispatched Orders, Needs to Dispatch) — search and bulk actions are
+// untouched either way.
+//
+// There used to be a 4th filter here too — order.status ("pending"/
+// "processing"/"shipped"/"delivered"/"cancelled") — removed along with its
+// own column (see OrdersTable.jsx): nothing in the current admin UI ever
+// updates that field, so every order sits at "pending" forever and
+// filtering by any other value always returned nothing. Customer Status
+// (customerStatus) is the real, actually-driven lifecycle field — this is
+// what Needs to Dispatch/Dispatched Orders/Generate Label eligibility are
+// all built on — genuinely useful, kept as-is.
 const OrdersList = ({
   defaultDateFilter = "all",
   title = "Orders",
   breadcrumbItems = [{ label: "Orders" }],
   restrictToStatuses = null,
-  showStatusFilter = true,
   showLabelStatusFilter = true,
 }) => {
   const [data, setData] = useState([]);
   const [isLoading, setIsLoading] = useState(true);
   const [dateFilter, setDateFilter] = useState(defaultDateFilter);
-  const [statusFilter, setStatusFilter] = useState("all");
   const [customerStatusFilter, setCustomerStatusFilter] = useState("all");
   const [labelStatusFilter, setLabelStatusFilter] = useState("all");
   const [page, setPage] = useState(1);
@@ -103,20 +122,13 @@ const OrdersList = ({
     () =>
       searchFiltered.filter(
         (order) =>
-          (statusFilter === "all" || order.status === statusFilter) &&
           (customerStatusFilter === "all" ||
             order.customerStatus === customerStatusFilter) &&
           (labelStatusFilter === "all" ||
             (order.labelStatus || "not_generated") === labelStatusFilter) &&
           matchesDateFilter(order, dateFilter),
       ),
-    [
-      searchFiltered,
-      statusFilter,
-      customerStatusFilter,
-      labelStatusFilter,
-      dateFilter,
-    ],
+    [searchFiltered, customerStatusFilter, labelStatusFilter, dateFilter],
   );
 
   // Any filter/search change can shift which page makes sense — and a
@@ -126,13 +138,7 @@ const OrdersList = ({
     setPage(1);
     setSelectedIds(new Set());
     setBulkResults(null);
-  }, [
-    search,
-    statusFilter,
-    customerStatusFilter,
-    labelStatusFilter,
-    dateFilter,
-  ]);
+  }, [search, customerStatusFilter, labelStatusFilter, dateFilter]);
 
   const totalPages = Math.max(Math.ceil(filteredData.length / PAGE_SIZE), 1);
   const pageData = useMemo(
@@ -266,13 +272,11 @@ const OrdersList = ({
   const hasActiveFilters =
     search.trim() !== "" ||
     dateFilter !== defaultDateFilter ||
-    statusFilter !== "all" ||
     customerStatusFilter !== "all" ||
     labelStatusFilter !== "all";
   const clearFilters = () => {
     setSearch("");
     setDateFilter(defaultDateFilter);
-    setStatusFilter("all");
     setCustomerStatusFilter("all");
     setLabelStatusFilter("all");
   };
@@ -358,21 +362,6 @@ const OrdersList = ({
             </option>
           ))}
         </select>
-
-        {showStatusFilter && (
-          <select
-            value={statusFilter}
-            onChange={(e) => setStatusFilter(e.target.value)}
-            className="inputBox !w-auto"
-          >
-            <option value="all">All Statuses</option>
-            {ORDER_STATUS_OPTIONS.map((status) => (
-              <option key={status} value={status}>
-                {status}
-              </option>
-            ))}
-          </select>
-        )}
 
         <select
           value={customerStatusFilter}

@@ -11,7 +11,6 @@ const NEEDS_DISPATCH_STATUSES = ["confirmed"];
 const NeedsDispatchOrders = () => (
   <OrdersList
     restrictToStatuses={NEEDS_DISPATCH_STATUSES}
-    showStatusFilter={false}
     showLabelStatusFilter={false}
     defaultDateFilter="all"
     title="Needs to Dispatch"

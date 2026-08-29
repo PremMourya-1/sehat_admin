@@ -15,7 +15,6 @@ const DISPATCHED_STATUSES = ["dispatched", "picked_up", "in_transit", "out_for_d
 const DispatchedOrders = () => (
   <OrdersList
     restrictToStatuses={DISPATCHED_STATUSES}
-    showStatusFilter={false}
     showLabelStatusFilter={false}
     defaultDateFilter="all"
     title="Dispatched Orders"

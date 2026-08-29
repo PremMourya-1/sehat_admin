@@ -188,22 +188,30 @@ const useOrdersColumns = ({ selectedIds, onToggleSelect, onCancelClick }) => {
         ),
     },
     {
-      key: "pickupDate",
-      label: "Pickup Date",
-      render: (row) => formatDate(row.pickupDate),
-    },
-    {
-      key: "shippingCostActual",
-      label: "Actual Shipping",
-      render: (row) =>
-        row.shippingCostActual !== null && row.shippingCostActual !== undefined
-          ? formatCurrency(row.shippingCostActual)
-          : "-",
-    },
-    {
-      key: "estimatedDeliveryDate",
-      label: "Est. Delivery",
-      render: (row) => formatDate(row.estimatedDeliveryDate),
+      // Pickup date, actual shipping cost, and estimated delivery used to be
+      // 3 separate columns — merged into one compact "Shipping" cell (each
+      // line labeled, so it's still immediately clear which value is which
+      // without needing 3 header labels' worth of horizontal space).
+      key: "shippingInfo",
+      label: "Shipping",
+      render: (row) => (
+        <div className="flex flex-col gap-0.5 text-xs whitespace-nowrap">
+          <span>
+            <span className="text-muted">Pickup: </span>
+            {formatDate(row.pickupDate)}
+          </span>
+          <span>
+            <span className="text-muted">Cost: </span>
+            {row.shippingCostActual !== null && row.shippingCostActual !== undefined
+              ? formatCurrency(row.shippingCostActual)
+              : "-"}
+          </span>
+          <span>
+            <span className="text-muted">Est. Delivery: </span>
+            {formatDate(row.estimatedDeliveryDate)}
+          </span>
+        </div>
+      ),
     },
     {
       key: "actions",
