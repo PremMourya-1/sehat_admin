@@ -19,14 +19,6 @@ const copyToClipboard = async (text) => {
   }
 };
 
-const STATUS_BADGE = {
-  pending: "badge-warning",
-  processing: "badge-info",
-  shipped: "badge-primary",
-  delivered: "badge-success",
-  cancelled: "badge-danger",
-};
-
 const LABEL_STATUS_BADGE = {
   not_generated: "badge-muted",
   generated: "badge-success",
@@ -158,11 +150,6 @@ const useOrdersColumns = ({ selectedIds, onToggleSelect, onCancelClick }) => {
     },
     { key: "createdAt", label: "Date", render: (row) => formatDate(row.createdAt) },
     {
-      key: "status",
-      label: "Status",
-      render: (row) => <span className={STATUS_BADGE[row.status] || "badge-muted"}>{row.status}</span>,
-    },
-    {
       key: "customerStatus",
       label: "Customer Status",
       render: (row) => (
@@ -201,9 +188,9 @@ const useOrdersColumns = ({ selectedIds, onToggleSelect, onCancelClick }) => {
         ),
     },
     {
-      key: "estimatedDeliveryDate",
-      label: "Est. Delivery",
-      render: (row) => formatDate(row.estimatedDeliveryDate),
+      key: "pickupDate",
+      label: "Pickup Date",
+      render: (row) => formatDate(row.pickupDate),
     },
     {
       key: "shippingCostActual",
@@ -212,6 +199,11 @@ const useOrdersColumns = ({ selectedIds, onToggleSelect, onCancelClick }) => {
         row.shippingCostActual !== null && row.shippingCostActual !== undefined
           ? formatCurrency(row.shippingCostActual)
           : "-",
+    },
+    {
+      key: "estimatedDeliveryDate",
+      label: "Est. Delivery",
+      render: (row) => formatDate(row.estimatedDeliveryDate),
     },
     {
       key: "actions",
