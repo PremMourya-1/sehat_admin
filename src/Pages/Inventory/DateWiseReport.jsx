@@ -109,18 +109,24 @@ const DateWiseReport = () => {
                         <thead>
                           <tr>
                             <th>Product</th>
+                            <th>Pack Size</th>
                             <th>Units Sold</th>
                             <th>Revenue</th>
                           </tr>
                         </thead>
                         <tbody>
-                          {day.products.map((p) => (
-                            <tr key={p.productId}>
-                              <td>{p.name}</td>
-                              <td>{p.unitsSold}</td>
-                              <td>{formatCurrency(p.revenue)}</td>
-                            </tr>
-                          ))}
+                          {day.products.flatMap((p) =>
+                            (p.variants && p.variants.length > 0 ? p.variants : [{ weight: "-", unitsSold: p.unitsSold, revenue: p.revenue }]).map(
+                              (v) => (
+                                <tr key={`${p.productId}-${v.weight}`}>
+                                  <td>{p.name}</td>
+                                  <td>{v.weight}</td>
+                                  <td>{v.unitsSold}</td>
+                                  <td>{formatCurrency(v.revenue)}</td>
+                                </tr>
+                              ),
+                            ),
+                          )}
                         </tbody>
                       </table>
                     </div>

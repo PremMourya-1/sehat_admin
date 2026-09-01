@@ -1,5 +1,5 @@
-import { useEffect, useMemo, useState } from "react";
-import { FiChevronDown, FiChevronUp, FiPrinter } from "react-icons/fi";
+import { Fragment, useEffect, useMemo, useState } from "react";
+import { FiChevronDown, FiChevronRight, FiChevronUp, FiPrinter } from "react-icons/fi";
 import Card from "../../Components/Card/Card";
 import PreLoader from "../../Components/Common/Loader/PreLoader";
 import LoaderSpiner from "../../Components/Common/Loader/LoaderSpiner";
@@ -29,6 +29,7 @@ const ProductWiseReport = () => {
   const [isLoading, setIsLoading] = useState(false);
   const [sortKey, setSortKey] = useState("revenue");
   const [sortDir, setSortDir] = useState("desc");
+  const [expandedProducts, setExpandedProducts] = useState(new Set());
 
   useEffect(() => {
     adminApi.getCategories().then((res) => res.data.action && setCategories(res.data.data));
@@ -39,11 +40,21 @@ const ProductWiseReport = () => {
 
   const handleApply = () => {
     if (!canApply) return;
+    setExpandedProducts(new Set());
     getSalesByProduct(
       { startDate, endDate, ...(categoryId && { categoryId }), ...(productId && { productId }) },
       setReport,
       setIsLoading,
     );
+  };
+
+  const toggleExpand = (id) => {
+    setExpandedProducts((prev) => {
+      const next = new Set(prev);
+      if (next.has(id)) next.delete(id);
+      else next.add(id);
+      return next;
+    });
   };
 
   const toggleSort = (key) => {
@@ -134,6 +145,7 @@ const ProductWiseReport = () => {
             <table className="customTable">
               <thead>
                 <tr>
+                  <th style={{ width: "2rem" }} />
                   <th>Product</th>
                   <th className="cursor-pointer select-none" onClick={() => toggleSort("units")}>
                     <span className="inline-flex items-center gap-1">
@@ -148,29 +160,66 @@ const ProductWiseReport = () => {
                 </tr>
               </thead>
               <tbody>
-                {sortedProducts.map((p) => (
-                  <tr key={p.productId}>
-                    <td>
-                      <div className="flex items-center gap-2">
-                        <span
-                          className="relative block h-9 w-9 flex-none overflow-hidden rounded-md border"
-                          style={{ borderColor: "var(--border)" }}
-                        >
-                          {p.image ? (
-                            <img src={getImageUrl(p.image)} alt={p.name} className="h-full w-full object-cover" />
-                          ) : (
-                            <div className="h-full w-full" style={{ backgroundColor: "var(--background-light)" }} />
-                          )}
-                        </span>
-                        <span className="text-sm font-medium" style={{ color: "var(--text)" }}>
-                          {p.name}
-                        </span>
-                      </div>
-                    </td>
-                    <td>{p.unitsSold}</td>
-                    <td>{formatCurrency(p.revenue)}</td>
-                  </tr>
-                ))}
+                {sortedProducts.map((p) => {
+                  const isExpanded = expandedProducts.has(p.productId);
+                  const hasVariants = (p.variants || []).length > 0;
+                  return (
+                    <Fragment key={p.productId}>
+                      <tr
+                        className={hasVariants ? "cursor-pointer" : undefined}
+                        onClick={() => hasVariants && toggleExpand(p.productId)}
+                      >
+                        <td>
+                          {hasVariants && (isExpanded ? <FiChevronDown size={14} /> : <FiChevronRight size={14} />)}
+                        </td>
+                        <td>
+                          <div className="flex items-center gap-2">
+                            <span
+                              className="relative block h-9 w-9 flex-none overflow-hidden rounded-md border"
+                              style={{ borderColor: "var(--border)" }}
+                            >
+                              {p.image ? (
+                                <img src={getImageUrl(p.image)} alt={p.name} className="h-full w-full object-cover" />
+                              ) : (
+                                <div className="h-full w-full" style={{ backgroundColor: "var(--background-light)" }} />
+                              )}
+                            </span>
+                            <span className="text-sm font-medium" style={{ color: "var(--text)" }}>
+                              {p.name}
+                            </span>
+                          </div>
+                        </td>
+                        <td>{p.unitsSold}</td>
+                        <td>{formatCurrency(p.revenue)}</td>
+                      </tr>
+                      {isExpanded && hasVariants && (
+                        <tr key={`${p.productId}-variants`}>
+                          <td />
+                          <td colSpan={3} className="!py-2">
+                            <table className="customTable !border-0">
+                              <thead>
+                                <tr>
+                                  <th>Pack Size</th>
+                                  <th>Units Sold</th>
+                                  <th>Revenue</th>
+                                </tr>
+                              </thead>
+                              <tbody>
+                                {p.variants.map((v) => (
+                                  <tr key={v.weight}>
+                                    <td>{v.weight}</td>
+                                    <td>{v.unitsSold}</td>
+                                    <td>{formatCurrency(v.revenue)}</td>
+                                  </tr>
+                                ))}
+                              </tbody>
+                            </table>
+                          </td>
+                        </tr>
+                      )}
+                    </Fragment>
+                  );
+                })}
               </tbody>
             </table>
           </div>
