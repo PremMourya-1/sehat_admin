@@ -94,7 +94,7 @@ const BreakdownSection = ({ range, onRangeChange, breakdown, isLoading }) => {
         </div>
       </div>
 
-      <div className="grid grid-cols-2 gap-4 md:grid-cols-4">
+      <div className="grid grid-cols-4 gap-4 lg:grid-cols-2 xs:grid-cols-1">
         <Card className={isLoading ? "animate-pulse" : ""}>
           <h4 className="mb-2 text-sm font-medium text-muted">Order Status</h4>
           {statusData.length === 0 ? (

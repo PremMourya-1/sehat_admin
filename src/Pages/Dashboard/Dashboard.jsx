@@ -124,16 +124,15 @@ const Dashboard = () => {
             ))}
           </div>
 
-          <div className="mt-4 grid grid-cols-2 gap-4 lg:grid-cols-1">
+          <div className="mt-6 grid grid-cols-2 gap-4 lg:grid-cols-1">
             <Card
               title="Total Revenue (all-time)"
               value={formatCurrency(stats?.totalRevenue)}
               icon={<FaRupeeSign />}
               accent="#C89B3C"
-              className="max-w-sm"
             />
 
-            <Card className="max-w-sm">
+            <Card>
               <div className="flex items-center justify-between gap-4">
                 <div>
                   <p className="text-sm font-medium text-muted">Shiprocket Wallet</p>
@@ -182,7 +181,7 @@ const Dashboard = () => {
             <OverviewStats overview={overview} isLoading={isOverviewLoading} />
           </div>
 
-          <div className="mt-4">
+          <div className="mt-6">
             <RevenueTrendChart trend={trend} isLoading={isTrendLoading} days={trendDays} onDaysChange={setTrendDays} />
           </div>
 
