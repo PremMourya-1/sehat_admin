@@ -23,6 +23,7 @@ import Faq from "../../Pages/Faq/Faq";
 import Review from "../../Pages/Review/Review";
 import Newsletter from "../../Pages/Newsletter/Newsletter";
 import Settings from "../../Pages/Settings/Settings";
+import SalesReports from "../../Pages/Inventory/SalesReports";
 
 // Data-driven route table consumed by Routes/Route.jsx. Each entry is
 // rendered as a nested <Route> under the ProtectedRoute > AdminLayout shell.
@@ -52,6 +53,7 @@ const adminRoutes = [
   { path: "reviews", element: Review },
   { path: "newsletter-subscribers", element: Newsletter },
   { path: "settings", element: Settings },
+  { path: "inventory/sales-reports", element: SalesReports },
 ];
 
 export default adminRoutes;

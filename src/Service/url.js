@@ -17,6 +17,10 @@ const adminUrl = {
   analyticsBreakdown: "/analytics/breakdown",
   analyticsBestSellers: "/analytics/best-sellers",
 
+  // inventory > sales reports
+  salesReportByProduct: "/reports/sales/by-product",
+  salesReportByDate: "/reports/sales/by-date",
+
   // product pricing ("Manage Product Pricing" bulk/quick price adjustment tool)
   pricingPreview: "/pricing/preview",
   pricingBulkUpdate: "/pricing/bulk-update",

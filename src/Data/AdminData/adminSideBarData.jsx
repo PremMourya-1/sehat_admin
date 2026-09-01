@@ -10,6 +10,8 @@ import {
   MdOutlineRemoveShoppingCart,
   MdOutlineLocalShipping,
   MdOutlinePendingActions,
+  MdOutlineInventory2,
+  MdOutlineBarChart,
 } from "react-icons/md";
 import { BiCategory } from "react-icons/bi";
 import {
@@ -66,6 +68,23 @@ const adminSideBarData = [
   },
   { label: "Coupons", path: "/coupons", icon: <FaTags />, group: "Sales" },
   { label: "Customers", path: "/customers", icon: <FaUsers />, group: "Sales" },
+
+  // First feature under Inventory — deliberately a `children` dropdown
+  // (not a single top-level link) even though there's only one item today,
+  // so stock tracking / other inventory-management features mentioned as
+  // "coming later" just slot in as more entries in this same array without
+  // ever needing to restructure this into a dropdown after the fact. No
+  // `group` here (same as Dashboard) — a one-item group whose header would
+  // just repeat the dropdown's own label ("INVENTORY" / "Inventory") is
+  // redundant; add one back if a second top-level Inventory item ever
+  // needs clustering alongside this dropdown.
+  {
+    label: "Inventory",
+    icon: <MdOutlineInventory2 />,
+    children: [
+      { label: "Sales Reports", path: "/inventory/sales-reports", icon: <MdOutlineBarChart /> },
+    ],
+  },
 
   { label: "Hero Banners", path: "/hero-banners", icon: <FaRegImages />, group: "Content" },
   { label: "Testimonials", path: "/testimonials", icon: <FaRegCommentDots />, group: "Content" },

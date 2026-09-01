@@ -20,6 +20,10 @@ const adminApi = {
   getAnalyticsBreakdown: (params) => apiJson.get(adminUrl.analyticsBreakdown, { params }),
   getBestSellers: (params) => apiJson.get(adminUrl.analyticsBestSellers, { params }),
 
+  // ---- inventory > sales reports ---- params: { startDate, endDate, productId?, categoryId?, sortBy?, sortDir? }
+  getSalesReportByProduct: (params) => apiJson.get(adminUrl.salesReportByProduct, { params }),
+  getSalesReportByDate: (params) => apiJson.get(adminUrl.salesReportByDate, { params }),
+
   // ---- product pricing ----
   // Also called directly by the product edit page's quick-adjust widget
   // (Pages/Product/ProductForm.jsx) with a single-item productIds array —
