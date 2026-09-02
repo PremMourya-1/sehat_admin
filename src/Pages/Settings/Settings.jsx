@@ -34,13 +34,22 @@ const Settings = () => {
     <div>
       <BreadCrumb title="Settings" items={[{ label: "Settings" }]} />
 
-      <div className="mb-5 flex overflow-hidden rounded-lg border" style={{ borderColor: "var(--border)", width: "fit-content" }}>
+      {/* `overflow-x: auto` + `flex-shrink-0` buttons: on a narrow phone
+          these 4 labels (esp. "Shipping Zones") don't fit in fit-content's
+          natural width — rather than let that blow out the whole page's
+          scrollWidth (a real horizontal-scroll-the-page bug this used to
+          have), the tab strip itself scrolls horizontally, same "pill row"
+          look intact on desktop where it already fits. */}
+      <div
+        className="mb-5 flex overflow-x-auto rounded-lg border"
+        style={{ borderColor: "var(--border)", width: "fit-content", maxWidth: "100%" }}
+      >
         {TABS.map((tab) => (
           <button
             key={tab.key}
             type="button"
             onClick={() => setActiveTab(tab.key)}
-            className="px-5 py-2 text-sm font-medium transition-colors"
+            className="flex-shrink-0 whitespace-nowrap px-5 py-2 text-sm font-medium transition-colors"
             style={
               activeTab === tab.key
                 ? { backgroundColor: "var(--primary)", color: "#fff" }
@@ -58,13 +67,17 @@ const Settings = () => {
 
       {activeTab === "integrations" && (
         <div>
-          <div className="mb-4 flex gap-2">
+          {/* Same overflow-x-auto containment as the main Settings tab
+              strip above — 4 buttons this wide don't fit a phone screen
+              without either wrapping (breaks the row's look) or scrolling
+              the page itself (the bug this fixes). */}
+          <div className="mb-4 flex gap-2 overflow-x-auto">
             {INTEGRATIONS.map((integration) => (
               <button
                 key={integration.key}
                 type="button"
                 onClick={() => setActiveIntegration(integration.key)}
-                className={activeIntegration === integration.key ? "btn-primary !px-4 !py-1.5 !text-sm" : "btn-outline !px-4 !py-1.5 !text-sm"}
+                className={`flex-shrink-0 whitespace-nowrap ${activeIntegration === integration.key ? "btn-primary !px-4 !py-1.5 !text-sm" : "btn-outline !px-4 !py-1.5 !text-sm"}`}
               >
                 {integration.label}
               </button>

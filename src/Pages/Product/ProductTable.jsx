@@ -58,7 +58,11 @@ const useProductColumns = ({ onDelete }) => {
         );
       },
     },
-    { key: "name", label: "Name" },
+    // Pinned on scroll (see Table.jsx's `sticky` doc comment) — this table
+    // has 9 columns, wider than a phone screen, so keeping the product
+    // name in view while scrolling to Price/Status/etc. matters more than
+    // the thumbnail before it.
+    { key: "name", label: "Name", sticky: true },
     {
       key: "category",
       label: "Category",

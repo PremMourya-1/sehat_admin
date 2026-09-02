@@ -297,7 +297,7 @@ const GeneralSettings = () => {
         </div>
       </Card>
 
-      <Card className="col-span-2">
+      <Card className="col-span-2 md:col-span-1">
         <h3 className="section-title mb-1">Build Your Own Mix</h3>
         <p className="mb-4 text-sm text-muted">
           Weight increments customers can add per ingredient on the mix builder
@@ -355,7 +355,7 @@ const GeneralSettings = () => {
         </div>
       </Card>
 
-      <Card className="col-span-2">
+      <Card className="col-span-2 md:col-span-1">
         <h3 className="section-title mb-1">Launch / Sale Countdown</h3>
         <p className="mb-4 text-sm text-muted">
           A dismissible countdown banner shown on the storefront, ticking down

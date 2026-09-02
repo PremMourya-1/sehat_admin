@@ -61,6 +61,11 @@ const useOrdersColumns = ({ selectedIds, onToggleSelect, onCancelClick }) => {
     {
       key: "product",
       label: "Product",
+      // Pinned while the rest of this (quite wide) table scrolls
+      // horizontally on mobile — see Table.jsx's `sticky` doc comment —
+      // so scrolling right to see Amount/Status/Shipping/etc. never loses
+      // track of which order's row you're looking at.
+      sticky: true,
       render: (row) => {
         const items = row.OrderItems || [];
         if (items.length === 0) return <span className="text-muted">-</span>;

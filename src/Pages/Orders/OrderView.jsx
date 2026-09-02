@@ -116,35 +116,42 @@ const OrderView = () => {
         <div className="col-span-2 lg:col-span-1">
           <div className="card mb-5">
             <h3 className="section-title mb-3">Items</h3>
-            <table className="customTable">
-              <thead>
-                <tr>
-                  <th>Product</th>
-                  <th>Qty</th>
-                  <th>Price</th>
-                </tr>
-              </thead>
-              <tbody>
-                {(order.OrderItems || []).map((item) => (
-                  <tr key={item.id}>
-                    <td>
-                      {item.Product?.name || "Product"}
-                      {item.weight ? ` (${item.weight})` : ""}
-                      {item.ComboOffer && (
-                        <span className="ml-2 badge-accent">Combo: {item.ComboOffer.title}</span>
-                      )}
-                      {item.customMixId && (
-                        <span className="ml-2 badge-accent">
-                          Mix: {item.customMixName || "Custom Mix"}
-                        </span>
-                      )}
-                    </td>
-                    <td>{item.quantity}</td>
-                    <td>{formatCurrency(item.price)}</td>
+            {/* Long product names + a Combo/Mix badge inline routinely push
+                this wider than a phone screen — unlike Components/Table/
+                Table.jsx's generic table, this one is hand-rolled and had
+                no scroll container of its own, so it used to overflow the
+                card (and the whole page) instead of just this table. */}
+            <div className="w-full overflow-x-auto">
+              <table className="customTable">
+                <thead>
+                  <tr>
+                    <th>Product</th>
+                    <th>Qty</th>
+                    <th>Price</th>
                   </tr>
-                ))}
-              </tbody>
-            </table>
+                </thead>
+                <tbody>
+                  {(order.OrderItems || []).map((item) => (
+                    <tr key={item.id}>
+                      <td>
+                        {item.Product?.name || "Product"}
+                        {item.weight ? ` (${item.weight})` : ""}
+                        {item.ComboOffer && (
+                          <span className="ml-2 badge-accent">Combo: {item.ComboOffer.title}</span>
+                        )}
+                        {item.customMixId && (
+                          <span className="ml-2 badge-accent">
+                            Mix: {item.customMixName || "Custom Mix"}
+                          </span>
+                        )}
+                      </td>
+                      <td>{item.quantity}</td>
+                      <td>{formatCurrency(item.price)}</td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
             <div className="mt-3 flex items-center justify-between border-t pt-3" style={{ borderColor: "var(--border)" }}>
               <span className="font-semibold" style={{ color: "var(--text)" }}>
                 Total

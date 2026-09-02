@@ -14,6 +14,7 @@ const useAbandonedCheckoutColumns = () => [
   {
     key: "items",
     label: "Items",
+    sticky: true,
     render: (row) => {
       const items = row.cartItemsSnapshot || [];
       if (items.length === 0) return <span className="text-muted">-</span>;

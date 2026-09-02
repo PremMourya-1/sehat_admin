@@ -385,6 +385,28 @@ a {
   background-color: var(--background-light);
 }
 
+/* Opt-in per-column (Table.jsx's `sticky: true`) — pins one identifying
+   column (e.g. product/customer name) to the left edge while the rest of a
+   wide table scrolls horizontally underneath it, so a table that's too wide
+   for mobile never loses "which row is this" context mid-scroll. Needs its
+   own opaque background (cells are transparent by default, letting the
+   row's own background show through) — repeated in the hover/header
+   variants below so it doesn't visually "pop" out of sync with the rest of
+   the row it belongs to. */
+.customTable .sticky-col {
+  position: sticky;
+  left: 0;
+  z-index: 5;
+  background-color: var(--surface);
+}
+.customTable thead th.sticky-col {
+  z-index: 6;
+  background-color: var(--table-heading);
+}
+.customTable tbody tr:hover td.sticky-col {
+  background-color: var(--background-light);
+}
+
 /* ------------------------------------------------------------------ */
 /* Shimmer skeleton                                                      */
 /* ------------------------------------------------------------------ */

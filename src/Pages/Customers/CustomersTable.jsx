@@ -1,7 +1,7 @@
 import { formatDate } from "../../Utils/utils";
 
 const useCustomersColumns = () => [
-  { key: "name", label: "Name", render: (row) => row.name || "-" },
+  { key: "name", label: "Name", sticky: true, render: (row) => row.name || "-" },
   { key: "email", label: "Email" },
   { key: "mobileNumber", label: "Phone" },
   { key: "orderCount", label: "Orders", render: (row) => row.orderCount ?? 0 },

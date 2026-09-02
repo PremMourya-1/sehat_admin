@@ -98,40 +98,45 @@ const ShippingZones = () => {
         <NoRecords message="No shipping zones configured yet" />
       ) : (
         <Card>
-          <table className="customTable">
-            <thead>
-              <tr>
-                <th>Zone</th>
-                <th>States</th>
-                <th>Charge</th>
-                <th></th>
-              </tr>
-            </thead>
-            <tbody>
-              {data.map((zone) => (
-                <tr key={zone.id}>
-                  <td>{zone.zoneName}</td>
-                  <td className="text-sm text-muted">{(zone.states || []).join(", ") || "-"}</td>
-                  <td>{formatCurrency(zone.shippingCharge)}</td>
-                  <td>
-                    <div className="flex items-center gap-2">
-                      <button type="button" className="action-icon-edit" onClick={() => openEdit(zone)} aria-label="Edit zone">
-                        <MdEdit />
-                      </button>
-                      <button
-                        type="button"
-                        className="action-icon-delete"
-                        onClick={() => setToDelete(zone)}
-                        aria-label="Delete zone"
-                      >
-                        <MdDeleteOutline />
-                      </button>
-                    </div>
-                  </td>
+          {/* States lists (e.g. a multi-state zone) can easily run wider
+              than a phone screen — scroll the table itself rather than
+              let it overflow the Card/page. */}
+          <div className="w-full overflow-x-auto">
+            <table className="customTable">
+              <thead>
+                <tr>
+                  <th>Zone</th>
+                  <th>States</th>
+                  <th>Charge</th>
+                  <th></th>
                 </tr>
-              ))}
-            </tbody>
-          </table>
+              </thead>
+              <tbody>
+                {data.map((zone) => (
+                  <tr key={zone.id}>
+                    <td>{zone.zoneName}</td>
+                    <td className="text-sm text-muted">{(zone.states || []).join(", ") || "-"}</td>
+                    <td>{formatCurrency(zone.shippingCharge)}</td>
+                    <td>
+                      <div className="flex items-center gap-2">
+                        <button type="button" className="action-icon-edit" onClick={() => openEdit(zone)} aria-label="Edit zone">
+                          <MdEdit />
+                        </button>
+                        <button
+                          type="button"
+                          className="action-icon-delete"
+                          onClick={() => setToDelete(zone)}
+                          aria-label="Delete zone"
+                        >
+                          <MdDeleteOutline />
+                        </button>
+                      </div>
+                    </td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
         </Card>
       )}
 

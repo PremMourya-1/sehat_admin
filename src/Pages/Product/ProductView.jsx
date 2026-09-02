@@ -38,26 +38,28 @@ const ProductView = () => {
 
           <div className="card mb-5">
             <h3 className="section-title mb-3">Weight Variants</h3>
-            <table className="customTable">
-              <thead>
-                <tr>
-                  <th>Weight</th>
-                  <th>MRP</th>
-                  <th>Price</th>
-                  <th>Stock</th>
-                </tr>
-              </thead>
-              <tbody>
-                {(product.variants || []).map((v) => (
-                  <tr key={v.id}>
-                    <td>{v.weight}</td>
-                    <td>{formatCurrency(v.mrp)}</td>
-                    <td>{formatCurrency(v.price)}</td>
-                    <td>{v.stock}</td>
+            <div className="w-full overflow-x-auto">
+              <table className="customTable">
+                <thead>
+                  <tr>
+                    <th>Weight</th>
+                    <th>MRP</th>
+                    <th>Price</th>
+                    <th>Stock</th>
                   </tr>
-                ))}
-              </tbody>
-            </table>
+                </thead>
+                <tbody>
+                  {(product.variants || []).map((v) => (
+                    <tr key={v.id}>
+                      <td>{v.weight}</td>
+                      <td>{formatCurrency(v.mrp)}</td>
+                      <td>{formatCurrency(v.price)}</td>
+                      <td>{v.stock}</td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
           </div>
         </div>
 

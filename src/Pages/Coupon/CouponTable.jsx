@@ -2,7 +2,7 @@ import ActionButtons from "../../Components/Common/ActionButtons/ActionButtons";
 import { formatCurrency, formatDate } from "../../Utils/utils";
 
 const useCouponColumns = ({ onEdit, onDelete }) => [
-  { key: "code", label: "Code", render: (row) => <span className="badge-accent">{row.code}</span> },
+  { key: "code", label: "Code", sticky: true, render: (row) => <span className="badge-accent">{row.code}</span> },
   { key: "discountPercent", label: "Discount", render: (row) => `${row.discountPercent}%` },
   { key: "minOrderAmount", label: "Min Order", render: (row) => formatCurrency(row.minOrderAmount) },
   { key: "maxDiscountAmount", label: "Max Discount", render: (row) => (row.maxDiscountAmount ? formatCurrency(row.maxDiscountAmount) : "-") },

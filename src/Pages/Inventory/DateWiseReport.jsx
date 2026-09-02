@@ -105,30 +105,32 @@ const DateWiseReport = () => {
 
                   {isExpanded && (
                     <div className="border-t px-3 pb-3 pt-2" style={{ borderColor: "var(--border)" }}>
-                      <table className="customTable !border-0">
-                        <thead>
-                          <tr>
-                            <th>Product</th>
-                            <th>Pack Size</th>
-                            <th>Units Sold</th>
-                            <th>Revenue</th>
-                          </tr>
-                        </thead>
-                        <tbody>
-                          {day.products.flatMap((p) =>
-                            (p.variants && p.variants.length > 0 ? p.variants : [{ weight: "-", unitsSold: p.unitsSold, revenue: p.revenue }]).map(
-                              (v) => (
-                                <tr key={`${p.productId}-${v.weight}`}>
-                                  <td>{p.name}</td>
-                                  <td>{v.weight}</td>
-                                  <td>{v.unitsSold}</td>
-                                  <td>{formatCurrency(v.revenue)}</td>
-                                </tr>
+                      <div className="w-full overflow-x-auto">
+                        <table className="customTable !border-0">
+                          <thead>
+                            <tr>
+                              <th>Product</th>
+                              <th>Pack Size</th>
+                              <th>Units Sold</th>
+                              <th>Revenue</th>
+                            </tr>
+                          </thead>
+                          <tbody>
+                            {day.products.flatMap((p) =>
+                              (p.variants && p.variants.length > 0 ? p.variants : [{ weight: "-", unitsSold: p.unitsSold, revenue: p.revenue }]).map(
+                                (v) => (
+                                  <tr key={`${p.productId}-${v.weight}`}>
+                                    <td>{p.name}</td>
+                                    <td>{v.weight}</td>
+                                    <td>{v.unitsSold}</td>
+                                    <td>{formatCurrency(v.revenue)}</td>
+                                  </tr>
+                                ),
                               ),
-                            ),
-                          )}
-                        </tbody>
-                      </table>
+                            )}
+                          </tbody>
+                        </table>
+                      </div>
                     </div>
                   )}
                 </div>
