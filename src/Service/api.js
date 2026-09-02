@@ -57,6 +57,7 @@ const adminApi = {
 
   // ---- customer ----
   getCustomers: () => apiJson.get(adminUrl.customer),
+  impersonateCustomer: (id) => apiJson.post(adminUrl.customerImpersonate(id)),
 
   // ---- coupon ----
   getCoupons: () => apiJson.get(adminUrl.coupon),

@@ -45,6 +45,7 @@ const adminUrl = {
 
   // customer
   customer: "/customers",
+  customerImpersonate: (id) => `/customers/${id}/impersonate`,
 
   // coupon
   coupon: "/coupons",

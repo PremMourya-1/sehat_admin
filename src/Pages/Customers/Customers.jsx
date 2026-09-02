@@ -4,7 +4,7 @@ import Table from "../../Components/Table/Table";
 import UseFilter from "../../Hooks/UseFilter";
 import usePageReload from "../../Hooks/usePageReload";
 import useCustomersColumns from "./CustomersTable";
-import { getCustomerData } from "./customerService";
+import { getCustomerData, impersonateCustomer } from "./customerService";
 
 const Customers = () => {
   const [data, setData] = useState([]);
@@ -15,7 +15,7 @@ const Customers = () => {
   const fetchCustomers = useCallback(() => getCustomerData(setData, setIsLoading), []);
   usePageReload(fetchCustomers);
 
-  const columns = useCustomersColumns();
+  const columns = useCustomersColumns({ onImpersonate: impersonateCustomer });
 
   return (
     <div>
