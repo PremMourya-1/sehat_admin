@@ -36,6 +36,27 @@
   white-space: nowrap;
 }
 
+/* Only meaningful on the off-canvas mobile panel — see SideBarHeader.jsx's
+   comment for why a dedicated close button is needed there. */
+.sidebar-mobile-close {
+  display: none;
+  margin-left: auto;
+  align-items: center;
+  justify-content: center;
+  width: 2rem;
+  height: 2rem;
+  flex-shrink: 0;
+  border-radius: 0.5rem;
+  color: var(--sidebar-text);
+  font-size: 1.15rem;
+  transition: background-color 0.15s ease, color 0.15s ease;
+}
+
+.sidebar-mobile-close:hover {
+  background-color: var(--sidebar-hover-bg);
+  color: var(--sidebar-text-active);
+}
+
 .sidebar-nav {
   flex: 1;
   overflow-y: auto;
@@ -211,5 +232,8 @@
   }
   .sidebar-backdrop {
     display: block;
+  }
+  .sidebar-mobile-close {
+    display: flex;
   }
 }

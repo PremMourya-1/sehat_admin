@@ -8,6 +8,10 @@ import { getLoggedInAdminDetails } from "../../../Store/Slices/AuthSlice";
 import { logout } from "../../../Pages/Auth/authService";
 import { cx } from "../../../Utils/utils";
 
+// Matches Styles/Sidebar.css's `@media (max-width: 992px)` off-canvas
+// breakpoint.
+const MOBILE_SIDEBAR_QUERY = "(max-width: 992px)";
+
 const Header = () => {
   const { isSidebarCollapsed, toggleSidebar, toggleMobileSidebar, colorTheme, toggleColorTheme } = useTheme();
   const { reloadCurrentPage, isReloading } = usePageData();
@@ -19,14 +23,22 @@ const Header = () => {
     await logout();
   };
 
-  // One button, two independent effects: collapses the sidebar on desktop
-  // (>992px, where it's always visible) and slides it in/out as an
-  // off-canvas panel on tablet/mobile (<=992px, where it's hidden by
-  // default) — each only has a visible effect at its own breakpoint, see
-  // Styles/Sidebar.css.
+  // One button, two DIFFERENT state variables depending on viewport: it
+  // collapses the sidebar on desktop (>992px, where it's always visible)
+  // or slides it in/out as an off-canvas panel on tablet/mobile (<=992px,
+  // where it's hidden by default) — see Styles/Sidebar.css's matching
+  // breakpoint. Deliberately toggles only ONE of them, decided by the
+  // actual viewport at click-time, not both unconditionally — firing both
+  // together (the previous behavior) let isSidebarCollapsed silently drift
+  // out of sync with reality, since closeMobileSidebar (nav-link clicks,
+  // the backdrop, the sidebar's own close button) only ever resets
+  // isMobileSidebarOpen. That drift was the root cause of the sidebar
+  // toggle feeling inconsistent — e.g. testing at desktop width, resizing
+  // down, then finding the panel already open or unresponsive.
   const handleSidebarToggle = () => {
-    toggleSidebar();
-    toggleMobileSidebar();
+    const isMobileViewport = window.matchMedia(MOBILE_SIDEBAR_QUERY).matches;
+    if (isMobileViewport) toggleMobileSidebar();
+    else toggleSidebar();
   };
 
   return (

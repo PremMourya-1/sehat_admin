@@ -15,7 +15,7 @@ const SideBar = () => {
       {isMobileSidebarOpen && <div className="sidebar-backdrop" onClick={closeMobileSidebar} />}
 
       <aside className={cx("sidebar", isSidebarCollapsed && "collapsed", isMobileSidebarOpen && "mobile-open")}>
-        <SideBarHeader collapsed={isSidebarCollapsed} />
+        <SideBarHeader collapsed={isSidebarCollapsed} onMobileClose={closeMobileSidebar} />
         <nav className="sidebar-nav">
           {adminSideBarData.map((item, index) => {
             const isNewGroup = item.group && item.group !== adminSideBarData[index - 1]?.group;
