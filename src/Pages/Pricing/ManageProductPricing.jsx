@@ -136,7 +136,9 @@ const ManageProductPricing = () => {
         />
       ),
     },
-    { key: "name", label: "Name" },
+    // Pinned on scroll (see Table.jsx's `sticky` doc comment) — same
+    // reasoning as ProductTable.jsx's own Name column.
+    { key: "name", label: "Name", sticky: true },
     // No `as` alias on the Product<->Category association (see
     // ProductTable.jsx's own comment on this) — the default key is
     // "Category" (capitalized), not "category".

@@ -76,7 +76,11 @@ const Review = () => {
         <div className="flex flex-col gap-3">
           {data.map((review) => (
             <Card key={review.id}>
-              <div className="flex items-start justify-between gap-4">
+              {/* Row on desktop; stacked on mobile — same reasoning as
+                  Pages/Faq/Faq.jsx's identical layout (a fixed-width
+                  actions cluster squeezing this card's, here even richer,
+                  content column on a phone). */}
+              <div className="flex items-start justify-between gap-4 md:flex-col">
                 <div className="min-w-0">
                   <div className="flex flex-wrap items-center gap-2">
                     <h3 className="section-title">{review.Product?.name || "Unknown product"}</h3>

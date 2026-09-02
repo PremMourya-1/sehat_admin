@@ -85,6 +85,45 @@
   padding: 1.5rem;
 }
 
+/* Components/Drawer/Drawer.jsx already renders its own close button (top
+   right, next to the title) and passes `closeButton={false}` specifically
+   to suppress rsuite's native one — but rsuite still renders it regardless
+   (forwarded to the underlying Modal, which adds it independently of that
+   prop in this version). Went unnoticed only because it used to render
+   off-screen along with the rest of a too-wide drawer on mobile (see the
+   width fix above) — now that the drawer fits the viewport, the redundant
+   second close button became visible too. Hidden outright since a working
+   close button already exists. */
+.rs-drawer-header-close {
+  display: none !important;
+}
+/* Same rsuite quirk, same fix — Components/Modal/Modal.jsx has the
+   identical `closeButton={false}` + own custom close button pattern. */
+.rs-modal-header-close {
+  display: none !important;
+}
+
+/* rsuite's drawer sizes (xs/sm/md/lg) are hardcoded pixel widths that don't
+   adapt on their own — `size="sm"` used throughout (Category, Coupon, Hero
+   Banner, Testimonial, Cart Reward, CMS, Shipping Zone forms) is 600px,
+   nearly double a phone's viewport. Anchored `right: 0`, a too-wide drawer
+   doesn't just get clipped — its LEFT portion (labels, the start of every
+   input) renders off-screen past the left edge entirely, unreachable. Below
+   the tablet breakpoint every drawer size becomes full viewport width
+   instead, same as the off-canvas mobile sidebar pattern. */
+@media (max-width: 992px) {
+  .rs-drawer.rs-drawer-xs,
+  .rs-drawer.rs-drawer-sm,
+  .rs-drawer.rs-drawer-md,
+  .rs-drawer.rs-drawer-lg,
+  .rs-drawer.rs-drawer-xs .rs-drawer-content,
+  .rs-drawer.rs-drawer-sm .rs-drawer-content,
+  .rs-drawer.rs-drawer-md .rs-drawer-content,
+  .rs-drawer.rs-drawer-lg .rs-drawer-content {
+    width: 100vw !important;
+  }
+}
+
 /* rsuite checkbox / toggle accent */
 .rs-checkbox-checked .rs-checkbox-wrapper .rs-checkbox-inner::before {
   background-color: var(--primary) !important;

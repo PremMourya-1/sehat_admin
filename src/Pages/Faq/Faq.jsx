@@ -76,7 +76,12 @@ const Faq = () => {
         <div className="flex flex-col gap-3">
           {data.map((faq) => (
             <Card key={faq.id}>
-              <div className="flex items-start justify-between gap-4">
+              {/* Row on desktop; stacked on mobile — the actions cluster
+                  (checkbox + edit + delete) is a fixed ~170px regardless of
+                  screen width, which on a phone squeezed the question/answer
+                  text into a narrow leftover column, wrapping far more than
+                  necessary. */}
+              <div className="flex items-start justify-between gap-4 md:flex-col">
                 <div>
                   <h3 className="section-title">{faq.question}</h3>
                   <p className="mt-1 text-sm text-muted">{faq.answer}</p>
