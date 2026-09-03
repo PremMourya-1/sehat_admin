@@ -26,7 +26,12 @@ export async function impersonateCustomer(customerId) {
   try {
     const res = await adminApi.impersonateCustomer(customerId);
     if (res.data.action) {
-      const url = `${import.meta.env.VITE_STORE_FRONT_URL}/api/impersonate?token=${encodeURIComponent(res.data.data.token)}`;
+      // Falls back to the production storefront if VITE_STORE_FRONT_URL isn't
+      // baked into this build (Vite env vars are build-time only) — without
+      // this, a missing var silently produces "undefined/api/impersonate",
+      // which the browser resolves relative to admin.sehatpotli.in -> 404.
+      const storeFrontUrl = import.meta.env.VITE_STORE_FRONT_URL || "https://sehatpotli.in";
+      const url = `${storeFrontUrl}/api/impersonate?token=${encodeURIComponent(res.data.data.token)}`;
       if (newTab) newTab.location.href = url;
       else window.open(url, "_blank");
     } else {
