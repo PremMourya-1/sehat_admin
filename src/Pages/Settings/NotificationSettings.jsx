@@ -1,4 +1,5 @@
 import { useCallback, useState } from "react";
+import { FiAlertTriangle } from "react-icons/fi";
 import Card from "../../Components/Card/Card";
 import PreLoader from "../../Components/Common/Loader/PreLoader";
 import LoaderSpiner from "../../Components/Common/Loader/LoaderSpiner";
@@ -6,6 +7,7 @@ import usePageReload from "../../Hooks/usePageReload";
 import { useSettings } from "../../Context/SettingsContext";
 import { useNotifications } from "../../Context/NotificationContext";
 import { updateWebSettings } from "./webSettingsService";
+import { sendTestWhatsappMessage } from "./whatsappSettingsService";
 
 const TOGGLES = [
   {
@@ -38,6 +40,16 @@ const CHANNEL_OPTIONS = [
   },
 ];
 
+// The 4 order-status events that have an admin-configurable WhatsApp
+// template (see WhatsAppSettings.jsx) — same keys the backend's
+// TEST_PARAMS_BY_EVENT (utils/whatsapp.js) has dummy data for.
+const TEST_EVENT_OPTIONS = [
+  { value: "orderConfirmed", label: "Order Placed / Confirmed" },
+  { value: "orderDispatched", label: "Order Dispatched" },
+  { value: "orderOutForDelivery", label: "Out for Delivery" },
+  { value: "orderDelivered", label: "Delivered" },
+];
+
 // These three only gate the *extra* delivery channels layered on top of the
 // bell/drawer notification (Part 2) — that one is always on regardless.
 // Reads/writes through the same SettingsContext row as the General tab
@@ -47,6 +59,10 @@ const NotificationSettings = () => {
   const { browserPermission } = useNotifications();
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [isSavingChannel, setIsSavingChannel] = useState(false);
+  const [testPhone, setTestPhone] = useState("");
+  const [testEvent, setTestEvent] = useState(TEST_EVENT_OPTIONS[0].value);
+  const [isSendingTest, setIsSendingTest] = useState(false);
+  const [lastTestResult, setLastTestResult] = useState(null);
 
   const fetchSettings = useCallback(() => refetchSettings(), [refetchSettings]);
   usePageReload(fetchSettings);
@@ -59,6 +75,19 @@ const NotificationSettings = () => {
 
   const handleChannelChange = async (value) => {
     await updateWebSettings({ notificationChannel: value }, setSettings, setIsSavingChannel);
+  };
+
+  const handleSendTest = async () => {
+    const digits = testPhone.replace(/\D/g, "");
+    if (digits.length !== 10) {
+      setLastTestResult({ message: "Enter a valid 10-digit mobile number.", isError: true });
+      return;
+    }
+    const result = await sendTestWhatsappMessage(digits, testEvent, setIsSendingTest);
+    setLastTestResult({
+      message: result.success ? result.message : `Send FAILED: ${result.error}`,
+      isError: !result.success,
+    });
   };
 
   if (isLoading) return <PreLoader />;
@@ -153,6 +182,70 @@ const NotificationSettings = () => {
           {isSavingChannel && <LoaderSpiner size={16} />}
         </div>
       </Card>
+
+      {/* For testing only — sends one of the 4 order-status WhatsApp
+          templates, with dummy placeholder data, straight to any number.
+          Doesn't touch a real order or require one to exist. The whole
+          point is showing the real Meta error (unapproved template, bad
+          credentials, missing send permission) right here instead of it
+          only ever being logged server-side — see
+          memory/whatsapp_integration_architecture.md's round 1-3 for the
+          kinds of issues this is meant to surface quickly. */}
+      <div
+        className="card"
+        style={{ border: "1px dashed var(--warning, #d97706)", background: "var(--warning-tp, #d9770611)" }}
+      >
+        <h3 className="section-title mb-1 flex items-center gap-1.5" style={{ color: "var(--warning, #d97706)" }}>
+          <FiAlertTriangle size={15} /> Send Test WhatsApp Message
+        </h3>
+        <p className="mb-4 text-xs text-muted">
+          Sends the selected event&apos;s approved template, with dummy order data, to any WhatsApp number — use this
+          to confirm templates are actually delivering before relying on real orders.
+        </p>
+
+        <div className="flex flex-col gap-2">
+          <input
+            type="tel"
+            className="inputBox"
+            placeholder="10-digit mobile number"
+            value={testPhone}
+            onChange={(e) => setTestPhone(e.target.value)}
+            disabled={isSendingTest}
+            maxLength={10}
+          />
+          <div className="flex flex-col gap-2 sm:flex-row">
+            <select
+              value={testEvent}
+              onChange={(e) => setTestEvent(e.target.value)}
+              className="inputBox flex-1"
+              disabled={isSendingTest}
+            >
+              {TEST_EVENT_OPTIONS.map((option) => (
+                <option key={option.value} value={option.value}>
+                  {option.label}
+                </option>
+              ))}
+            </select>
+            <button
+              type="button"
+              className="btn-primary !px-4 !py-1.5 !text-sm"
+              onClick={handleSendTest}
+              disabled={isSendingTest}
+            >
+              {isSendingTest ? <LoaderSpiner size={16} /> : "Send Test Message"}
+            </button>
+          </div>
+        </div>
+
+        {lastTestResult && (
+          <p
+            className="mt-3 text-xs"
+            style={lastTestResult.isError ? { color: "var(--danger, #dc2626)" } : { color: "var(--muted)" }}
+          >
+            {lastTestResult.message}
+          </p>
+        )}
+      </div>
     </div>
   );
 };

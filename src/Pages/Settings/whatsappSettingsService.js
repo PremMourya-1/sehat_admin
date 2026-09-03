@@ -34,3 +34,23 @@ export async function updateWhatsappSettings(config, setData, setIsSubmitting) {
     setIsSubmitting(false);
   }
 }
+
+// Sends one of the 4 order-status templates, with dummy placeholder data,
+// straight to `phoneNumber` — for the "Send Test Message" panel on Settings
+// > Notifications. Unlike every other service function on this page, the
+// failure branch here does NOT toast a generic message — it returns the
+// real Meta error text (unapproved template, bad phone number ID, missing
+// send permission, etc.) so the caller can show the admin exactly why a
+// real order's message would also fail.
+export async function sendTestWhatsappMessage(phoneNumber, event, setIsSending) {
+  try {
+    setIsSending(true);
+    const res = await adminApi.sendTestWhatsappTemplate({ phoneNumber, event });
+    if (res.data.action) return { success: true, message: res.data.message };
+    return { success: false, error: res.data.message || "Test message failed to send" };
+  } catch (e) {
+    return { success: false, error: e?.response?.data?.message || "Test message failed to send" };
+  } finally {
+    setIsSending(false);
+  }
+}

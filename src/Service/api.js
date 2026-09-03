@@ -115,6 +115,7 @@ const adminApi = {
   // ---- integration settings ----
   getIntegrationSettings: (key) => apiJson.get(adminUrl.integrationSettings(key)),
   updateIntegrationSettings: (key, data) => apiJson.put(adminUrl.integrationSettings(key), data),
+  sendTestWhatsappTemplate: (data) => apiJson.post(adminUrl.whatsappTestSend, data),
 
   // ---- web settings ----
   getWebSettings: () => apiJson.get(adminUrl.webSettings),

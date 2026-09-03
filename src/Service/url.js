@@ -86,6 +86,7 @@ const adminUrl = {
 
   // integration settings (Shiprocket today; generic by key for future integrations)
   integrationSettings: (key) => `/integrations/${key}`,
+  whatsappTestSend: "/integrations/whatsapp/test-send",
 
   // web settings (site-wide business settings — COD toggle, notification delivery channels)
   webSettings: "/web-settings",
