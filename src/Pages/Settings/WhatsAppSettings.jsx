@@ -20,6 +20,16 @@ const DEFAULT_TEMPLATE_NAMES = {
   orderDelivered: "order_delivered",
 };
 
+// Mirrors backend utils/whatsapp.js's TEMPLATE_LANGUAGE — same pre-fill-only
+// reasoning as DEFAULT_TEMPLATE_NAMES above. Meta rejects a send with error
+// 132001 ("Template name does not exist in the translation") if this
+// doesn't exactly match the language the template was actually APPROVED
+// under in WhatsApp Manager (a template submitted by hand there commonly
+// ends up "English" / en rather than "English (US)" / en_US unless that's
+// deliberately picked) — check the Language column next to each template
+// in WhatsApp Manager > Message Templates if a test send fails with 132001.
+const DEFAULT_TEMPLATE_LANGUAGE = "en_US";
+
 // Credentials live in the DB (IntegrationSettings, integrationKey
 // "whatsapp"), same reason as every other integration here. accessToken and
 // webhookVerifyToken are write-only — the API only ever sends back
@@ -52,6 +62,7 @@ const WhatsAppSettings = () => {
       orderDispatchedTemplate: "",
       orderOutForDeliveryTemplate: "",
       orderDeliveredTemplate: "",
+      templateLanguage: "",
     },
   });
 
@@ -70,6 +81,7 @@ const WhatsAppSettings = () => {
         orderDispatchedTemplate: templates.orderDispatched || DEFAULT_TEMPLATE_NAMES.orderDispatched,
         orderOutForDeliveryTemplate: templates.orderOutForDelivery || DEFAULT_TEMPLATE_NAMES.orderOutForDelivery,
         orderDeliveredTemplate: templates.orderDelivered || DEFAULT_TEMPLATE_NAMES.orderDelivered,
+        templateLanguage: settings.config?.templateLanguage || DEFAULT_TEMPLATE_LANGUAGE,
       });
     }
   }, [settings, reset]);
@@ -87,6 +99,7 @@ const WhatsAppSettings = () => {
         orderOutForDelivery: values.orderOutForDeliveryTemplate.trim() || DEFAULT_TEMPLATE_NAMES.orderOutForDelivery,
         orderDelivered: values.orderDeliveredTemplate.trim() || DEFAULT_TEMPLATE_NAMES.orderDelivered,
       },
+      templateLanguage: values.templateLanguage.trim() || DEFAULT_TEMPLATE_LANGUAGE,
     };
     if (values.accessToken) config.accessToken = values.accessToken;
     if (values.webhookVerifyToken) config.webhookVerifyToken = values.webhookVerifyToken;
@@ -201,6 +214,21 @@ const WhatsAppSettings = () => {
               error={errors.orderDeliveredTemplate}
               required
             />
+            <InputBox
+              label="Template Language Code"
+              name="templateLanguage"
+              type="text"
+              register={register}
+              rules={{ required: "Language code is required" }}
+              error={errors.templateLanguage}
+              placeholder="e.g. en_US, en, en_GB"
+              required
+            />
+            <p className="mb-4 -mt-2 text-xs text-muted">
+              Must exactly match the language each template is APPROVED under in WhatsApp Manager &gt; Message
+              Templates (see the Language column there) — a mismatch here is what error{" "}
+              <code>#132001 &quot;Template name does not exist in the translation&quot;</code> means.
+            </p>
 
             <button type="submit" className="btn-primary w-full" disabled={isSubmitting}>
               {isSubmitting ? <LoaderSpiner size={18} /> : "Save Settings"}
