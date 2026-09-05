@@ -13,14 +13,12 @@ const TOGGLES = [
   {
     key: "chromePushEnabled",
     label: "Browser (Chrome) Push Notifications",
-    description:
-      "Shows a native browser notification for new orders, even if the admin panel tab isn't focused.",
+    description: "Shows a native browser notification for new orders, even if the admin panel tab isn't focused.",
   },
   {
     key: "toastPopupEnabled",
     label: "Toast Popup",
-    description:
-      "Shows an in-app toast in the top-right corner when a new order comes in.",
+    description: "Shows an in-app toast in the top-right corner when a new order comes in.",
   },
   {
     key: "soundEnabled",
@@ -46,17 +44,12 @@ const CHANNEL_OPTIONS = [
 // template (see WhatsAppSettings.jsx) — same keys the backend's
 // TEST_PARAMS_BY_EVENT (utils/whatsapp.js) has dummy data for.
 const TEST_EVENT_OPTIONS = [
-  { value: "hello_world", label: "Hello, World!" },
   { value: "orderConfirmed", label: "Order Placed / Confirmed" },
   { value: "orderDispatched", label: "Order Dispatched" },
   { value: "orderOutForDelivery", label: "Out for Delivery" },
   { value: "orderDelivered", label: "Delivered" },
 ];
 
-// These three only gate the *extra* delivery channels layered on top of the
-// bell/drawer notification (Part 2) — that one is always on regardless.
-// Reads/writes through the same SettingsContext row as the General tab
-// (WebSetting's "notifications" key — see utils/webSettings.js).
 // This admin's own browser remembers the last number tested here (not
 // synced anywhere — purely a "don't retype it every time" convenience for
 // whoever is sitting at this machine), so it survives a refresh/reopen of
@@ -72,6 +65,10 @@ function readStoredTestPhone() {
   }
 }
 
+// These three only gate the *extra* delivery channels layered on top of the
+// bell/drawer notification (Part 2) — that one is always on regardless.
+// Reads/writes through the same SettingsContext row as the General tab
+// (WebSetting's "notifications" key — see utils/webSettings.js).
 const NotificationSettings = () => {
   const { settings, isLoading, refetchSettings, setSettings } = useSettings();
   const { browserPermission } = useNotifications();
@@ -88,19 +85,11 @@ const NotificationSettings = () => {
   const toggles = settings?.notifications || {};
 
   const handleToggle = (key) => async (event) => {
-    await updateWebSettings(
-      { notifications: { [key]: event.target.checked } },
-      setSettings,
-      setIsSubmitting,
-    );
+    await updateWebSettings({ notifications: { [key]: event.target.checked } }, setSettings, setIsSubmitting);
   };
 
   const handleChannelChange = async (value) => {
-    await updateWebSettings(
-      { notificationChannel: value },
-      setSettings,
-      setIsSavingChannel,
-    );
+    await updateWebSettings({ notificationChannel: value }, setSettings, setIsSavingChannel);
   };
 
   const handleTestPhoneChange = (e) => {
@@ -116,17 +105,10 @@ const NotificationSettings = () => {
   const handleSendTest = async () => {
     const digits = testPhone.replace(/\D/g, "");
     if (digits.length !== 10) {
-      setLastTestResult({
-        message: "Enter a valid 10-digit mobile number.",
-        isError: true,
-      });
+      setLastTestResult({ message: "Enter a valid 10-digit mobile number.", isError: true });
       return;
     }
-    const result = await sendTestWhatsappMessage(
-      digits,
-      testEvent,
-      setIsSendingTest,
-    );
+    const result = await sendTestWhatsappMessage(digits, testEvent, setIsSendingTest);
     setLastTestResult({
       message: result.success ? result.message : `Send FAILED: ${result.error}`,
       isError: !result.success,
@@ -144,8 +126,8 @@ const NotificationSettings = () => {
       <Card>
         <h3 className="section-title mb-4">Order Notification Delivery</h3>
         <p className="mb-4 text-xs text-muted">
-          The bell icon and notification drawer always show new orders — these
-          toggles control extra ways to get alerted on top of that.
+          The bell icon and notification drawer always show new orders — these toggles control extra ways to get
+          alerted on top of that.
         </p>
 
         <div className="flex flex-col gap-3">
@@ -156,33 +138,20 @@ const NotificationSettings = () => {
               style={{ borderColor: "var(--border)" }}
             >
               <div>
-                <p
-                  className="text-sm font-medium"
-                  style={{ color: "var(--text)" }}
-                >
+                <p className="text-sm font-medium" style={{ color: "var(--text)" }}>
                   {toggle.label}
                 </p>
                 <p className="text-xs text-muted">{toggle.description}</p>
-                {toggle.key === "chromePushEnabled" &&
-                  toggles.chromePushEnabled &&
-                  browserPermission === "denied" && (
-                    <p
-                      className="mt-1 text-xs font-medium"
-                      style={{ color: "var(--danger, #dc2626)" }}
-                    >
-                      Blocked at the browser level — this admin has denied
-                      notification permission for this site. Enable it from the
-                      browser&apos;s site settings (usually the padlock icon
-                      next to the address bar) for push notifications to
-                      actually show.
-                    </p>
-                  )}
-                {toggle.key === "chromePushEnabled" &&
-                  browserPermission === "unsupported" && (
-                    <p className="mt-1 text-xs text-muted">
-                      This browser doesn&apos;t support push notifications.
-                    </p>
-                  )}
+                {toggle.key === "chromePushEnabled" && toggles.chromePushEnabled && browserPermission === "denied" && (
+                  <p className="mt-1 text-xs font-medium" style={{ color: "var(--danger, #dc2626)" }}>
+                    Blocked at the browser level — this admin has denied notification permission for this site.
+                    Enable it from the browser&apos;s site settings (usually the padlock icon next to the address
+                    bar) for push notifications to actually show.
+                  </p>
+                )}
+                {toggle.key === "chromePushEnabled" && browserPermission === "unsupported" && (
+                  <p className="mt-1 text-xs text-muted">This browser doesn&apos;t support push notifications.</p>
+                )}
               </div>
               <span className="flex flex-shrink-0 items-center gap-2">
                 {isSubmitting && <LoaderSpiner size={16} />}
@@ -202,9 +171,8 @@ const NotificationSettings = () => {
       <Card>
         <h3 className="section-title mb-1">Active Notification Channel</h3>
         <p className="mb-4 text-xs text-muted">
-          Determines which channel new orders use for status notifications.
-          Existing orders keep using whichever channel was active when they were
-          placed.
+          Determines which channel new orders use for status notifications. Existing orders keep using whichever
+          channel was active when they were placed.
         </p>
 
         <div className="flex flex-col gap-2 sm:flex-row">
@@ -214,31 +182,22 @@ const NotificationSettings = () => {
               className="flex flex-1 cursor-pointer items-start gap-3 rounded-lg border p-3"
               style={{
                 borderColor:
-                  (settings?.notificationChannel || "email") === option.value
-                    ? "var(--primary)"
-                    : "var(--border)",
+                  (settings?.notificationChannel || "email") === option.value ? "var(--primary)" : "var(--border)",
                 backgroundColor:
-                  (settings?.notificationChannel || "email") === option.value
-                    ? "var(--primary-tp)"
-                    : "transparent",
+                  (settings?.notificationChannel || "email") === option.value ? "var(--primary-tp)" : "transparent",
               }}
             >
               <input
                 type="radio"
                 name="notificationChannel"
                 value={option.value}
-                checked={
-                  (settings?.notificationChannel || "email") === option.value
-                }
+                checked={(settings?.notificationChannel || "email") === option.value}
                 onChange={() => handleChannelChange(option.value)}
                 disabled={isSavingChannel}
                 className="mt-1 h-4 w-4"
               />
               <span>
-                <p
-                  className="text-sm font-medium"
-                  style={{ color: "var(--text)" }}
-                >
+                <p className="text-sm font-medium" style={{ color: "var(--text)" }}>
                   {option.title}
                 </p>
                 <p className="text-xs text-muted">{option.desc}</p>
@@ -249,23 +208,24 @@ const NotificationSettings = () => {
         </div>
       </Card>
 
+      {/* For testing only — sends one of the 4 order-status WhatsApp
+          templates, with dummy placeholder data, straight to any number.
+          Doesn't touch a real order or require one to exist. The whole
+          point is showing the real Meta error (unapproved template, bad
+          credentials, missing send permission) right here instead of it
+          only ever being logged server-side — see
+          memory/whatsapp_integration_architecture.md's round 1-3 for the
+          kinds of issues this is meant to surface quickly. */}
       <div
         className="card"
-        style={{
-          border: "1px dashed var(--warning, #d97706)",
-          background: "var(--warning-tp, #d9770611)",
-        }}
+        style={{ border: "1px dashed var(--warning, #d97706)", background: "var(--warning-tp, #d9770611)" }}
       >
-        <h3
-          className="section-title mb-1 flex items-center gap-1.5"
-          style={{ color: "var(--warning, #d97706)" }}
-        >
+        <h3 className="section-title mb-1 flex items-center gap-1.5" style={{ color: "var(--warning, #d97706)" }}>
           <FiAlertTriangle size={15} /> Send Test WhatsApp Message
         </h3>
         <p className="mb-4 text-xs text-muted">
-          Sends the selected event&apos;s approved template, with dummy order
-          data, to any WhatsApp number — use this to confirm templates are
-          actually delivering before relying on real orders.
+          Sends the selected event&apos;s approved template, with dummy order data, to any WhatsApp number — use this
+          to confirm templates are actually delivering before relying on real orders.
         </p>
 
         <div className="flex flex-col gap-2">
@@ -305,11 +265,7 @@ const NotificationSettings = () => {
         {lastTestResult && (
           <p
             className="mt-3 text-xs"
-            style={
-              lastTestResult.isError
-                ? { color: "var(--danger, #dc2626)" }
-                : { color: "var(--muted)" }
-            }
+            style={lastTestResult.isError ? { color: "var(--danger, #dc2626)" } : { color: "var(--muted)" }}
           >
             {lastTestResult.message}
           </p>
